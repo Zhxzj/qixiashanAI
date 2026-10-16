@@ -1,0 +1,463 @@
+/* 栖霞山小向导 · 前端（M3/M4）
+ * 对话（SSE 流式）+ 示意地图 + 到点自动播报 + 演示控制台 + 剧本模式。
+ */
+const SID = localStorage.getItem("qixi_sid") || "demo";
+localStorage.setItem("qixi_sid", SID);
+const $ = (s) => document.querySelector(s);
+let DATA = { pois: [], routes: [] };
+
+const TOOL_LABELS = {
+  get_location: "位置",
+  list_nearby: "周边",
+  get_poi: "讲解资料",
+  plan_route: "路线",
+  navigate_hint: "导航提示",
+  save_memory: "记住此刻",
+  get_conditions: "天气与红叶",
+};
+
+const state = {
+  visits: {},      // 此次会话内每点驻足次数（进入 35m 内计数）
+  speaking: null,  // 正在播报的信息
+  voiceOn: true,   // 游客是否允许开口（"别念了"后置 false）
+  scriptRunning: false,
+};
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  return r.json();
+}
+
+// ---------- 初始化 ----------
+
+async function init() {
+  DATA = await api("/api/data");
+  fillPoiSelect();
+  await refreshState();
+  await refreshConditions();
+  const h = await api("/api/health");
+  setKeyStatus(!!h.key_configured);
+}
+
+function setKeyStatus(ok) {
+  const el = $("#keyStatus");
+  el.textContent = ok ? "Key 已配置" : "未配置 Key";
+  el.classList.toggle("ok", ok);
+}
+
+function fillPoiSelect() {
+  $("#poiSelect").innerHTML = DATA.pois
+    .map((p) => `<option value="${p.poi_id}">${p.name}</option>`)
+    .join("");
+}
+
+async function refreshState() {
+  const st = await api(`/api/state?session_id=${SID}`);
+  renderMap(st);
+  renderStateInfo(st);
+  renderTripMini(st);
+  return st;
+}
+
+function renderStateInfo(st) {
+  const loc = st.location || {};
+  const snapped = loc.snapped || {};
+  const poi = DATA.pois.find((p) => p.poi_id === snapped.poi_id);
+  $("#stateInfo").textContent = `${Number(loc.lat).toFixed(4)}, ${Number(loc.lng).toFixed(4)}${
+    poi ? " · 在" + poi.name : ""
+  }`;
+}
+
+function renderTripMini(st) {
+  const visited = st.visited || [];
+  const memories = st.memory || [];
+  if (!visited.length) {
+    $("#tripMini").textContent = "走到哪儿，这里就记到哪儿。";
+    return;
+  }
+  const names = visited
+    .map((v) => (DATA.pois.find((p) => p.poi_id === v.poi_id) || {}).name || v.poi_id)
+    .map((n) => `<span class="chip">${n}</span>`)
+    .join("");
+  const mem = memories.length ? `<div class="muted">记下 ${memories.length} 条</div>` : "";
+  $("#tripMini").innerHTML = names + mem;
+}
+
+// ---------- 地图 ----------
+
+function renderMap(st) {
+  const box = $("#mapBox");
+  const pts = [];
+  DATA.routes.forEach((r) => (r.geometry || []).forEach((g) => pts.push(g)));
+  DATA.pois.forEach((p) => pts.push(p.coord));
+  if (!pts.length) return;
+  const lats = pts.map((p) => p[0]);
+  const lngs = pts.map((p) => p[1]);
+  const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+  const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+  const W = 320, H = 360, pad = 26;
+  const sx = (lng) => pad + ((lng - minLng) / (maxLng - minLng || 1)) * (W - pad * 2);
+  const sy = (lat) => H - pad - ((lat - minLat) / (maxLat - minLat || 1)) * (H - pad * 2);
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+  const activeId = (st && st.route && st.route.route_id) || "";
+  DATA.routes.forEach((r) => {
+    const ptsStr = (r.geometry || [])
+      .map((g) => `${sx(g[1]).toFixed(1)},${sy(g[0]).toFixed(1)}`)
+      .join(" ");
+    svg += `<polyline points="${ptsStr}" class="route ${r.route_id} ${
+      r.route_id === activeId ? "active" : ""
+    }" />`;
+  });
+  DATA.pois.forEach((p) => {
+    const [lat, lng] = p.coord;
+    const x = sx(lng).toFixed(1), y = sy(lat).toFixed(1);
+    const visited = (st.visited || []).some((v) => v.poi_id === p.poi_id);
+    svg += `<circle cx="${x}" cy="${y}" r="${visited ? 4.2 : 3.2}" class="poi${
+      visited ? " visited" : ""
+    }" />`;
+    svg += `<text x="${Number(x) + 6}" y="${Number(y) + 3}" class="poi-label">${p.name}</text>`;
+  });
+  if (st && st.location) {
+    svg += `<circle cx="${sx(st.location.lng).toFixed(1)}" cy="${sy(st.location.lat).toFixed(
+      1
+    )}" r="6" class="me" />`;
+  }
+  svg += "</svg>";
+  box.innerHTML = svg;
+}
+
+// ---------- 对话 ----------
+
+function addMsg(role, text) {
+  const div = document.createElement("div");
+  div.className = `msg ${role}`;
+  div.textContent = text;
+  $("#messages").appendChild(div);
+  $("#messages").scrollTop = $("#messages").scrollHeight;
+  return div;
+}
+
+function addNote(text) {
+  const div = document.createElement("div");
+  div.className = "note";
+  div.textContent = text;
+  $("#messages").appendChild(div);
+  $("#messages").scrollTop = $("#messages").scrollHeight;
+  return div;
+}
+
+async function sendChat(text) {
+  if (!text.trim()) return;
+  addMsg("user", text);
+  const bubble = addMsg("ai", "");
+  let note = null;
+  try {
+    const resp = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: SID, text }),
+    });
+    if (!resp.ok || !resp.body) {
+      bubble.textContent = "服务出问题了，稍后再试。";
+      return;
+    }
+    const reader = resp.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let idx;
+      while ((idx = buf.indexOf("\n\n")) >= 0) {
+        const chunk = buf.slice(0, idx);
+        buf = buf.slice(idx + 2);
+        if (!chunk.startsWith("data:")) continue;
+        let ev;
+        try {
+          ev = JSON.parse(chunk.slice(5).trim());
+        } catch {
+          continue;
+        }
+        if (ev.type === "delta") bubble.textContent += ev.text;
+        else if (ev.type === "tool_start") {
+          note = addNote(`小栖去查一下（${TOOL_LABELS[ev.name] || ev.name}）…`);
+        } else if (ev.type === "tool_end" && note) {
+          note.textContent = `查好了（${TOOL_LABELS[ev.name] || ev.name}）`;
+          note = null;
+        } else if (ev.type === "error") {
+          bubble.textContent += (bubble.textContent ? "\n" : "") + ev.message;
+          bubble.classList.add("err");
+        }
+      }
+    }
+    if (!bubble.textContent) bubble.textContent = "……";
+  } catch (e) {
+    bubble.textContent = "网络断了，再试一次。";
+  } finally {
+    refreshState();
+  }
+}
+
+// ---------- 到点自动播报（决策 #17） ----------
+
+function speak(text) {
+  if (!state.voiceOn) return false;
+  stopVoice();
+  const src = state.speaking && state.speaking.audio_url;
+  if (src) {
+    const a = new Audio(src);
+    a.play().catch(() => {
+      speakBrowser(text);
+      promptManualPlay(src);
+    });
+    state.speaking = { ...(state.speaking || {}), el: a };
+    return true;
+  }
+  return speakBrowser(text);
+}
+
+function speakBrowser(text) {
+  if (!window.speechSynthesis || !text) return false;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "zh-CN";
+  u.rate = 0.95;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(u);
+  return true;
+}
+
+function stopVoice() {
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  const el = state.speaking && state.speaking.el;
+  if (el && el.pause) {
+    el.pause();
+    el.currentTime = 0;
+  }
+  state.speaking = null;
+}
+
+let manualPromptShown = false;
+function promptManualPlay(src) {
+  if (manualPromptShown) return;
+  manualPromptShown = true;
+  const n = addNote("浏览器挡了自动播放，点这里播一次：");
+  const b = document.createElement("button");
+  b.className = "chip-btn";
+  b.textContent = "▶ 播放语音";
+  b.onclick = () => new Audio(src).play();
+  n.appendChild(b);
+}
+
+function typeInto(el, text, speed = 30) {
+  el.textContent = "";
+  return new Promise((res) => {
+    let i = 0;
+    const t = setInterval(() => {
+      el.textContent = text.slice(0, ++i);
+      if (i >= text.length) {
+        clearInterval(t);
+        res();
+      }
+    }, speed);
+  });
+}
+
+async function showArrival(info, meters) {
+  const card = $("#arrivedCard");
+  card.style.display = "block";
+  $("#arrivedName").textContent = "到点播报 · " + info.name;
+  $("#arrivedPoi").textContent = meters != null ? `${meters} 米内` : "";
+  state.speaking = info;
+  await typeInto($("#arrivedText"), info.line || info.name, 26);
+  speak(info.line || "");
+  addNote(`到点播报｜${info.name}：${info.line || ""}`);
+}
+
+async function onArrive(info, meters) {
+  if (!info) return;
+  if (!state.voiceOn) {
+    $("#arrivedCard").style.display = "block";
+    $("#arrivedName").textContent = "到点 · " + info.name;
+    $("#arrivedPoi").textContent = "安静模式：不播报";
+    $("#arrivedText").textContent = info.name;
+    return;
+  }
+  await showArrival(info, meters);
+}
+
+function dwellCheck(poiId) {
+  if (!poiId) return false;
+  state.visits[poiId] = (state.visits[poiId] || 0) + 1;
+  return state.visits[poiId] >= 2; // 连推两次位置（约等于停留 8 秒）才算到点
+}
+
+// ---------- 演示控制台 ----------
+
+async function demoCall(path, payload, opts = {}) {
+  const r = await api(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (r.error) {
+    addNote("控制台：" + r.error);
+    return r;
+  }
+  if (r.state) {
+    renderMap(r.state);
+    renderStateInfo(r.state);
+    renderTripMini(r.state);
+  }
+  if (r.arrived) {
+    const meters = Math.round((r.state.location.snapped || {}).distance_m || 0);
+    const ready = dwellCheck(r.arrived.poi_id) || opts.immediate;
+    if (ready) await onArrive(r.arrived, meters);
+  }
+  return r;
+}
+
+// 剧本模式：一键走 golden path
+const SCRIPT = [
+  { hint: "行前：小栖给明天上午的半日安排", wait: 6, run: () => sendChat("明天上午到，想看红叶，也看千佛岩，怎么安排？") },
+  { hint: "上山：从山门走到明镜湖", wait: 8, run: () => demoCall("/api/demo/goto", { session_id: SID, poi_id: "mingjinghu" }, { immediate: true }) },
+  { hint: "继续走到栖霞寺", wait: 8, run: () => demoCall("/api/demo/goto", { session_id: SID, poi_id: "qixiasi" }, { immediate: true }) },
+  { hint: "再上石阶，到千佛岩", wait: 8, run: () => demoCall("/api/demo/goto", { session_id: SID, poi_id: "qianfoyan" }, { immediate: true }) },
+  { hint: "追问：讲讲最大那尊", wait: 7, run: () => sendChat("讲讲最大那尊") },
+  { hint: "累了：结合天气和红叶重规划", wait: 9, run: () => sendChat("我有点累了，想看红叶，今天天气怎么样，怎么走最快？") },
+  { hint: "记住此刻", wait: 5, run: () => sendChat("帮我记住这里，风从石缝里过，很凉") },
+];
+
+async function runScript() {
+  if (state.scriptRunning) return;
+  state.scriptRunning = true;
+  const btn = $("#scriptBtn");
+  btn.textContent = "剧本进行中…";
+  const hint = $("#scriptHint");
+  hint.hidden = false;
+  for (let i = 0; i < SCRIPT.length; i++) {
+    const step = SCRIPT[i];
+    hint.textContent = `第 ${i + 1}/${SCRIPT.length} 步 · ${step.hint}`;
+    try {
+      await step.run();
+    } catch (e) {
+      hint.textContent = `第 ${i + 1} 步出错了：${e.message}`;
+      break;
+    }
+    await new Promise((r) => setTimeout(r, step.wait * 1000));
+  }
+  hint.textContent = "剧本走完 · 现在去写今天的日记 ";
+  const b = document.createElement("button");
+  b.className = "chip-btn";
+  b.textContent = "打开发日记 →";
+  b.onclick = () => (location.href = "/poster.html");
+  hint.appendChild(b);
+  btn.textContent = "▶ 走一遍剧本（3 分钟）";
+  state.scriptRunning = false;
+}
+
+// ---------- 天气与红叶 ----------
+
+async function refreshConditions() {
+  const c = await api("/api/conditions");
+  const w = c.weather || {};
+  const now = w.now || {};
+  const today = w.today || {};
+  const red = c.red_leaf || {};
+  $("#conditions").innerHTML = `
+    <div class="cond-line"><b>${now.text || ""}</b> ${now.temp_c ?? "-"}°C
+      <span class="muted">${now.wind || ""}</span></div>
+    <div class="cond-line">今日 ${today.min ?? "-"}~${today.max ?? "-"}°C ·
+      雨概率 ${today.rain_prob ?? "-"}% · 落日 ${today.sunset ?? "-"}</div>
+    <div class="cond-line red"><b>红叶指数 ${red.score ?? "-"}</b>（${red.text || ""}）</div>
+    <ul class="advice">${(c.advice || []).map((a) => `<li>${a}</li>`).join("")}</ul>
+    <div class="muted src">来源：${
+      c.source === "open-meteo" ? "Open-Meteo" : "本地记录"
+    } · 天气数据 © Open-Meteo</div>`;
+}
+
+// ---------- 事件 ----------
+
+function bindEvents() {
+  $("#chatForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = $("#chatInput");
+    const text = input.value;
+    input.value = "";
+    sendChat(text);
+  });
+
+  document.querySelectorAll("[data-q]").forEach((b) => {
+    b.addEventListener("click", () => sendChat(b.dataset.q));
+  });
+
+  document.querySelectorAll("[data-act='advance']").forEach((btn) => {
+    btn.addEventListener("click", () =>
+      demoCall("/api/demo/advance", {
+        session_id: SID,
+        meters: Number(btn.dataset.val),
+      })
+    );
+  });
+
+  $("#gotoBtn").addEventListener("click", () =>
+    demoCall("/api/demo/goto", { session_id: SID, poi_id: $("#poiSelect").value })
+  );
+
+  $("#resetBtn").addEventListener("click", async () => {
+    stopVoice();
+    const r = await demoCall("/api/demo/reset", { session_id: SID });
+    state.visits = {};
+    state.voiceOn = true;
+    $("#arrivedCard").style.display = "none";
+    addNote("已重置到山门。");
+    return r;
+  });
+
+  $("#scriptBtn").addEventListener("click", runScript);
+
+  $("#playAgainBtn").addEventListener("click", () => {
+    state.voiceOn = true;
+    if (state.speaking && state.speaking.line) {
+      const t = state.speaking.line;
+      const src = state.speaking.audio_url;
+      if (src) new Audio(src).play().catch(() => speakBrowser(t));
+      else speakBrowser(t);
+    }
+  });
+  $("#stopVoiceBtn").addEventListener("click", () => {
+    state.voiceOn = false;
+    stopVoice();
+    addNote("好，安静走。");
+  });
+  $("#askMoreBtn").addEventListener("click", () => {
+    const name = (state.speaking && state.speaking.name) || "这里";
+    sendChat(`讲讲${name}`);
+  });
+  $("#toPosterBtn").addEventListener("click", () => (location.href = "/poster.html"));
+
+  $("#keyBtn").addEventListener("click", () => {
+    $("#keyModal").style.display = "flex";
+  });
+  $("#keyClose").addEventListener("click", () => {
+    $("#keyModal").style.display = "none";
+  });
+  $("#keySave").addEventListener("click", async () => {
+    const key = $("#keyInput").value.trim();
+    if (!key) return;
+    $("#keyMsg").textContent = "保存中…";
+    await api("/api/config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ deepseek_api_key: key }),
+    });
+    $("#keyMsg").textContent = "测试连接中…";
+    const t = await api("/api/config/test", { method: "POST" });
+    $("#keyMsg").textContent = t.ok ? "连接正常 ✓" : `连接失败：${t.message}`;
+    setKeyStatus(!!t.ok);
+  });
+}
+
+init();
+bindEvents();

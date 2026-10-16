@@ -1,0 +1,11 @@
+/* 字号阶梯（海报办法 H4：@1080 宽 96/72/52/36/28/20）与字族纪律（H5）。 */
+#stage { font-family: "SimSun", "Songti SC", "Source Han Serif SC", "Noto Serif SC", serif; color: var(--ink); }
+#stage .t1 { font-size: 96px; line-height: 1.08; font-family: var(--font-title); letter-spacing: 2px; }
+#stage .t2 { font-size: 72px; line-height: 1.12; font-family: var(--font-title); letter-spacing: 2px; }
+#stage .t3 { font-size: 52px; line-height: 1.22; font-family: var(--font-title); }
+#stage .t4 { font-size: 36px; line-height: 1.5; }
+#stage .t5 { font-size: 28px; line-height: 1.6; }
+#stage .t6 { font-size: 20px; line-height: 1.5; }
+#stage .num { font-family: "EB Garamond", "Garamond", "Georgia", serif; }
+#stage .vertical { writing-mode: vertical-rl; text-orientation: upright; }
+#stage :root, #stage { --font-title: "KaiTi", "STKaiti", "Kaiti SC", "FangSong", serif; }

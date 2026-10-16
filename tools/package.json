@@ -1,0 +1,9 @@
+{
+  "name": "qixi-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "海报渲染的无头自测环境（仅开发用，不参与运行与打包）",
+  "dependencies": {
+    "jsdom": "^24.0.0"
+  }
+}

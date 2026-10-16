@@ -1,0 +1,82 @@
+[
+  {
+    "route_id": "classic",
+    "name": "经典线",
+    "theme": "classic",
+    "total_m": 1100,
+    "attrs": {"total_steps": 900, "shade_ratio": 0.45, "indoor_points": 1, "slippery_risk": 3},
+    "points": [
+      {"poi_id": "shanmen", "instruction": "从山门检票进山", "stay_s": 60, "geo_idx": 0},
+      {"poi_id": "mingjinghu", "instruction": "沿镜湖路向北，到明镜湖", "stay_s": 180, "geo_idx": 2},
+      {"poi_id": "qixiasi", "instruction": "过九曲桥进栖霞寺", "stay_s": 240, "geo_idx": 4},
+      {"poi_id": "qianfoyan", "instruction": "出寺东行，石阶上到千佛岩", "stay_s": 300, "geo_idx": 6},
+      {"poi_id": "shelita", "instruction": "继续向东北，舍利塔在左手边", "stay_s": 180, "geo_idx": 8},
+      {"poi_id": "shuanghongyuan", "instruction": "折向西，缓坡到霜红苑", "stay_s": 240, "geo_idx": 11}
+    ],
+    "geometry": [
+      [32.1489, 118.9560],
+      [32.1493, 118.9563],
+      [32.1498, 118.9568],
+      [32.1501, 118.9572],
+      [32.1505, 118.9575],
+      [32.1508, 118.9578],
+      [32.1512, 118.9581],
+      [32.1514, 118.9583],
+      [32.1516, 118.9586],
+      [32.1519, 118.9580],
+      [32.1523, 118.9576],
+      [32.1526, 118.9572]
+    ]
+  },
+  {
+    "route_id": "autumn",
+    "name": "赏枫专线",
+    "theme": "autumn",
+    "total_m": 1400,
+    "attrs": {"total_steps": 800, "shade_ratio": 0.6, "indoor_points": 1, "slippery_risk": 2},
+    "points": [
+      {"poi_id": "shanmen", "instruction": "从山门进山", "stay_s": 60, "geo_idx": 0},
+      {"poi_id": "mingjinghu", "instruction": "先到明镜湖热身一张合影", "stay_s": 120, "geo_idx": 1},
+      {"poi_id": "shuanghongyuan", "instruction": "翻东坡上霜红苑，红叶从这里开始密", "stay_s": 300, "geo_idx": 5},
+      {"poi_id": "taixuting", "instruction": "沿山腰向西到太虚亭歇脚", "stay_s": 180, "geo_idx": 8},
+      {"poi_id": "fenglinhu", "instruction": "再上一段到枫林湖，收尾看倒影", "stay_s": 240, "geo_idx": 11}
+    ],
+    "geometry": [
+      [32.1489, 118.9560],
+      [32.1498, 118.9568],
+      [32.1506, 118.9570],
+      [32.1514, 118.9571],
+      [32.1520, 118.9572],
+      [32.1526, 118.9572],
+      [32.1530, 118.9568],
+      [32.1534, 118.9563],
+      [32.1538, 118.9558],
+      [32.1544, 118.9556],
+      [32.1548, 118.9554],
+      [32.1551, 118.9552]
+    ]
+  },
+  {
+    "route_id": "family",
+    "name": "亲子短线",
+    "theme": "family",
+    "total_m": 700,
+    "attrs": {"total_steps": 300, "shade_ratio": 0.5, "indoor_points": 2, "slippery_risk": 1},
+    "points": [
+      {"poi_id": "shanmen", "instruction": "从山门进山", "stay_s": 60, "geo_idx": 0},
+      {"poi_id": "mingjinghu", "instruction": "到明镜湖喂一会儿鱼（务必用园区饲料）", "stay_s": 180, "geo_idx": 1},
+      {"poi_id": "qixiasi", "instruction": "进栖霞寺看古树和大殿", "stay_s": 240, "geo_idx": 2},
+      {"poi_id": "luyuchazhuang", "instruction": "沿缓坡到陆羽茶庄，喝口水收尾", "stay_s": 300, "geo_idx": 6}
+    ],
+    "geometry": [
+      [32.1489, 118.9560],
+      [32.1498, 118.9568],
+      [32.1505, 118.9575],
+      [32.1512, 118.9573],
+      [32.1520, 118.9570],
+      [32.1527, 118.9567],
+      [32.1532, 118.9565]
+    ]
+  }
+]
+

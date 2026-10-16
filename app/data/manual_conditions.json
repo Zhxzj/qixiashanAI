@@ -1,0 +1,14 @@
+{
+  "red_leaf_override": null,
+  "note": "现场实况待填：例如 霜红苑七成（2026-10-31 人工更新）",
+  "fallback_weather": {
+    "temp_c": 18.0,
+    "text": "多云",
+    "wind": "微风",
+    "min": 12,
+    "max": 22,
+    "rain_prob": 20,
+    "sunset": "17:22"
+  }
+}
+

@@ -1,0 +1,5 @@
+/* 四套色板（海报办法 §2.1）。运行时仅允许 --accent 被照片取色覆盖（§3.4）。 */
+[data-palette="danfeng"] { --bg:#A63A2B; --paper:#F7F0E4; --primary:#C2492F; --secondary:#6E2A20; --accent:#D9A441; --ink:#2E2622; }
+[data-palette="zhemo"]   { --bg:#F3EDE0; --paper:#FBF7EF; --primary:#8C5A2B; --secondary:#4A3A2A; --accent:#B23A2E; --ink:#2B2620; }
+[data-palette="yanlan"]  { --bg:#DFDCD4; --paper:#F4F2EC; --primary:#5B6E6A; --secondary:#94A69E; --accent:#C2492F; --ink:#333B38; }
+[data-palette="yuebai"]  { --bg:#F7F5F0; --paper:#FFFFFF; --primary:#3E4A5B; --secondary:#A8B0BD; --accent:#D9A441; --ink:#262C36; }

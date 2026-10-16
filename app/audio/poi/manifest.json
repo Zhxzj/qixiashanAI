@@ -1,0 +1,72 @@
+[
+  {
+    "poi_id": "shanmen",
+    "name": "山门",
+    "text": "前面就是山门。进山第一道门。想细听就说一声。",
+    "file": "/audio/poi/shanmen.mp3",
+    "bytes": 36288
+  },
+  {
+    "poi_id": "mingjinghu",
+    "name": "明镜湖",
+    "text": "前面就是明镜湖。湖上九曲桥，水面静的时候像面镜子，「彩虹明镜」说的就是这里。想细听就说一声。",
+    "file": "/audio/poi/mingjinghu.mp3",
+    "bytes": 65232
+  },
+  {
+    "poi_id": "qixiasi",
+    "name": "栖霞寺",
+    "text": "前面就是栖霞寺。南朝齐年间建的寺，三论宗祖庭。想细听就说一声。",
+    "file": "/audio/poi/qixiasi.mp3",
+    "bytes": 48528
+  },
+  {
+    "poi_id": "qianfoyan",
+    "name": "千佛岩",
+    "text": "前面就是千佛岩。南朝凿的石窟，294 龛、515 尊佛。想细听就说一声。",
+    "file": "/audio/poi/qianfoyan.mp3",
+    "bytes": 56448
+  },
+  {
+    "poi_id": "shelita",
+    "name": "舍利塔",
+    "text": "前面就是舍利塔。隋诏始建、南唐重修的石塔。想细听就说一声。",
+    "file": "/audio/poi/shelita.mp3",
+    "bytes": 45216
+  },
+  {
+    "poi_id": "shuanghongyuan",
+    "name": "霜红苑",
+    "text": "前面就是霜红苑。霜后最红的一片坡。想细听就说一声。",
+    "file": "/audio/poi/shuanghongyuan.mp3",
+    "bytes": 40176
+  },
+  {
+    "poi_id": "taixuting",
+    "name": "太虚亭",
+    "text": "前面就是太虚亭。山腰一座亭。想细听就说一声。",
+    "file": "/audio/poi/taixuting.mp3",
+    "bytes": 37440
+  },
+  {
+    "poi_id": "fenglinhu",
+    "name": "枫林湖",
+    "text": "前面就是枫林湖。湖边一整圈枫香。想细听就说一声。",
+    "file": "/audio/poi/fenglinhu.mp3",
+    "bytes": 39312
+  },
+  {
+    "poi_id": "fengxiangfeng",
+    "name": "凤翔峰",
+    "text": "前面就是凤翔峰。栖霞山主峰，286 米。想细听就说一声。",
+    "file": "/audio/poi/fengxiangfeng.mp3",
+    "bytes": 44496
+  },
+  {
+    "poi_id": "luyuchazhuang",
+    "name": "陆羽茶庄",
+    "text": "前面就是陆羽茶庄。走累了就进来坐。想细听就说一声。",
+    "file": "/audio/poi/luyuchazhuang.mp3",
+    "bytes": 39888
+  }
+]

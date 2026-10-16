@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>游后日记 · 栖霞山小向导</title>
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/poster/poster.css">
+  <link rel="stylesheet" href="/poster/skill/css/palettes.css">
+  <link rel="stylesheet" href="/poster/skill/css/type.css">
+  <link rel="stylesheet" href="/poster/skill/css/base.css">
+</head>
+<body class="poster-page">
+  <header class="topbar">
+    <div class="brand">栖霞山小向导 <span class="sub">· 游后日记</span></div>
+    <nav class="topnav">
+      <a href="/" class="ghost">← 回到向导</a>
+    </nav>
+  </header>
+
+  <main class="poster-layout">
+    <!-- 左：素材与游踪 -->
+    <section class="pcard pleft">
+      <div class="card">
+        <div class="card-title">① 今天的照片</div>
+        <div class="drop" id="dropZone">
+          <input type="file" id="fileInput" accept="image/*,.heic,.heif" multiple hidden>
+          <div class="drop-text">把照片拖进来，或 <button id="pickBtn" class="link">选择文件</button></div>
+          <div class="muted">照片只在本机处理，不上传图床；有 GPS 会自动匹配点位。</div>
+        </div>
+        <div class="photo-grid" id="photoGrid"></div>
+        <div class="console-row">
+          <button id="samplesBtn" class="ghost">用示例照片一键体验</button>
+          <button id="clearBtn" class="ghost">清空</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">② 点位核对</div>
+        <div id="photoList" class="photo-list"></div>
+        <div id="pickPanel" class="pick-panel" hidden>
+          <div class="muted" id="pickHint"></div>
+          <div class="pick-grid" id="pickGrid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">③ 出游记录</div>
+        <div id="tripInfo" class="trip-info muted">还没有游踪。先回向导页走一段，再来生成日记。</div>
+        <div class="console-row">
+          <button id="replayBtn">回放小传</button>
+          <button id="recapBtn" class="ghost">刷新文案</button>
+        </div>
+        <div id="replayBox" class="replay-box" hidden></div>
+      </div>
+    </section>
+
+    <!-- 中：画布 -->
+    <section class="pcard pcenter">
+      <div class="stage-wrap" id="stageWrap">
+        <div id="stage" class="poster-stage"></div>
+        <div id="stageEmpty" class="stage-empty">
+          <div class="t4">生成三张候选后在这里预览</div>
+          <div class="muted">点左侧「用示例照片一键体验」可以马上看效果</div>
+        </div>
+      </div>
+      <div class="stage-bar">
+        <button id="genBtn" class="primary">生成三张候选</button>
+        <button id="redrawBtn" class="ghost">换一批（换 seed）</button>
+        <button id="pngBtn" class="ghost">导出 PNG</button>
+        <span id="qaBadge" class="pill">质检待命</span>
+      </div>
+    </section>
+
+    <!-- 右：候选与质检 -->
+    <section class="pcard pright">
+      <div class="card">
+        <div class="card-title">候选（A 稳妥 / B 叙事 / C 惊喜）</div>
+        <div class="cand-row" id="candRow"></div>
+        <div class="muted" id="candHint">生成后点缩略图切换。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">色板</div>
+        <div class="pal-row" id="palRow"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">质检（H1–H11）</div>
+        <div id="qaBox" class="qa-box muted">还没渲染。</div>
+      </div>
+      <div class="card">
+        <div class="card-title">取色联动</div>
+        <div id="hintBox" class="muted">渲染后显示照片主色命中情况。</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="/vendor/html-to-image.js"></script>
+  <script src="/vendor/exifr.min.js"></script>
+  <script src="/poster/skill/renderer/render.js"></script>
+  <script src="/poster/skill/renderer/grammar-mount.js"></script>
+  <script src="/poster/skill/renderer/grammar-scroll.js"></script>
+  <script src="/poster/skill/renderer/grammar-timeline.js"></script>
+  <script src="/poster/skill/renderer/grammar-collage.js"></script>
+  <script src="/poster/skill/renderer/grammar-poem.js"></script>
+  <script src="/poster/skill/renderer/grammar-map.js"></script>
+  <script src="/poster/skill/renderer/poster-qa.js"></script>
+  <script src="/poster/poster-app.js"></script>
+</body>
+</html>

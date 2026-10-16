@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+config.json
+logs/
+app/data/cache/
+work/
+.tmp/
+node_modules/
+dist/
+*.log
+startup.log
+.git_acl_broken_old/
+
+
