@@ -1,133 +1,175 @@
-"""一键构建"免安装版"：素材 → 便携 Python → 组装 → 打 zip。
+"""Reproducible Windows x64 portable build: pinned inputs -> clean payload -> native EXE.
 
-用法：
-    scripts\\build_portable.bat            （推荐）
-    .venv\\Scripts\\python scripts\\build_portable.py
-选项：
-    --py-version 3.12     便携 Python 版本（默认与开发环境同版本）
-    --skip-download       复用 .tmp\\portable 里已下载的压缩包（离线重打）
-    --no-zip              只组装文件夹，不压缩
-
-产物：dist\\枫客松-小栖-demo-free\\ 与同名 .zip
-说明：不需要 PyInstaller；对方机器零依赖（自带解释器与依赖）。
+Requires build-machine Python 3.14 x64 and MinGW-w64 GCC on PATH.
+Recipients need none of those. No source asset generation and no venv-copy fallback.
 """
-
 from __future__ import annotations
-
 import argparse
+import ctypes
+import hashlib
+import json
+import os
 import shutil
+import struct
 import subprocess
 import sys
 import time
+import urllib.request
+import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+ROOT=Path(__file__).resolve().parents[1]
+STAGE=ROOT/"dist/QixiGuide-portable"
+MAGIC=b"QIXIPK02"
+def sha(path):
+    with path.open("rb") as stream:
+        return hashlib.file_digest(stream,"sha256").hexdigest()
 
-from scripts.make_portable import (  # noqa: E402  （复用下载/组装逻辑）
-    LAUNCH_BAT,
-    STAGE,
-    copy_app,
-    download_runtime,
-    extract_runtime,
-    install_deps,
-    runtime_is_standard,
-    write_launcher,
-)
+def download(url,dest,digest,offline=False):
+    if dest.exists() and sha(dest)==digest:
+        return
+    if offline:
+        raise RuntimeError(f"离线输入缺失或摘要不符：{dest}")
+    dest.parent.mkdir(parents=True,exist_ok=True)
+    part=dest.with_suffix(".part")
+    try:
+        with urllib.request.urlopen(url,timeout=120) as src, part.open("wb") as dst:
+            shutil.copyfileobj(src,dst)
+        if sha(part)!=digest:
+            raise RuntimeError("下载摘要不符："+url)
+        part.replace(dest)
+    finally:
+        part.unlink(missing_ok=True)
 
+def run(args,**kwargs):
+    subprocess.run([str(a) for a in args],check=True,**kwargs)
 
-def log(msg: str) -> None:
-    print(msg, flush=True)
+def pack(stage,bootstrap,output,build_id):
+    dll=ctypes.WinDLL("cabinet",use_last_error=True)
+    handle=ctypes.c_void_p()
+    dll.CreateCompressor.argtypes=[ctypes.c_uint,ctypes.c_void_p,ctypes.POINTER(ctypes.c_void_p)]
+    dll.Compress.argtypes=[ctypes.c_void_p,ctypes.c_void_p,ctypes.c_size_t,ctypes.c_void_p,ctypes.c_size_t,ctypes.POINTER(ctypes.c_size_t)]
+    dll.CloseCompressor.argtypes=[ctypes.c_void_p]
+    if not dll.CreateCompressor(4,None,ctypes.byref(handle)):
+        raise ctypes.WinError(ctypes.get_last_error())
+    files=sorted(p for p in stage.rglob("*") if p.is_file())
+    shutil.copyfile(bootstrap,output)
+    payload_hash=hashlib.sha256()
+    try:
+        with output.open("ab") as out:
+            offset=out.tell()
+            for path in files:
+                raw=path.read_bytes()
+                name=path.relative_to(stage).as_posix().encode("utf-8")
+                packed=b""
+                if raw:
+                    needed=ctypes.c_size_t()
+                    dll.Compress(handle,raw,len(raw),None,0,ctypes.byref(needed))
+                    buffer=ctypes.create_string_buffer(needed.value)
+                    if not dll.Compress(handle,raw,len(raw),buffer,len(buffer),ctypes.byref(needed)):
+                        raise ctypes.WinError(ctypes.get_last_error())
+                    packed=buffer.raw[:needed.value]
+                header=struct.pack("<IQQ32s",len(name),len(raw),len(packed),hashlib.sha256(raw).digest())
+                for chunk in (header,name,packed):
+                    out.write(chunk)
+                    payload_hash.update(chunk)
+            out.write(struct.pack("<8sQI64s32s",MAGIC,offset,len(files),build_id.encode(),payload_hash.digest()))
+    finally:
+        dll.CloseCompressor(handle)
 
-
-def run_step(title: str, args: list[str]) -> bool:
-    log(title)
-    r = subprocess.run([sys.executable, *args], cwd=str(ROOT), capture_output=True,
-                       text=True, encoding="utf-8", errors="replace")
-    ok = r.returncode == 0
-    if not ok:
-        tail = ((r.stderr or "") + (r.stdout or "")).strip().splitlines()[-6:]
-        for line in tail:
-            log("    " + line)
-    return ok
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--py-version", default=f"{sys.version_info.major}.{sys.version_info.minor}")
-    ap.add_argument("--skip-download", action="store_true")
-    ap.add_argument("--no-zip", action="store_true")
-    args = ap.parse_args()
-
-    if getattr(sys, "frozen", False):
-        log("请在源码目录跑这个脚本（.venv\\Scripts\\python scripts\\build_portable.py）。")
-        return 1
-
-    t0 = time.time()
-    log("=" * 52)
-    log("  栖霞山小向导 · 免安装版构建")
-    log("=" * 52)
-    log("  (build_portable: assembling portable Python pack)")
-    log("")
-    log("[1/5] 准备素材（示例照片 / 播报语音）…")
-    if not run_step("    · 示例照片", ["scripts/make_samples.py"]):
-        log("    （示例照片跳过，不影响打包）")
-    if not run_step("    · 播报语音", ["scripts/make_audio.py"]):
-        log("    （语音跳过：页面会回退浏览器 TTS，建议联网后重跑一次）")
-
-    log(f"[2/5] 准备便携 Python {args.py_version} …")
-    archive = download_runtime(args.py_version, skip=args.skip_download)
-    if archive is None:
-        log("")
-        log("[失败] 拿不到便携 Python 压缩包。备选办法（三选一）：")
-        log("  A) 开代理/VPN 后重跑本脚本；")
-        log(f"  B) 手动下载 python-build-standalone 的 cpython-{args.py_version}.*-x86_64-pc-windows-msvc-install_only.tar.gz")
-        log(f"     放到 {ROOT / '.tmp' / 'portable'}（文件名无所谓），再跑：")
-        log("     scripts\\build_portable.bat --skip-download")
-        log("  C) 换用官方 embeddable python（体积更小，但需要手工配 site-packages），")
-        log("     具体做法见 docs\\打包与分发调研.md")
-        return 1
+def main():
+    ap=argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--cache",type=Path,default=ROOT/".tmp/portable-v2")
+    ap.add_argument("--skip-download",action="store_true")
+    ap.add_argument("--no-zip",action="store_true")
+    ap.add_argument("--source-commit",default=None)
+    args=ap.parse_args()
+    if os.name!="nt" or sys.version_info[:2]!=(3,14) or struct.calcsize("P")!=8:
+        raise RuntimeError("构建机需要 Windows + Python 3.14 x64")
+    inputs=json.loads((ROOT/"build-inputs.lock.json").read_text(encoding="utf-8"))
+    runtime=inputs["runtime"]
+    archive=args.cache/runtime["filename"]
+    download(runtime["url"],archive,runtime["sha256"],args.skip_download)
+    wheel_dir=args.cache/"wheels"
+    for wheel in inputs["wheels"]:
+        download(wheel["url"],wheel_dir/wheel["filename"],wheel["sha256"],args.skip_download)
+    # Only delete the fixed build directory after checking its fully resolved location.
+    if STAGE.resolve().parent != (ROOT/"dist").resolve():
+        raise RuntimeError("非法构建目标")
     if STAGE.exists():
         shutil.rmtree(STAGE)
-    STAGE.mkdir(parents=True)
-
-    log("[3/5] 解包运行时并复制程序 …")
-    py_dir = extract_runtime(archive, STAGE / "runtime")
-    if not runtime_is_standard(py_dir / "python.exe"):
-        log("[失败] 解出来的便携 Python 是 free-threaded（无 GIL）构建，和依赖轮子不兼容。")
-        log("   处理：删掉 .tmp\\portable 里的压缩包，重跑本脚本（已修正为固定选标准构建）。")
-        return 1
-    copy_app(STAGE)
-
-    log("[4/5] 安装依赖到 runtime\\packages …（约 1 分钟）")
-    if not install_deps(py_dir / "python.exe", STAGE / "runtime" / "packages"):
-        log("[失败] 依赖安装失败，多半是网络问题；确认能访问 pypi.org 后重试。")
-        return 1
-
-    log("[5/5] 写启动器与说明 …")
-    write_launcher(STAGE)
-    for doc in ("DEMO使用说明.md", "安装与卸载说明.md", "打包与分发调研.md"):
-        src = ROOT / "docs" / doc
-        if src.exists():
-            shutil.copy2(src, STAGE / doc)
-
-    zip_path = None
+    py_dir=STAGE/"runtime/python"
+    py_dir.mkdir(parents=True)
+    with zipfile.ZipFile(archive) as z:
+        for member in z.infolist():
+            target=(py_dir/member.filename).resolve()
+            if not target.is_relative_to(py_dir.resolve()):
+                raise RuntimeError("非法运行时路径")
+        z.extractall(py_dir)
+    (py_dir/"python314._pth").write_text("python314.zip\n.\n..\\packages\n..\\..\nimport site\n",encoding="ascii")
+    for name in ("app","web"):
+        shutil.copytree(ROOT/name,STAGE/name,ignore=shutil.ignore_patterns("__pycache__","*.pyc"))
+    for name in ("launcher.py","requirements.lock"):
+        shutil.copy2(ROOT/name,STAGE/name)
+    for name in ("stop_service.py",):
+        (STAGE/"scripts").mkdir(exist_ok=True)
+        shutil.copy2(ROOT/"scripts"/name,STAGE/"scripts"/name)
+    packages=STAGE/"runtime/packages"
+    packages.mkdir()
+    # Locked wheels are ZIP containers. No pip bootstrap or build-host venv fallback.
+    for wheel in inputs["wheels"]:
+        with zipfile.ZipFile(wheel_dir/wheel["filename"]) as z:
+            for name in z.namelist():
+                if name.endswith("/"):
+                    continue
+                destination=name
+                if ".data/" in name:
+                    prefix,tail=name.split(".data/",1)
+                    area,relative=tail.split("/",1)
+                    if area in ("purelib","platlib"):
+                        destination=relative
+                    else:
+                        continue  # CLI entrypoints/headers are not used by the embedded host.
+                target=(packages/destination).resolve()
+                if not target.is_relative_to(packages.resolve()):
+                    raise RuntimeError("非法依赖路径")
+                target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes(z.read(name))
+    # Embedded Python reads only its explicit _pth. No dependence on build-machine PYTHONPATH.
+    env={k:v for k,v in os.environ.items() if not k.startswith("PYTHON")}
+    env["QIXI_USER_DIR"]=str(args.cache/"probe-user")
+    env["QIXI_NO_BROWSER"]="1"
+    run([py_dir/"python.exe","-B",STAGE/"launcher.py","--check"],env=env,cwd=STAGE)
+    native=ROOT/"dist/bootstrap.exe"
+    compiler=shutil.which("gcc")
+    if not compiler:
+        raise RuntimeError("构建机未找到 MinGW-w64 GCC")
+    windres=shutil.which("windres")
+    if not windres:
+        raise RuntimeError("构建机未找到 MinGW-w64 windres")
+    resource=ROOT/"dist/guide-resource.o"
+    run([windres,"guide.rc","-O","coff","-o",resource],cwd=ROOT/"native")
+    run([compiler,"-municode","-mwindows","-Os","-static","-Wall","-Wextra","-Werror","-Wl,--no-insert-timestamp",ROOT/"native/portable.c",resource,"-o",native,"-lbcrypt","-lcabinet","-lshell32"])
+    (STAGE/"使用说明.txt").write_text("双击启动.bat；主交付请使用同目录外的栖霞山小向导.exe。\n首次启动自动准备用户缓存；无需管理员、Python或命令行。\n应用会保持运行，请点击页面右上角‘退出应用’；关闭浏览器不会停止服务。\n无 Key 时地图、模拟游览、照片手工选点和模板日记可用；对话需在设置里配置并测试。\n诊断：页面右上角‘诊断’。配置、行程和日志在 %LOCALAPPDATA%/QixiGuide。\n照片不保存到该目录；开启云识别时压缩照片会发往 DeepSeek。\n新版本运行前请先退出旧版本。删除 EXE 不会清除用户数据。\n缓存管理：退出全部实例后运行 EXE --clean-cache，仅清理版本及未完成展开，保留 config/state/logs。\n资料和路线为示意草稿，正式出行请核对园区信息。\n",encoding="utf-8-sig")
+    bat='@echo off\r\ncd /d "%~dp0"\r\nstart "" "%~dp0runtime\\python\\pythonw.exe" -B "%~dp0launcher.py"\r\n'
+    (STAGE/"start.bat").write_bytes(bat.encode("ascii"))
+    (STAGE/"启动.bat").write_bytes(bat.encode("ascii"))
+    commit=args.source_commit
+    if not commit:
+        proc=subprocess.run(["git","rev-parse","HEAD"],cwd=ROOT,capture_output=True,text=True)
+        commit=proc.stdout.strip() if proc.returncode==0 else "unversioned"
+    files={p.relative_to(STAGE).as_posix():sha(p) for p in sorted(STAGE.rglob("*")) if p.is_file()}
+    manifest={"schema_version":1,"source_commit":commit,"native_sources":{name:sha(ROOT/"native"/name) for name in ("portable.c","guide.rc","guide.ico")},"runtime":runtime,"dependency_lock_sha256":sha(ROOT/"requirements.lock"),"inputs_lock_sha256":sha(ROOT/"build-inputs.lock.json"),"compiler":subprocess.check_output([compiler,"--version"],text=True).splitlines()[0],"files":files}
+    build_id=hashlib.sha256(json.dumps(manifest,sort_keys=True).encode()).hexdigest()
+    manifest["build_id"]=build_id
+    (STAGE/"manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,sort_keys=True,indent=2),encoding="utf-8")
+    exe=ROOT/"dist/栖霞山小向导.exe"
+    pack(STAGE,native,exe,build_id)
     if not args.no_zip:
-        log("      压缩 zip …")
-        zip_path = shutil.make_archive(str(STAGE), "zip", root_dir=str(STAGE.parent), base_dir=STAGE.name)
-
-    size_mb = sum(f.stat().st_size for f in STAGE.rglob("*") if f.is_file()) / 1048576
-    log("")
-    log(f"[完成] 成品文件夹：{STAGE}")
-    if zip_path:
-        log(f"[完成] 发放包（zip）：{zip_path}")
-    log(f"   体积：文件夹 {size_mb:.0f}MB · 用时 {time.time() - t0:.0f} 秒")
-    log("")
-    log("自测（重要）：")
-    log("   1) 进 dist\\枫客松-小栖-demo-free\\ 双击 启动.bat（或 start.bat），确认浏览器打开、对话能用；")
-    log("   2) 有条件的话，拷到一台没装 Python 的电脑上再试一次。")
+        shutil.make_archive(str(STAGE),"zip",root_dir=STAGE)
+    artifacts=[exe]+([] if args.no_zip else [STAGE.with_suffix(".zip")])
+    (ROOT/"dist/SHA256SUMS.txt").write_text("".join(sha(p)+"  "+p.name+"\n" for p in artifacts),encoding="utf-8")
+    print(json.dumps({"exe":str(exe),"build_id":build_id,"bytes":exe.stat().st_size,"sha256":sha(exe)},ensure_ascii=False))
     return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__=="__main__":
+    raise SystemExit(main())

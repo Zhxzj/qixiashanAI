@@ -9,5 +9,6 @@ if not exist ".venv\Scripts\python.exe" (
   exit /b 1
 )
 ".venv\Scripts\python.exe" scripts\build_portable.py %*
-if errorlevel 1 pause
-exit /b 0
+set "BUILD_RC=%errorlevel%"
+if not "%BUILD_RC%"=="0" pause
+exit /b %BUILD_RC%

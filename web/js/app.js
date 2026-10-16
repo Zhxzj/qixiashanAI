@@ -1,8 +1,10 @@
 /* 栖霞山小向导 · 前端（M3/M4）
  * 对话（SSE 流式）+ 示意地图 + 到点自动播报 + 演示控制台 + 剧本模式。
  */
-const SID = localStorage.getItem("qixi_sid") || "demo";
-localStorage.setItem("qixi_sid", SID);
+const SID = Qixi.sid;
+let uiGeneration = 0;
+const chats = new Map();
+const seenArrivals = new Set();
 const $ = (s) => document.querySelector(s);
 let DATA = { pois: [], routes: [] };
 
@@ -25,23 +27,23 @@ const state = {
 
 async function api(path, opts) {
   const r = await fetch(path, opts);
+  if (!r.ok) throw new Error((await r.json()).detail || "HTTP " + r.status);
   return r.json();
 }
 
 // ---------- 初始化 ----------
 
 async function init() {
-  DATA = await api("/api/data");
-  fillPoiSelect();
-  await refreshState();
-  await refreshConditions();
-  const h = await api("/api/health");
-  setKeyStatus(!!h.key_configured);
+  const core = api("/api/data").then((d) => { DATA = d; fillPoiSelect(); return refreshState(); });
+  const health = api("/api/health").then((h) => setKeyStatus(!!h.key_configured));
+  refreshConditions().catch(() => { $("#conditions").textContent = "天气暂不可用"; });
+  await Promise.all([core, health]);
+  setInterval(() => refreshState().catch(() => {}), 2000);
 }
 
 function setKeyStatus(ok) {
   const el = $("#keyStatus");
-  el.textContent = ok ? "Key 已配置" : "未配置 Key";
+  el.textContent = ok ? "Key 已保存（可测试连接）" : "对话尚未配置";
   el.classList.toggle("ok", ok);
 }
 
@@ -52,7 +54,11 @@ function fillPoiSelect() {
 }
 
 async function refreshState() {
+  const epoch = uiGeneration;
   const st = await api(`/api/state?session_id=${SID}`);
+  if (epoch !== uiGeneration) return st;
+  Qixi.generation = st.generation;
+  if (st.arrived) onArrive(st.arrived, st.location?.snapped?.poi_distance_m);
   renderMap(st);
   renderStateInfo(st);
   renderTripMini(st);
@@ -152,11 +158,17 @@ async function sendChat(text) {
   addMsg("user", text);
   const bubble = addMsg("ai", "");
   let note = null;
+  const epoch = uiGeneration;
+  const controller = new AbortController();
+  const request_id = crypto.randomUUID();
+  chats.set(request_id, controller);
+  $("#cancelChatBtn").disabled = false;
   try {
     const resp = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: SID, text }),
+      body: JSON.stringify({ session_id: SID, text, request_id, generation: Qixi.generation }),
+      signal: controller.signal,
     });
     if (!resp.ok || !resp.body) {
       bubble.textContent = "服务出问题了，稍后再试。";
@@ -167,6 +179,7 @@ async function sendChat(text) {
     let buf = "";
     while (true) {
       const { done, value } = await reader.read();
+      if (epoch !== uiGeneration) return;
       if (done) break;
       buf += dec.decode(value, { stream: true });
       let idx;
@@ -180,11 +193,12 @@ async function sendChat(text) {
         } catch {
           continue;
         }
+        if (ev.type === "done" && ev.status === "cancelled") bubble.textContent += "（已取消）";
         if (ev.type === "delta") bubble.textContent += ev.text;
         else if (ev.type === "tool_start") {
           note = addNote(`小栖去查一下（${TOOL_LABELS[ev.name] || ev.name}）…`);
         } else if (ev.type === "tool_end" && note) {
-          note.textContent = `查好了（${TOOL_LABELS[ev.name] || ev.name}）`;
+          note.textContent = `${ev.ok ? "查好了" : "查询未完成"}（${TOOL_LABELS[ev.name] || ev.name}）`;
           note = null;
         } else if (ev.type === "error") {
           bubble.textContent += (bubble.textContent ? "\n" : "") + ev.message;
@@ -194,21 +208,28 @@ async function sendChat(text) {
     }
     if (!bubble.textContent) bubble.textContent = "……";
   } catch (e) {
-    bubble.textContent = "网络断了，再试一次。";
+    if (epoch === uiGeneration) bubble.textContent = e.name === "AbortError" ? "已取消" : "网络断了，再试一次。";
   } finally {
-    refreshState();
+    chats.delete(request_id);
+    $("#cancelChatBtn").disabled = chats.size === 0;
+    if (epoch === uiGeneration) refreshState().catch(() => {});
   }
 }
 
 // ---------- 到点自动播报（决策 #17） ----------
 
+let playbackToken = 0;
 function speak(text) {
   if (!state.voiceOn) return false;
+  const info = state.speaking;
   stopVoice();
-  const src = state.speaking && state.speaking.audio_url;
+  state.speaking = info;
+  const token = playbackToken;
+  const src = info && info.audio_url;
   if (src) {
     const a = new Audio(src);
     a.play().catch(() => {
+      if (token !== playbackToken || !state.voiceOn) return;
       speakBrowser(text);
       promptManualPlay(src);
     });
@@ -235,7 +256,8 @@ function stopVoice() {
     el.pause();
     el.currentTime = 0;
   }
-  state.speaking = null;
+  playbackToken++;
+  if (state.speaking) delete state.speaking.el;
 }
 
 let manualPromptShown = false;
@@ -246,15 +268,17 @@ function promptManualPlay(src) {
   const b = document.createElement("button");
   b.className = "chip-btn";
   b.textContent = "▶ 播放语音";
-  b.onclick = () => new Audio(src).play();
+  b.onclick = () => { state.voiceOn = true; speak(state.speaking?.line || ""); };
   n.appendChild(b);
 }
 
 function typeInto(el, text, speed = 30) {
   el.textContent = "";
+  const epoch = uiGeneration;
   return new Promise((res) => {
     let i = 0;
     const t = setInterval(() => {
+      if (epoch !== uiGeneration) { clearInterval(t); return res(); }
       el.textContent = text.slice(0, ++i);
       if (i >= text.length) {
         clearInterval(t);
@@ -270,13 +294,15 @@ async function showArrival(info, meters) {
   $("#arrivedName").textContent = "到点播报 · " + info.name;
   $("#arrivedPoi").textContent = meters != null ? `${meters} 米内` : "";
   state.speaking = info;
-  await typeInto($("#arrivedText"), info.line || info.name, 26);
   speak(info.line || "");
+  typeInto($("#arrivedText"), info.line || info.name, 26);
   addNote(`到点播报｜${info.name}：${info.line || ""}`);
 }
 
 async function onArrive(info, meters) {
-  if (!info) return;
+  if (!info || seenArrivals.has(info.event_id)) return;
+  seenArrivals.add(info.event_id);
+  state.speaking = info;
   if (!state.voiceOn) {
     $("#arrivedCard").style.display = "block";
     $("#arrivedName").textContent = "到点 · " + info.name;
@@ -287,20 +313,17 @@ async function onArrive(info, meters) {
   await showArrival(info, meters);
 }
 
-function dwellCheck(poiId) {
-  if (!poiId) return false;
-  state.visits[poiId] = (state.visits[poiId] || 0) + 1;
-  return state.visits[poiId] >= 2; // 连推两次位置（约等于停留 8 秒）才算到点
-}
-
 // ---------- 演示控制台 ----------
 
 async function demoCall(path, payload, opts = {}) {
+  const epoch = uiGeneration;
   const r = await api(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, generation: Qixi.generation }),
   });
+  if (epoch !== uiGeneration) return r;
+  if (r.state) Qixi.generation = r.state.generation;
   if (r.error) {
     addNote("控制台：" + r.error);
     return r;
@@ -312,8 +335,7 @@ async function demoCall(path, payload, opts = {}) {
   }
   if (r.arrived) {
     const meters = Math.round((r.state.location.snapped || {}).distance_m || 0);
-    const ready = dwellCheck(r.arrived.poi_id) || opts.immediate;
-    if (ready) await onArrive(r.arrived, meters);
+    await onArrive(r.arrived, meters);
   }
   return r;
 }
@@ -332,11 +354,13 @@ const SCRIPT = [
 async function runScript() {
   if (state.scriptRunning) return;
   state.scriptRunning = true;
+  const epoch = uiGeneration;
   const btn = $("#scriptBtn");
   btn.textContent = "剧本进行中…";
   const hint = $("#scriptHint");
   hint.hidden = false;
   for (let i = 0; i < SCRIPT.length; i++) {
+    if (epoch !== uiGeneration || !state.scriptRunning) return;
     const step = SCRIPT[i];
     hint.textContent = `第 ${i + 1}/${SCRIPT.length} 步 · ${step.hint}`;
     try {
@@ -345,8 +369,10 @@ async function runScript() {
       hint.textContent = `第 ${i + 1} 步出错了：${e.message}`;
       break;
     }
+    if (epoch !== uiGeneration) return;
     await new Promise((r) => setTimeout(r, step.wait * 1000));
   }
+  if (epoch !== uiGeneration) return;
   hint.textContent = "剧本走完 · 现在去写今天的日记 ";
   const b = document.createElement("button");
   b.className = "chip-btn";
@@ -365,6 +391,7 @@ async function refreshConditions() {
   const now = w.now || {};
   const today = w.today || {};
   const red = c.red_leaf || {};
+  if (red.kind === "estimated") red.text = (red.text || "") + " · 算法估计";
   $("#conditions").innerHTML = `
     <div class="cond-line"><b>${now.text || ""}</b> ${now.temp_c ?? "-"}°C
       <span class="muted">${now.wind || ""}</span></div>
@@ -380,6 +407,12 @@ async function refreshConditions() {
 // ---------- 事件 ----------
 
 function bindEvents() {
+  $("#cancelChatBtn").addEventListener("click", () => {
+    for (const [request_id, controller] of chats) {
+      controller.abort();
+      api("/api/chat/cancel",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:SID,request_id})}).catch(e=>addNote(e.message));
+    }
+  });
   $("#chatForm").addEventListener("submit", (e) => {
     e.preventDefault();
     const input = $("#chatInput");
@@ -397,17 +430,27 @@ function bindEvents() {
       demoCall("/api/demo/advance", {
         session_id: SID,
         meters: Number(btn.dataset.val),
-      })
+      }).catch(e=>addNote(e.message))
     );
   });
 
   $("#gotoBtn").addEventListener("click", () =>
-    demoCall("/api/demo/goto", { session_id: SID, poi_id: $("#poiSelect").value })
+    demoCall("/api/demo/goto", { session_id: SID, poi_id: $("#poiSelect").value }).catch(e=>addNote(e.message))
   );
 
   $("#resetBtn").addEventListener("click", async () => {
+    uiGeneration++;
+    state.scriptRunning = false;
+    for (const [request_id, controller] of chats) { controller.abort(); api("/api/chat/cancel", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({session_id:SID,request_id})}).catch(() => {}); }
+    $("#scriptBtn").textContent = "▶ 走一遍剧本（3 分钟）";
+    $("#scriptHint").hidden = true;
     stopVoice();
-    const r = await demoCall("/api/demo/reset", { session_id: SID });
+    state.speaking = null;
+    let r;
+    try { r = await demoCall("/api/demo/reset", { session_id: SID }); }
+    catch(e) { addNote("新行程创建失败："+e.message); return; }
+    localStorage.setItem("qixi_epoch", crypto.randomUUID());
+    seenArrivals.clear();
     state.visits = {};
     state.voiceOn = true;
     $("#arrivedCard").style.display = "none";
@@ -420,10 +463,7 @@ function bindEvents() {
   $("#playAgainBtn").addEventListener("click", () => {
     state.voiceOn = true;
     if (state.speaking && state.speaking.line) {
-      const t = state.speaking.line;
-      const src = state.speaking.audio_url;
-      if (src) new Audio(src).play().catch(() => speakBrowser(t));
-      else speakBrowser(t);
+      speak(state.speaking.line);
     }
   });
   $("#stopVoiceBtn").addEventListener("click", () => {
@@ -447,6 +487,7 @@ function bindEvents() {
     const key = $("#keyInput").value.trim();
     if (!key) return;
     $("#keyMsg").textContent = "保存中…";
+    try {
     await api("/api/config", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -455,9 +496,10 @@ function bindEvents() {
     $("#keyMsg").textContent = "测试连接中…";
     const t = await api("/api/config/test", { method: "POST" });
     $("#keyMsg").textContent = t.ok ? "连接正常 ✓" : `连接失败：${t.message}`;
-    setKeyStatus(!!t.ok);
+    $("#keyStatus").textContent = t.ok ? "模型已连通" : "Key 已保存，连接未通过";
+    } catch (e) { $("#keyMsg").textContent = e.message; }
   });
 }
 
-init();
+init().catch((e) => addNote("启动数据加载失败：" + e.message));
 bindEvents();

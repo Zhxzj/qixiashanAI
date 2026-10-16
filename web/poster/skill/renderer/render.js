@@ -128,7 +128,7 @@
     return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
   }
 
-  function extractPalette(photos) {
+  function extractPalette(photos, palette) {
     return new Promise((resolve) => {
       const hist = new Map();
       let pending = photos.length;
@@ -169,7 +169,7 @@
           .map((e) => [e[0] / e[3], e[1] / e[3], e[2] / e[3]].map(Math.round));
         if (!top.length) return resolve(null);
         const labTop = rgb2lab(...top[0]);
-        const pal = S.currentPalette ? S.currentPalette() : null;
+        const pal = palette || null;
         let accentOverride = null;
         if (pal && pal.accent) {
           const labAccent = rgb2lab(...pal.accent);
@@ -209,7 +209,7 @@
     const content = await grammar(ctx);
     stage.appendChild(content);
 
-    const hint = await extractPalette(spec.photos);
+    const hint = await extractPalette(spec.photos, PALETTES[spec.palette]);
     spec.palette_hint = hint;
     if (hint && hint.accent_override) {
       stage.style.setProperty("--accent", `rgb(${hint.accent_override.join(",")})`);
@@ -227,7 +227,7 @@
       stage.appendChild(node);
     }
     stage.appendChild(footerEl(spec.meta.date));
-    if (spec.type.seal) stage.appendChild(sealEl(spec.type.seal, { right: "6%", bottom: "7%" }, spec.grammar === "timeline"));
+    if (spec.type.seal) stage.appendChild(sealEl(spec.type.seal, spec.grammar === "mount" ? {left:"6.2%",bottom:"6%"} : {right:"6.2%",bottom:"6%"}, true));
     return stage;
   }
 
@@ -245,8 +245,9 @@
     const caps = (spec.type.captions || [])
       .map((c) => (typeof c === "string" ? { text: c } : c))
       .filter((c) => c && c.text);
+    const captionFor = (photo, i) => caps.find(c => c.photo_id === photo.file) || (caps.some(c => c.photo_id) ? {text:""} : caps[i]) || {text:""};
     return {
-      spec, w, h, hero, subs, caps, rnd: mulberry32(spec.seed || 1),
+      spec, w, h, hero, subs, caps, captionFor, rnd: mulberry32(spec.seed || 1),
       el, textEl, verticalTitle, photoEl, motifEl,
       title: spec.type.title || "山中一日",
       kicker: spec.type.kicker || spec.meta.date,

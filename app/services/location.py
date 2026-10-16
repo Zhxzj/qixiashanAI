@@ -62,7 +62,10 @@ class LocationService:
         if best is None:
             best = {"route_id": None, "point_idx": 0, "distance_m": None}
         near = self.nearest_pois(lat, lng, limit=1, radius_m=80)
+        best["route_distance_m"] = best["distance_m"]
         best["poi_id"] = near[0]["poi_id"] if near else None
+        best["poi_distance_m"] = near[0]["distance_m"] if near else None
+        best["distance_m"] = best["poi_distance_m"]
         return {
             "lat": round(lat, 6),
             "lng": round(lng, 6),
@@ -90,7 +93,7 @@ class LocationService:
 
     def ensure(self, state: dict) -> dict:
         if not state.get("location"):
-            sm = self.poi_by_id["shanmen"]
+            sm = self.pois[0]
             lat, lng = sm["coord"]
             state["location"] = {
                 "lat": lat,
@@ -120,30 +123,23 @@ class LocationService:
         lat, lng = p["coord"]
         return self.set_position(state, lat, lng)
 
-    def advance(self, state: dict, meters: float) -> dict:
-        """沿当前吸附路线几何前进 meters 米（演示控制台用）。"""
-        loc = self.ensure(state)
-        snapped = loc["snapped"]
-        route = next(
-            (r for r in self.routes if r["route_id"] == snapped.get("route_id")), None
-        )
-        if route is None:
-            return loc
-        geo = route["geometry"]
-        idx = min(snapped.get("point_idx", 0), len(geo) - 1)
-        lat, lng = geo[idx]
-        remaining = float(meters)
-        while remaining > 0 and idx < len(geo) - 1:
-            nxt = geo[idx + 1]
-            seg = dist_m((lat, lng), tuple(nxt))
-            if seg <= remaining or seg == 0:
-                lat, lng = nxt
-                remaining -= seg
-                idx += 1
-            else:
-                ratio = remaining / seg
-                lat = lat + (nxt[0] - lat) * ratio
-                lng = lng + (nxt[1] - lng) * ratio
-                remaining = 0
-        return self.set_position(state, lat, lng)
 
+    def advance(self, state: dict, meters: float) -> dict:
+        from app.services.geometry import project, length, at
+        loc = self.ensure(state)
+        plan = state.get("route")
+        if plan and plan.get("status") == "ready":
+            geo = plan["geometry"]
+        else:
+            route = next((r for r in self.routes if r["route_id"] == loc["snapped"].get("route_id")), self.routes[0])
+            geo = route["geometry"]
+        offset = project((loc["lat"],loc["lng"]),geo)[0]
+        progress = min(length(geo), max(0, offset + max(0,float(meters))))
+        pos = at(geo,progress)
+        result = self.set_position(state,*pos)
+        if plan and plan.get("status") == "ready":
+            plan["progress_m"] = progress
+            plan["remaining_m"] = max(0,round(plan["total_m"]-progress))
+            while plan["current_step"] < len(plan["steps"]) and plan["steps"][plan["current_step"]]["at_m"] <= progress+1:
+                plan["current_step"] += 1
+        return result

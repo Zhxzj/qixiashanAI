@@ -12,11 +12,8 @@
     box.appendChild(textEl("div", "kicker t6", ctx.kicker, {
       position: "absolute", left: "5.6%", top: "61.6%",
     }));
-    box.appendChild(textEl("div", "t3", "栖霞山纪游", {
-      position: "absolute", left: "5.6%", top: "63.6%", opacity: "0.78",
-    }));
-    box.appendChild(verticalTitle(ctx.title, "t2", {
-      position: "absolute", right: "6.4%", top: "61%", color: "var(--primary)",
+    box.appendChild(textEl("div", "t3", ctx.title, {
+      position: "absolute", left: "5.6%", top: "64%", width: "80%", color: "var(--primary)",
     }));
     const cap = (ctx.caps[0] && ctx.caps[0].text) || "";
     if (cap) {

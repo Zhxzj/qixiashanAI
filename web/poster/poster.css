@@ -82,6 +82,7 @@ button.sm { font-size: 12px; padding: 4px 8px; }
 }
 .stage-wrap #stage { box-shadow: 0 18px 60px rgba(46,38,34,0.35); }
 .stage-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; color: #6b6154; }
+.stage-empty[hidden] { display: none; }
 .stage-bar { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
 button.primary { background: var(--accent); }
 

@@ -7,17 +7,17 @@
     const box = el("div", "grammar grammar-scroll", { position: "absolute", inset: "0" });
 
     // 左栏
-    box.appendChild(textEl("div", "t2 vertical", ctx.title, {
-      position: "absolute", left: "3.6%", top: "5%",
+    box.appendChild(textEl("div", "t3 vertical", ctx.title, {
+      position: "absolute", left: "5.5%", top: "5%",
       writingMode: "vertical-rl", textOrientation: "upright", height: "44%",
-      color: "var(--primary)", letterSpacing: "10px",
+      color: "var(--primary)", letterSpacing: "2px",
     }));
     box.appendChild(textEl("div", "t6 kicker", spec.meta.date, {
       position: "absolute", left: "6.2%", top: "52%",
       writingMode: "vertical-rl", letterSpacing: "6px",
     }));
     box.appendChild(textEl("div", "t6 num", spec.meta.page_no || "", {
-      position: "absolute", left: "3.6%", bottom: "8%", opacity: "0.7",
+      position: "absolute", left: "5.5%", bottom: "8%", opacity: "0.7",
     }));
 
     // 右大图

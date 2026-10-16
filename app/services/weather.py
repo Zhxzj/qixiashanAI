@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import time
-from datetime import date
+from datetime import date, datetime, timezone, timedelta
 from pathlib import Path
 
 import httpx
@@ -12,6 +13,9 @@ import httpx
 LAT, LNG = 32.1538, 118.9587  # 栖霞山
 API = "https://api.open-meteo.com/v1/forecast"
 TTL = 900  # 缓存 15 分钟
+
+def park_date():
+    return datetime.now(timezone(timedelta(hours=8))).date()
 
 WMO = {
     0: "晴", 1: "晴间多云", 2: "多云", 3: "阴", 45: "雾", 48: "雾凇",
@@ -61,6 +65,8 @@ class ConditionsService:
         self.data_dir = Path(data_dir)
         self._cache: dict | None = None
         self._cache_ts = 0.0
+        self.client = None
+        self._lock = asyncio.Lock()
         try:
             self._manual = json.loads(
                 (self.data_dir / "manual_conditions.json").read_text(encoding="utf-8")
@@ -68,22 +74,26 @@ class ConditionsService:
         except Exception:
             self._manual = {}
 
-    async def get(self, days: int = 1, force: bool = False) -> dict:
-        now = time.time()
-        if (
-            not force
-            and self._cache
-            and now - self._cache_ts < TTL
-            and self._cache.get("days", 1) >= days
-        ):
-            return self._cache
-        try:
-            data = await self._fetch(days)
-        except Exception as e:  # 网络/解析失败→手动兜底，永不抛给上游
-            data = self._fallback(str(e))
-        self._cache = data
-        self._cache_ts = now
-        return data
+
+    async def get(self, days=1, force=False):
+        days=max(1,min(3,int(days)))
+        async with self._lock:
+            now=time.time()
+            today=park_date().isoformat()
+            ttl=60 if (self._cache or {}).get("source")=="fallback" else TTL
+            if not force and self._cache and self._cache.get("requested_date")==today and now-self._cache_ts<ttl and self._cache.get("requested_days",self._cache.get("days",1))>=days:
+                return self._cache
+            try:
+                data=await self._fetch(days)
+            except Exception as e:
+                data=self._fallback(type(e).__name__)
+            data["requested_days"]=days
+            data["requested_date"]=today
+            data["data_date"]=today if data["source"]=="open-meteo" else self._manual.get("data_date")
+            data["kind"]="forecast" if data["source"]=="open-meteo" else "fallback_not_live"
+            data["red_leaf"]["kind"]="manual" if self._manual.get("red_leaf_override") is not None else "estimated"
+            self._cache,self._cache_ts=data,now
+            return data
 
     async def _fetch(self, days: int) -> dict:
         params = {
@@ -95,10 +105,9 @@ class ConditionsService:
             "forecast_days": max(1, min(3, days)),
             "past_days": 7,
         }
-        async with httpx.AsyncClient(timeout=httpx.Timeout(8, connect=6)) as client:
-            resp = await client.get(API, params=params)
-            resp.raise_for_status()
-            raw = resp.json()
+        resp = await self.client.get(API, params=params)
+        resp.raise_for_status()
+        raw = resp.json()
         cur = raw.get("current", {})
         daily = raw.get("daily", {})
         times = daily.get("time", [])
@@ -171,9 +180,9 @@ class ConditionsService:
             return {
                 "score": score,
                 "text": _red_leaf_text(score),
-                "trend": self._manual.get("note") or "现场实况",
+                "trend": self._manual.get("note") or "人工记录，采集日期未核验",
             }
-        curve = _date_curve(date.today())
+        curve = _date_curve(park_date())
         if past_mins:
             cold = sum(max(0.0, 12.0 - m) for m in past_mins if m is not None)
         else:

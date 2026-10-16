@@ -26,8 +26,9 @@ def line(mark: str, text: str) -> None:
 
 def check_python() -> None:
     v = sys.version_info
-    ok = v >= (3, 10)
-    line(OK if ok else BAD, f"Python {v.major}.{v.minor}.{v.micro}" + ("" if ok else "（需要 3.10 以上）"))
+    import struct
+    ok = v[:2] == (3, 14) and struct.calcsize("P") == 8
+    line(OK if ok else BAD, f"Python {v.major}.{v.minor}.{v.micro}" + ("" if ok else "（源码锁定 Python 3.14 x64；收件人使用便携 EXE）"))
 
 
 def check_deps() -> None:
@@ -59,7 +60,7 @@ def check_ports() -> None:
     elif free:
         line(OK, f"端口 {free[0]} 可用（其余被占用，启动脚本会自动选空闲端口）")
     else:
-        line(BAD, "8017–8022 都被占用。先关掉占用程序，或运行 scripts\\stop.bat")
+        line(OK, "8017–8022 被占用，启动器将申请系统空闲端口，不需要结束其他程序")
 
 
 def probe(url: str, timeout: int = 6) -> tuple[bool, str]:
@@ -79,7 +80,7 @@ def check_network_and_key() -> None:
         line(BAD, "DeepSeek Key 未配置（页面右上角填上就能对话；不填也能看地图和海报流程）")
         return
     ok, info = probe("https://api.deepseek.com", timeout=8)
-    line(OK if ok else BAD, f"DeepSeek 接口可达（{info}），Key 已配置（{key[:6]}…）" if ok else f"DeepSeek 接口不可达（{info}）：检查网络/公司代理")
+    line(OK if ok else BAD, f"DeepSeek 站点可达（{info}），Key 已保存；是否有效请在页面测试连接" if ok else f"DeepSeek 接口不可达（{info}）：检查网络/公司代理")
 
 
 def check_weather() -> None:

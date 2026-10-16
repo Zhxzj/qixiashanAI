@@ -47,7 +47,7 @@ def _heal_venv_path() -> None:
 
 
 _heal_venv_path()
-MIN_PY = (3, 10)
+MIN_PY = (3, 14)
 PORT_CANDIDATES = (8017, 8018, 8019, 8020, 8021, 8022)
 PIP_MIRRORS = [
     "https://pypi.tuna.tsinghua.edu.cn/simple",
@@ -107,7 +107,7 @@ def _venv_python_path() -> Path:
 def _run_ok(cmd: list[str], timeout: int = 25) -> bool:
     """跑一条命令，rc==0 视为成功；任何异常都当失败（绝不向上抛）。"""
     try:
-        r = subprocess.run(cmd, capture_output=True, timeout=timeout)
+        r = subprocess.run(cmd, capture_output=True, timeout=timeout,cwd=ROOT)
         return r.returncode == 0
     except Exception:
         return False
@@ -126,7 +126,8 @@ def _py_version_of(exe: str) -> str:
 
 def _deps_probe(venv_py: str) -> bool:
     """核心依赖能不能 import（离线兜底与跳过联网检查都靠它）。"""
-    return _run_ok([venv_py, "-c", "import fastapi, uvicorn, httpx, PIL"])
+    code="import importlib.metadata as m; from pathlib import Path; import fastapi,uvicorn,httpx,PIL; rows=[r.split()[0].split('==') for r in Path('requirements.lock').read_text().splitlines() if '==' in r]; assert all(m.version(n)==v for n,v in rows)"
+    return _run_ok([venv_py,"-c",code])
 
 
 def _stamp_path() -> Path:
@@ -135,7 +136,7 @@ def _stamp_path() -> Path:
 
 def _req_sha() -> str:
     try:
-        return hashlib.sha256((ROOT / "requirements.txt").read_bytes()).hexdigest()[:16]
+        return hashlib.sha256((ROOT / "requirements.txt").read_bytes()+(ROOT / "requirements.lock").read_bytes()).hexdigest()[:16]
     except Exception:
         return "no-req"
 
@@ -193,13 +194,14 @@ def _is_our_service(port: int, timeout: float = 1.5) -> bool:
     try:
         with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=timeout) as r:
             data = json.loads(r.read().decode("utf-8", "ignore"))
-            return bool(data.get("ok"))
+            from app.runtime import APP_ID,API_VERSION,BUILD_ID
+            return data.get("ok") is True and data.get("app_id")==APP_ID and data.get("api_version")==API_VERSION and data.get("build_id")==BUILD_ID and bool(data.get("instance_id"))
     except Exception:
         return False
 
 
 def _find_python() -> str | None:
-    """找 Python 3.10+；返回可执行文件路径（--exe 已含）。"""
+    """找 Python 3.14；返回调用参数。"""
     candidates: list[list[str]] = []
     p = shutil.which("python")
     if p and "WindowsApps" not in p:  # 跳过“微软应用商店”假 python（会弹商店）
@@ -222,7 +224,7 @@ def _find_python() -> str | None:
             if r.returncode != 0:
                 continue
             ver = tuple(int(x) for x in (r.stdout or "").strip().split(".")[:2])
-            if ver >= MIN_PY:
+            if ver == MIN_PY:
                 say(f"  找到 Python {' '.join(cmd)} → {r.stdout.strip()}")
                 return cmd  # type: ignore[return-value]
             say(f"  跳过过旧版本：{' '.join(cmd)} → {r.stdout.strip()}")
@@ -250,7 +252,7 @@ def ensure_env() -> str | None:
     else:
         py = _find_python()
         if not py:
-            say("[错误] 没有找到 Python 3.10+。")
+            say("[错误] 源码开发需要 Python 3.14 x64；普通收件人请使用便携 EXE。")
             say("  请到 https://www.python.org/downloads/ 安装，安装时勾选 “Add python.exe to PATH”。")
             say("  装好后重新双击 start.bat。")
             return None
@@ -264,7 +266,10 @@ def ensure_env() -> str | None:
             return None
         say(f"  环境创建完成：{venv_py_path}")
 
-    # 依赖：本地校验快路过 → 联网安装（多镜像）→ 离线兜底
+    if not _run_ok([venv_py,"-c","import sys,struct; assert sys.version_info[:2]==(3,14) and struct.calcsize('P')==8"]):
+        say("[错误] 当前 .venv 与锁定依赖不匹配，需要 Python 3.14 x64。请使用便携 EXE，或另建符合版本的开发环境。")
+        return None
+    # 精确版本与哈希；离线只接受同一锁定版本。
     if _stamp_match() and _deps_probe(venv_py):
         say("[2/2] 依赖已就绪（本地校验通过，跳过联网检查）")
         return venv_py
@@ -355,83 +360,14 @@ def cmd_server() -> int:
 
 
 def cmd_run() -> int:
-    say("=" * 46)
-    say("  栖霞山小向导")
-    say("=" * 46)
-    say(f"  程序目录：{ROOT}")
-    say(f"  日志文件：{say.path}")
-
-    # 1) 已有本程序的服务在跑？直接开页面
-    existing = find_our_service()
-    if existing:
-        url = f"http://127.0.0.1:{existing}"
-        say(f"  检测到服务已在运行：{url}")
-        proc = open_browser(url)
-        if proc:
-            proc.wait()
-            say("  应用窗口已关闭。服务仍在后台运行；要停请双击 scripts\\stop.bat。")
-        else:
-            pause("  按回车退出本窗口（服务继续运行；stop.bat 可停）…")
-        return 0
-
-    # 2) 装环境
-    venv_py = ensure_env()
+    venv_py=ensure_env()
     if not venv_py:
-        pause("  安装没成功，按回车关闭窗口（把上面内容发给我即可）…")
         return 1
-
-    # 2.5) 首次运行时当前是“系统 Python”，切到 venv 的 Python 再继续
-    rc = _maybe_reexec(venv_py)
+    rc=_maybe_reexec(venv_py)
     if rc is not None:
         return rc
-
-    # 3) 选端口
-    port = 0
-    preferred = os.environ.get("QIXI_TEST_PORT")
-    order = ([int(preferred)] + list(PORT_CANDIDATES)) if preferred else list(PORT_CANDIDATES)
-    for p in order:
-        if not _port_busy(p):
-            port = p
-            break
-        say(f"  端口 {p} 被别的程序占用，换下一个。")
-    if port == 0:
-        say("[错误] 8017–8022 都被占用。请先关掉占用程序（或跑 scripts\\stop.bat）。")
-        pause("  按回车关闭…")
-        return 1
-
-    # 4) 起服务：同一个进程 + 后台线程（不再依赖 start /b，最稳）
-    os.environ["QIXI_PORT"] = str(port)
-    from app.main import run_server
-
-    say(f"  启动服务：http://127.0.0.1:{port}")
-    import threading
-
-    threading.Thread(target=run_server, args=(port,), daemon=True).start()
-
-    deadline = time.time() + 40
-    while time.time() < deadline:
-        if _is_our_service(port, timeout=1.0):
-            break
-        time.sleep(0.5)
-    else:
-        say("[错误] 服务 40 秒内没有起来。日志里有细节；把日志发我。")
-        pause("  按回车关闭…")
-        return 1
-
-    # 5) 开浏览器，关窗后停服
-    url = f"http://127.0.0.1:{port}"
-    say(f"  服务已就绪：{url}")
-    proc = open_browser(url)
-    if proc is None:
-        pause("  按回车停止服务并退出…")
-        return 0
-    say("  浏览器已打开。关闭应用窗口即停止服务。")
-    try:
-        proc.wait()
-    except KeyboardInterrupt:
-        pass
-    say("  应用窗口已关闭，服务停止。")
-    return 0
+    from launcher import main as launch
+    return launch()
 
 
 def main() -> int:

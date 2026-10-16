@@ -16,6 +16,7 @@
     <nav class="topnav">
       <a href="/" class="ghost">← 回到向导</a>
     </nav>
+  <a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="exitApp">退出应用</button>
   </header>
 
   <main class="poster-layout">
@@ -26,8 +27,9 @@
         <div class="drop" id="dropZone">
           <input type="file" id="fileInput" accept="image/*,.heic,.heif" multiple hidden>
           <div class="drop-text">把照片拖进来，或 <button id="pickBtn" class="link">选择文件</button></div>
-          <div class="muted">照片只在本机处理，不上传图床；有 GPS 会自动匹配点位。</div>
+          <div class="muted">照片不落盘、不上传图床。有 GPS 本地匹配；可手工选点。最多 12 张，每张 25MB、4000 万像素；支持 JPG/PNG/WEBP。</div>
         </div>
+        <label class="muted"><input type="checkbox" id="cloudDetect">允许将压缩照片发给 DeepSeek 识别地点（不勾选则仅本地候选）</label><div id="photoError" role="status"></div>
         <div class="photo-grid" id="photoGrid"></div>
         <div class="console-row">
           <button id="samplesBtn" class="ghost">用示例照片一键体验</button>
@@ -51,6 +53,7 @@
           <button id="replayBtn">回放小传</button>
           <button id="recapBtn" class="ghost">刷新文案</button>
         </div>
+        <div id="diaryBody" style="white-space:pre-wrap;line-height:1.8"></div><button id="copyDiary" class="ghost">复制日记正文</button>
         <div id="replayBox" class="replay-box" hidden></div>
       </div>
     </section>
@@ -94,6 +97,7 @@
     </section>
   </main>
 
+  <script src="/js/session.js"></script>
   <script src="/vendor/html-to-image.js"></script>
   <script src="/vendor/exifr.min.js"></script>
   <script src="/poster/skill/renderer/render.js"></script>
@@ -105,5 +109,6 @@
   <script src="/poster/skill/renderer/grammar-map.js"></script>
   <script src="/poster/skill/renderer/poster-qa.js"></script>
   <script src="/poster/poster-app.js"></script>
+  <script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
 </body>
 </html>

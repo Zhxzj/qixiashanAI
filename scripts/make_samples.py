@@ -1,8 +1,8 @@
 """生成演示用示例照片与参考图库（合成图，无真人肖像，合规）。
 
 用途：
-1. `app/data/samples/` —— 演示"上传照片 → 生成海报"；
-2. `app/data/refs/<poi_id>/` —— 无 GPS 照片场景识别的本地参考图（M8）。
+1. `.tmp/synthetic-fixtures/samples/` —— 海报测试样本；
+2. `.tmp/synthetic-fixtures/refs/<poi_id>/` —— 合成测试参考图。
 
 说明：合成图为程序绘制的风格化风景，不含任何第三方肖像或版权素材；
 赛前可用公开图库/现场拍摄替换 `app/data/refs/`，脚本接口不变。
@@ -20,8 +20,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
-SAMPLES = ROOT / "app" / "data" / "samples"
-REFS = ROOT / "app" / "data" / "refs"
+SAMPLES = ROOT / ".tmp" / "synthetic-fixtures" / "samples"
+REFS = ROOT / ".tmp" / "synthetic-fixtures" / "refs"
 
 W, H = 1600, 1200
 

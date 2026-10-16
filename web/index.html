@@ -14,16 +14,19 @@
       <a class="toplink" href="/poster.html">游后日记 →</a>
       <button id="keyBtn" class="ghost">API Key</button>
     </div>
+  <a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="exitApp">退出应用</button>
   </header>
 
   <main class="layout">
     <section class="chat-panel">
       <div id="messages" class="messages">
         <div class="note">演示提示：右侧控制台可以「前进」或「跳点」，模拟在山上走。</div>
+        <div class="note">行程和文字记忆保存在这台电脑。资料及路线为示意草稿，正式出行请核对园区信息。</div>
       </div>
       <form id="chatForm" class="composer">
         <input id="chatInput" autocomplete="off" placeholder="跟小栖说点什么，比如：我现在看到的是什么？">
         <button type="submit">发送</button>
+        <button type="button" id="cancelChatBtn" class="ghost" disabled>取消回答</button>
       </form>
       <div class="quick" id="quickRow">
         <button class="chip-btn" data-q="明天上午到，想看红叶，也看千佛岩，怎么安排？">行前规划</button>
@@ -58,7 +61,7 @@
           <button id="gotoBtn">跳到这里</button>
         </div>
         <div class="console-row">
-          <button id="resetBtn" class="ghost">重置</button>
+          <button id="resetBtn" class="ghost">开始新行程</button>
           <span id="stateInfo" class="muted"></span>
         </div>
       </div>
@@ -94,7 +97,9 @@
     </div>
   </div>
 
+  <script src="/js/session.js"></script>
   <script src="/js/app.js"></script>
+  <script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
 </body>
 </html>
 

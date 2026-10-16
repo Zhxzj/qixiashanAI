@@ -15,12 +15,12 @@
 
     const photos = [hero, ...subs].slice(0, 6);
     const slots = [
-      { left: 6, top: 14, w: 44, h: 24, rot: -2.2 },
-      { left: 55, top: 13, w: 39, h: 21, rot: 2.6 },
-      { left: 8, top: 42, w: 37, h: 21, rot: 1.6 },
-      { left: 50, top: 38, w: 44, h: 25, rot: -2.8 },
-      { left: 12, top: 66, w: 35, h: 20, rot: -1.4 },
-      { left: 54, top: 65, w: 40, h: 22, rot: 2.2 },
+      { left: 6, top: 14, w: 44, h: 20, rot: -2.2 },
+      { left: 55, top: 13, w: 39, h: 19, rot: 2.6 },
+      { left: 8, top: 39, w: 37, h: 18, rot: 1.6 },
+      { left: 50, top: 38, w: 44, h: 20, rot: -2.8 },
+      { left: 12, top: 62, w: 35, h: 18, rot: -1.4 },
+      { left: 54, top: 62, w: 40, h: 18, rot: 2.2 },
     ];
     photos.forEach((p, i) => {
       const s = slots[i % slots.length];
@@ -32,7 +32,7 @@
         transform: `rotate(${s.rot + (rnd() - 0.5) * 1.2}deg)`,
       });
       box.appendChild(f);
-      const cap = (caps[i] && caps[i].text) || "";
+      const cap = ctx.captionFor(p, i).text || "";
       if (cap) {
         box.appendChild(textEl("div", "t6", cap, {
           position: "absolute", left: (s.left + jx + 1) + "%", top: (s.top + jy + s.h + 0.4) + "%",

@@ -23,29 +23,23 @@ SCHEMA = {
 }
 
 
+
 async def run(args, ctx):
-    state = ctx["state"]
-    route = state.get("route")
-    if not route:
-        return {"error": {"code": "no_route", "message": "还没有规划路线，先让游客说想去哪。"}}
-
-    locator = ctx["services"]["location"]
-    loc = locator.ensure(state)
-    target = locator.poi(route.get("to"))
-    if target is None:
-        return {"error": {"code": "not_found", "message": "目标点位数据缺失。"}}
-
-    pos = (loc["lat"], loc["lng"])
-    remaining = dist_m(pos, tuple(target["coord"]))
-    bearing = bearing_text(pos, tuple(target["coord"]))
-    step10 = max(10, round(remaining / 10) * 10)
-    text = f"朝{bearing}走，大约 {step10} 米就到{target['name']}。"
-    if args.get("action") == "repeat":
-        text = "再说一遍，" + text
-    return {
-        "text": text,
-        "audio_url": None,  # 构建期预生成音频后填 /audio/hint/xxx.mp3（M5）
-        "next_poi_id": route.get("to"),
-        "remaining_m": round(remaining),
-    }
-
+    state=ctx["state"]
+    route=state.get("route")
+    if not route or route.get("status")!="ready":
+        return {"error":{"code":"no_route","message":"请先规划一条有效路线"}}
+    index=route["current_step"]
+    if args.get("action")=="skip":
+        index=min(index+1,len(route["steps"]))
+        route["current_step"]=index
+    if route["remaining_m"]<=2:
+        return {"text":"已到达路线终点。","remaining_m":0,"next_poi_id":None,"audio_url":None}
+    if index>=len(route["steps"]):
+        return {"text":"已跳过全部提示，路线终点尚未到达。","remaining_m":route["remaining_m"],"next_poi_id":None,"audio_url":None}
+    step=route["steps"][index]
+    remaining=max(0,round(step["at_m"]-route["progress_m"]))
+    text=f"{step['instruction']}，沿路线约 {remaining} 米。"
+    if args.get("action")=="repeat":
+        text="再说一遍，"+text
+    return {"text":text,"audio_url":None,"next_poi_id":step["poi_id"],"remaining_m":remaining}

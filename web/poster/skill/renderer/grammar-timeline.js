@@ -13,7 +13,7 @@
       position: "absolute", left: "6.4%", top: "10.6%",
     }));
 
-    const axX = 27;
+    const axX = 50;
     box.appendChild(el("div", "hairline", {
       position: "absolute", left: axX + "%", top: "15%", width: "2px", height: "66%",
     }));
@@ -35,7 +35,7 @@
         position: "absolute", left: left + "%", top: top + "%",
         width: w + "%", height: "13.4%",
       }));
-      const cap = (caps[i] && caps[i].text) || "";
+      const cap = ctx.captionFor(p, i).text || "";
       if (cap) {
         box.appendChild(textEl("div", "t6", cap, {
           position: "absolute",

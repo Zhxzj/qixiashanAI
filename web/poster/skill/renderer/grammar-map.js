@@ -22,9 +22,8 @@
     svg.style.cssText = "position:absolute;inset:0;width:100%;height:100%";
     const nodes = [];
     for (let i = 0; i < n; i++) {
-      const t = i / (n - 1);
-      const x = 180 + 720 * t + Math.sin(t * Math.PI * 1.3) * 90;
-      const y = 1290 - 820 * t + Math.cos(t * Math.PI) * 60;
+      const x = i % 2 === 0 ? 450 : 560;
+      const y = i < 2 ? 1000 : 510;
       nodes.push([x, y]);
     }
     let d = `M ${nodes[0][0]} ${nodes[0][1]}`;
@@ -51,34 +50,29 @@
     box.appendChild(svg);
 
     // 起点 / 终点标记
-    const st = nodes[0], en = nodes[nodes.length - 1];
     box.appendChild(textEl("div", "t6", "起点", {
-      position: "absolute", left: (st[0] / 1080 * 100 - 2) + "%", top: (st[1] / 1620 * 100 + 2) + "%",
-      color: "var(--primary)",
+      position: "absolute", left: "44%", top: "78%",
+      color: "var(--ink)",
     }));
     box.appendChild(textEl("div", "t6", (spec.meta.poi_count ? spec.meta.poi_count + " 站" : "终点"), {
-      position: "absolute", left: (en[0] / 1080 * 100 - 2) + "%", top: (en[1] / 1620 * 100 - 6) + "%",
-      color: "var(--primary)",
+      position: "absolute", left: "44%", top: "16%",
+      color: "var(--ink)",
     }));
 
     // 照片锚点
     photos.forEach((p, i) => {
-      const [x, y] = nodes[Math.min(i, nodes.length - 1)];
-      const left = i % 2 === 0 ? x + 60 : x - 340;
-      const top = y - 190 + (i % 2) * 40;
+      const left = i % 2 === 0 ? 100 : 600;
+      const top = i < 2 ? 820 : 330;
       box.appendChild(photoEl(p, "polaroid", {
-        position: "absolute", left: Math.min(640, Math.max(60, left)) + "px",
-        top: Math.max(220, Math.min(1180, top)) + "px",
-        width: "26%", height: "15%",
+        position: "absolute", left: left + "px", top: top + "px",
+        width: "300px", height: "300px",
         transform: `rotate(${i % 2 === 0 ? -2 : 2.4}deg)`,
       }));
-      const cap = (caps[i] && caps[i].text) || "";
+      const cap = ctx.captionFor(p, i).text || "";
       if (cap) {
         box.appendChild(textEl("div", "t6", cap, {
           position: "absolute",
-          left: Math.min(640, Math.max(60, left)) + "px",
-          top: Math.max(220, Math.min(1180, top)) + 260 + "px",
-          width: "26%",
+          left: left + "px", top: top + 330 + "px", width: "300px",
         }));
       }
     });

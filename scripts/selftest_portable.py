@@ -1,123 +1,118 @@
-"""便携包自检（演示前 / 发给别人前跑一遍）：
-
-1) 便携 Python 能导入依赖与应用（fastapi/uvicorn/httpx/PIL + app.main）；
-2) 双击 start.bat 的实际链路（pythonw 静默启动）能起服务、/api/health 通过；
-3) 结束后尽量把测试进程收掉。
-
-用法：
-    .venv\\Scripts\\python scripts\\selftest_portable.py
-    .venv\\Scripts\\python scripts\\selftest_portable.py --stage dist\\枫客松-小栖-demo-free --port 8017
-退出码 0 = 通过。
-"""
-
-from __future__ import annotations
-
+"""Test the actual EXE in an isolated user cache; fail on skipped/unknown checks."""
 import argparse
+import hashlib
+import http.server
 import json
 import os
-import re
+import socket
 import subprocess
 import sys
+import threading
 import time
 import urllib.request
+import uuid
 from pathlib import Path
+ROOT=Path(__file__).resolve().parents[1]
 
-ROOT = Path(__file__).resolve().parents[1]
+def get_json(url):
+    with urllib.request.urlopen(url,timeout=2) as response:
+        return json.load(response)
 
-
-def _health(port: int, timeout: float = 1.5) -> bool:
-    try:
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health", timeout=timeout) as r:
-            return bool(json.loads(r.read().decode("utf-8", "ignore")).get("ok"))
-    except Exception:
-        return False
-
-
-def _listening_pid(port: int) -> str | None:
-    try:
-        r = subprocess.run(["netstat", "-ano", "-p", "tcp"], capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", timeout=20)
-        for line in (r.stdout or "").splitlines():
-            if "LISTENING" not in line:
-                continue
-            m = re.search(rf"127\.0\.0\.1:{port}\s+.*LISTENING\s+(\d+)", line)
-            if m:
-                return m.group(1)
-    except Exception:
-        pass
-    return None
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--stage", default=str(ROOT / "dist" / "枫客松-小栖-demo-free"))
-    ap.add_argument("--port", type=int, default=8017)
-    args = ap.parse_args()
-
-    stage = Path(args.stage)
-    py = stage / "runtime" / "python" / "python.exe"
-    if not py.exists():
-        print(f"[FAIL] 没找到便携运行时：{py}（先跑 scripts\\build_portable.bat）")
-        return 1
-
-    ok_all = True
-
-    # 1) 导入探针
-    env = {k: v for k, v in os.environ.items() if not k.startswith("PYTHON")}
-    env["PYTHONPATH"] = f"{stage};{stage / 'runtime' / 'packages'}"
-    env["PYTHONIOENCODING"] = "utf-8"
-    r = subprocess.run(
-        [str(py), "-c", "import fastapi, uvicorn, httpx, PIL, app.main; print('import OK')"],
-        capture_output=True, text=True, encoding="utf-8", errors="replace", env=env, timeout=120,
-    )
-    probe_ok = r.returncode == 0
-    ok_all &= probe_ok
-    print(f"[{'PASS' if probe_ok else 'FAIL'}] 依赖与应用可导入"
-          + ("" if probe_ok else f"：{(r.stderr or '')[-300:]}"))
-
-    # 2) start.bat 实际链路
-    if _health(args.port):
-        print(f"[WARN] 端口 {args.port} 上已有本程序在跑，先停掉再测（scripts\\stop.bat）。")
-        return 1 if not ok_all else 0
-
-    run_env = dict(env)
-    run_env["QIXI_NO_BROWSER"] = "1"
-    log_path = stage / "launcher.log"
-    try:
-        subprocess.run(["cmd", "/c", "start.bat"], cwd=str(stage), env=run_env,
-                       capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=90)
-    except Exception as e:
-        print(f"[WARN] 调 start.bat 出错（继续等端口）：{type(e).__name__}")
-
-    boot_ok = False
-    deadline = time.time() + 60
-    while time.time() < deadline:
-        time.sleep(1.0)
-        if _health(args.port):
-            boot_ok = True
-            break
-    ok_all &= boot_ok
-    print(f"[{'PASS' if boot_ok else 'FAIL'}] start.bat 链路能起服务（http://127.0.0.1:{args.port}）")
-
-    # 3) 收尾
-    pid = _listening_pid(args.port) if boot_ok else None
-    if pid:
+def wait_instance(path,process,timeout=30):
+    deadline=time.monotonic()+timeout
+    while time.monotonic()<deadline:
+        if process.poll() is not None:
+            raise AssertionError(f"成品提前退出：{process.returncode}")
         try:
-            subprocess.run(["taskkill", "/F", "/PID", pid], capture_output=True, timeout=20)
-            time.sleep(1.5)
-            stopped = not _health(args.port)
-        except Exception:
-            stopped = False
-        ok_all &= stopped
-        print(f"[{'PASS' if stopped else 'FAIL'}] 关闭后端口释放（pid={pid}）")
-    else:
-        print("[WARN] 没找到监听进程，跳过关闭检查")
+            instance=json.loads(path.read_text(encoding="utf-8"))
+            health=get_json(f"http://127.0.0.1:{instance['port']}/api/health")
+            if health.get("instance_id")==instance["instance_id"] and health.get("app_id")=="qixi-guide":
+                return instance,health
+        except (OSError,ValueError):
+            pass
+        time.sleep(.1)
+    raise AssertionError("等待成品就绪超时")
 
-    if not boot_ok and log_path.exists():
-        print("---- launcher.log 尾部 ----")
-        print("\n".join(log_path.read_text(encoding="utf-8", errors="replace").strip().splitlines()[-12:]))
-    return 0 if ok_all else 1
+def shutdown(instance):
+    request=urllib.request.Request(f"http://127.0.0.1:{instance['port']}/api/app/control",data=json.dumps({"token":instance["token"],"action":"exit"}).encode(),headers={"Content-Type":"application/json"},method="POST")
+    with urllib.request.urlopen(request,timeout=3) as response:
+        assert json.load(response)["stopping"]
 
-
-if __name__ == "__main__":
+def main():
+    ap=argparse.ArgumentParser()
+    ap.add_argument("--exe",type=Path,default=ROOT/"dist/栖霞山小向导.exe")
+    args=ap.parse_args()
+    assert args.exe.is_file(),"成品不存在，不能跳过"
+    user=ROOT/".tmp"/("成品验证 路径-"+uuid.uuid4().hex)
+    user.mkdir(parents=True)
+    env={k:v for k,v in os.environ.items() if not k.startswith("PYTHON")}
+    env.update(QIXI_USER_DIR=str(user),QIXI_NO_BROWSER="1",PYTHONPATH="Z:/not-installed",PYTHONHOME="Z:/not-installed",PATH=os.environ.get("SystemRoot","C:/Windows")+"/System32")
+    passed=[]
+    def check(name,condition):
+        assert condition,name
+        passed.append(name)
+        print("[PASS]",name,flush=True)
+    run=lambda *flags:subprocess.run([str(args.exe.resolve()),*flags],env=env,timeout=60).returncode
+    check("实际 EXE 在隔离 Python 环境中 --check",run("--check")==0)
+    folders=list((user/"versions").iterdir())
+    check("只创建一个完整版本",len(folders)==1)
+    version=folders[0]
+    marker=version/"web/index.html"
+    original=marker.read_bytes()
+    stamp=marker.stat().st_mtime_ns
+    check("热启动检查通过",run("--check")==0)
+    check("热启动复用文件，未重新展开",marker.stat().st_mtime_ns==stamp)
+    # Occupy a requested port with an unrelated HTTP 200 service. It must survive.
+    class Foreign(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200);self.end_headers();self.wfile.write(b'{"ok":true}')
+        def log_message(self,*args): pass
+    foreign=http.server.ThreadingHTTPServer(("127.0.0.1",0),Foreign)
+    threading.Thread(target=foreign.serve_forever,daemon=True).start()
+    occupied=foreign.server_port
+    env["QIXI_TEST_PORT"]=str(occupied)
+    process=subprocess.Popen([str(args.exe.resolve())],env=env,stdin=subprocess.DEVNULL)
+    instance=None
+    try:
+        started=time.monotonic()
+        instance,health=wait_instance(user/"instance/current.json",process)
+        startup_ms=round((time.monotonic()-started)*1000)
+        check("端口占用时启动自己的实例",instance["port"]!=occupied)
+        check("健康身份和构建一致",health["build_id"]==version.name)
+        time.sleep(.4)
+        check("无 stdin、无浏览器时宿主持久保活",process.poll() is None)
+        check("二次双击返回已有实例",run()==0 and get_json(f"http://127.0.0.1:{instance['port']}/api/health")["instance_id"]==instance["instance_id"])
+        check("活动实例阻止清理缓存",run("--clean-cache")!=0)
+        check("不停止无关 HTTP 200 服务",get_json(f"http://127.0.0.1:{occupied}/api/health")["ok"] is True)
+        with urllib.request.urlopen(f"http://127.0.0.1:{instance['port']}/poster.html") as page:
+            check("实际成品提供海报工作台",b"poster-app.js" in page.read())
+        shutdown(instance)
+        check("实例凭证退出，EXE 返回零",process.wait(timeout=15)==0)
+        check("退出移除本实例描述",not (user/"instance/current.json").exists())
+        marker.write_bytes(b"corrupted-test")
+        check("损坏缓存自动修复",run("--check")==0 and marker.read_bytes()==original)
+        (user/"config").mkdir(exist_ok=True)
+        keep=user/"config/keep.txt";keep.write_text("keep",encoding="ascii")
+        check("清理无活动实例缓存",run("--clean-cache")==0)
+        check("清理保留配置与行程",keep.exists() and (user/"state/sessions.sqlite3").exists() and not (user/"versions").exists())
+        bad=user/"损坏包.exe"
+        data=bytearray(args.exe.read_bytes());data[-1]^=1;bad.write_bytes(data)
+        bad_proc=subprocess.run([str(bad)],env=env,timeout=20)
+        check("损坏成品明确失败",bad_proc.returncode!=0)
+    finally:
+        if instance and process.poll() is None:
+            try:
+                shutdown(instance)
+                process.wait(timeout=12)
+            except Exception:
+                # Only a process handle created by this test may be terminated.
+                process.terminate()
+                process.wait(timeout=5)
+        foreign.shutdown();foreign.server_close()
+    report={"passed":passed,"exe_sha256":hashlib.sha256(args.exe.read_bytes()).hexdigest(),"warm_host_startup_ms_one_sample":startup_ms,"user_cache":str(user),"limitations":["本机无头验证，不代替干净 Win10/Win11 与浏览器已有窗口实测","单次启动数据不是 P95"]}
+    target=ROOT/"dist/portable-test-results.json"
+    target.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
+    print(f"成品验证 {len(passed)}/{len(passed)}；单次热宿主启动 {startup_ms}ms")
+    return 0
+if __name__=="__main__":
     sys.exit(main())

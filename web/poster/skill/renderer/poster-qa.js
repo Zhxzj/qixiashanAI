@@ -66,7 +66,10 @@
 
   function rectOf(node) {
     const r = node.getBoundingClientRect();
-    return r;
+    const stage = node.closest(".poster-stage");
+    const root = stage?.getBoundingClientRect();
+    const scale = root?.width ? 1080 / root.width : 1;
+    return {left:r.left*scale,right:r.right*scale,top:r.top*scale,bottom:r.bottom*scale,width:r.width*scale,height:r.height*scale};
   }
 
   function checkOverflow(stage, rootRect) {
@@ -146,7 +149,7 @@
     const bad = [];
     stage.querySelectorAll('[data-qa="img"]').forEach((f) => {
       const img = f.querySelector("img");
-      if (!img || !img.naturalWidth) return;
+      if (!img || !img.naturalWidth) { bad.push({type:"image-not-decoded"}); return; }
       const fr = rectOf(f), ir = rectOf(img);
       const srcRatio = img.naturalWidth / img.naturalHeight;
       const boxRatio = ir.width / Math.max(1, ir.height);
@@ -198,21 +201,21 @@
 
   function checkDensity(canvasCtx, w, h, palette) {
     try {
-      const bg = palette.bg;
+      const bg = palette.bg, paper = palette.paper;
       const img = canvasCtx.getImageData(0, 0, w, h).data;
       let same = 0, total = 0;
       for (let y = 0; y < h; y += 8) {
         for (let x = 0; x < w; x += 8) {
           const i = (y * w + x) * 4;
-          const d = Math.abs(img[i] - bg[0]) + Math.abs(img[i + 1] - bg[1]) + Math.abs(img[i + 2] - bg[2]);
+          const d = Math.min(Math.abs(img[i]-bg[0])+Math.abs(img[i+1]-bg[1])+Math.abs(img[i+2]-bg[2]),Math.abs(img[i]-paper[0])+Math.abs(img[i+1]-paper[1])+Math.abs(img[i+2]-paper[2]));
           if (d < 90) same++;
           total++;
         }
       }
       const ratio = same / Math.max(1, total);
-      return { name: "H9 留白", ok: ratio >= 0.30, detail: `背景可见约 ${(ratio * 100).toFixed(0)}%` };
+      return { name: "H9 留白", ok: ratio >= 0.35, detail: `背景可见约 ${(ratio * 100).toFixed(0)}%` };
     } catch (e) {
-      return { name: "H9 留白", ok: true, unknown: true, detail: "无法取样（跳过）" };
+      return { name: "H9 留白", ok: false, unknown: true, detail: "无法取样（跳过）" };
     }
   }
 
@@ -231,7 +234,7 @@
     if (opts && opts.canvasCtx && opts.palette) {
       results.push(checkDensity(opts.canvasCtx, opts.canvasCtx.canvas.width, opts.canvasCtx.canvas.height, opts.palette));
     }
-    const failed = results.filter((r) => !r.ok && !r.unknown);
+    const failed = results.filter((r) => !r.ok || r.unknown);
     return {
       ok: failed.length === 0,
       pass: results.filter((r) => r.ok).length,
