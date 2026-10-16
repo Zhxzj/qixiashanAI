@@ -55,3 +55,15 @@ node tools\test_poster_dom.mjs        :: 海报渲染 72 组合无头自测（�
 - **.bat 文件只写 ASCII**：cmd 按本地 ANSI 代码页逐字节解析 bat，UTF-8 的中文会把字符串拆成乱码命令
   （2026-10-15 实际踩坑）。面向用户的中文提示一律放 Python 输出；bat 只负责 `chcp 65001` 与调用。
 
+## 版本管理与推送（2026-10-16 起）
+- 远程仓库：`https://github.com/joeyl3526-cloud/qixi-guide`（**私有**），分支 `main`；
+  协作者：zhxzj、lisirui330-oss。三人协作流程见 `docs/协作指南.md`。
+- 仓库已排除 `dist/`、`.venv/`、`node_modules/`、日志等大文件（见 `.gitignore`），不要 `git add -f` 强行提交。
+- 本机普通终端推送：首次会弹 Git Credential Manager 浏览器登录；或先 `gh auth login` 一次。
+- Codex 沙箱内推送（schannel 与 `!` 凭证助手不可用，用下面配方）：
+  ```powershell
+  $env:GH_CONFIG_DIR='C:\Users\COLORFUL-Joey\Documents\Codex\.gh-cli'
+  $tok = gh auth token; $b64 = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("x-access-token:$tok"))
+  git -c http.sslBackend=openssl -c credential.helper= -c http.extraheader="AUTHORIZATION: basic $b64" push -u origin main
+  ```
+
