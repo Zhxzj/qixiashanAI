@@ -1,0 +1,233 @@
+{
+  "comparison": "before-osm-20261017; excludes secrets, materials, generated artifacts and design/inventory self hashes",
+  "files": [
+    {
+      "path": "app/config.py",
+      "bytes": 1321,
+      "sha256": "781178e73794a13a38cf9b69dcb2b358453e64c9ed801bc52eb38e4fe27f3525",
+      "status": "modified"
+    },
+    {
+      "path": "app/main.py",
+      "bytes": 16578,
+      "sha256": "de2213a8ed87de9fce1462aa5f56895cb6cdbc52553f604f713e3ff55f613ef7",
+      "status": "modified"
+    },
+    {
+      "path": "app/map_api.py",
+      "bytes": 16922,
+      "sha256": "3416a2b34fd686f70622aae51ad4359424a413ef0beb4c590f017eb97648db3f",
+      "status": "modified"
+    },
+    {
+      "path": "app/runtime.py",
+      "bytes": 1056,
+      "sha256": "2b0c3953cb598e16bab59c0f50d4b0b70bc4fbecd71b4cbe8e19fec1aea01e70",
+      "status": "modified"
+    },
+    {
+      "path": "app/agent/loop.py",
+      "bytes": 15049,
+      "sha256": "dd1682badc7ecbc1be36a405e3ca27da307019d0d5c6460604cda16866aeb14b",
+      "status": "modified"
+    },
+    {
+      "path": "app/services/map_navigation.py",
+      "bytes": 10381,
+      "sha256": "2f8a2fd496a902beb0afeb5a147cf1e74cab98c3e17229cd797e6cc6e91e1050",
+      "status": "modified"
+    },
+    {
+      "path": "app/services/osm_map.py",
+      "bytes": 8205,
+      "sha256": "530fb210ed3de4bdc3b088c2c5617afb24cbf2f626fb922ef5d633971f979569",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "app/services/route.py",
+      "bytes": 6309,
+      "sha256": "1816ca62656c3c86f65cd9144b41a4ec83fbb57c85c4390a2d8ebba1c2bf9e10",
+      "status": "modified"
+    },
+    {
+      "path": "app/services/session.py",
+      "bytes": 4643,
+      "sha256": "693fb34ab3705f9baa00797a0ba0fa4a25ae2d81d1aa55853a622d2ae9d7cc23",
+      "status": "modified"
+    },
+    {
+      "path": "app/tools/navigate_hint.py",
+      "bytes": 2832,
+      "sha256": "3d2bc8d342a3d54525a73fb447783beca950ac395f4f0adbae5b82757cdcd610",
+      "status": "modified"
+    },
+    {
+      "path": "app/tools/plan_route.py",
+      "bytes": 2343,
+      "sha256": "11d4cfa517425b3100ce5aefc36f0dd876d67fd465d2c490c36d65d0ca8605f0",
+      "status": "modified"
+    },
+    {
+      "path": "app/data/osm/map.json",
+      "bytes": 220397,
+      "sha256": "9df931c9e589426ce78d03e714990a067e5879b03afd5737f9ca3b99e97e9eef",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "app/data/osm/photo-reference.json",
+      "bytes": 2176,
+      "sha256": "1ec33e5cbce326f65fd8b7e9a8d935482536cff7296dbaa33f1e4e9d82d6752c",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "app/data/osm/README.md",
+      "bytes": 957,
+      "sha256": "d2ab3e5f588f2abdb482b5ab5451b32357e77b54511094060f4ec020b5fb622e",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "app/data/osm/source-config.json",
+      "bytes": 186,
+      "sha256": "138ab232b8591ebc813e35bb35cdeddc92c1024b610859525fa84bd1c7f5feaa",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "app/data/osm/source.osm.gz",
+      "bytes": 347046,
+      "sha256": "c26b43518cfd92c95be60929b2cad23afd61d576ae13c22762b5c7090ef000f0",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/index.html",
+      "bytes": 9910,
+      "sha256": "f8b657d647c5bc2b9e9bd7be15c4bf49768e259621c756ea255d3b16d7ff16a2",
+      "status": "modified"
+    },
+    {
+      "path": "web/css/map.css",
+      "bytes": 3577,
+      "sha256": "5bc2c330eb5a36416b3554fb1bb008b9d24c1d6da6d7d3ce331eae15f19c1722",
+      "status": "modified"
+    },
+    {
+      "path": "web/data/toilets-template.json",
+      "bytes": 317,
+      "sha256": "a9adacb974571336295d7c1258fef46c6903ae299266314a128e7d5be0dd7675",
+      "status": "modified"
+    },
+    {
+      "path": "web/js/map-osm.js",
+      "bytes": 22086,
+      "sha256": "1cd258e9486935489432a6926b8f488a003292875c6aab2c7c574380d2a8f3ea",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/leaflet.css",
+      "bytes": 14806,
+      "sha256": "a7837102824184820dfa198d1ebcd109ff6d0ff9a2672a074b9a1b4d147d04c6",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/leaflet.js",
+      "bytes": 147552,
+      "sha256": "db49d009c841f5ca34a888c96511ae936fd9f5533e90d8b2c4d57596f4e5641a",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/LICENSE",
+      "bytes": 1395,
+      "sha256": "53e8dc25862014e4324741ca18fbe3611e11d42ef69f59f86ea8c5389647d4cb",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/images/layers-2x.png",
+      "bytes": 1259,
+      "sha256": "066daca850d8ffbef007af00b06eac0015728dee279c51f3cb6c716df7c42edf",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/images/layers.png",
+      "bytes": 696,
+      "sha256": "1dbbe9d028e292f36fcba8f8b3a28d5e8932754fc2215b9ac69e4cdecf5107c6",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/images/marker-icon-2x.png",
+      "bytes": 2464,
+      "sha256": "00179c4c1ee830d3a108412ae0d294f55776cfeb085c60129a39aa6fc4ae2528",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/images/marker-icon.png",
+      "bytes": 1466,
+      "sha256": "574c3a5cca85f4114085b6841596d62f00d7c892c7b03f28cbfa301deb1dc437",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "web/vendor/leaflet/images/marker-shadow.png",
+      "bytes": 618,
+      "sha256": "264f5c640339f042dd729062cfc04c17f8ea0f29882b538e3848ed8f10edb4da",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "scripts/build_osm_data.py",
+      "bytes": 6277,
+      "sha256": "e145d170e77b185eb921fda8f65b91838c84795dde5b2e8527819e3cf5c21d44",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "scripts/build_portable.py",
+      "bytes": 10235,
+      "sha256": "e403c14ea4b9a9ef115a16695c90e9d2bbd8208ce32cd34d6196cdc49497ac26",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/selftest_portable.py",
+      "bytes": 7109,
+      "sha256": "af121550791e251d28a90c4868404313869096efe5d473e9a833db168488ce2d",
+      "status": "modified"
+    },
+    {
+      "path": "scripts/test_osm_delivery.py",
+      "bytes": 2571,
+      "sha256": "5cf78f3eb9f15da97c9991ff61a6688a1027b3b7e879e4f7dfd01df458cfe33c",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "tests/test_map_navigation.py",
+      "bytes": 14041,
+      "sha256": "a066471e76dcc154dfa93e01908a166dcf5707d8a191b787d8fc216c2937bf92",
+      "status": "modified"
+    },
+    {
+      "path": "tests/test_osm_map.py",
+      "bytes": 9320,
+      "sha256": "0cf30b92f43c48395150725517f62b07aef1d3835949d206b30a136eaaf87908",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "tools/test_osm_browser.cjs",
+      "bytes": 8279,
+      "sha256": "82089327ffa0a0dc2d212627b8526641c91c7c792a0e493b878881bff086d5b4",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "docs/Leaflet依赖来源.json",
+      "bytes": 1036,
+      "sha256": "fff69251bcfcea4fcdfaf6ff9a26e86624dc6bf9f6686cb778e2138a404c3c9b",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "docs/OSM电脑版使用说明.md",
+      "bytes": 2145,
+      "sha256": "2d1af063c7cbccfcd28399a072dfb38eb6732bcd865f6738bbc2e80d76394540",
+      "status": "new_or_not_in_backup"
+    },
+    {
+      "path": "README.md",
+      "bytes": 3787,
+      "sha256": "46154d60b03a56711a223f2c7bf968abe1bfdc504b97c66c9b94b817304f2e10",
+      "status": "modified"
+    }
+  ]
+}

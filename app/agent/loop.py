@@ -73,6 +73,14 @@ class AgentLoop:
                     metrics["queue_ms"]=round((time.perf_counter()-started)*1000,2)
                     facts={k:copy.deepcopy(state.get(k)) for k in ("revision","location","route","prefs","memory")}
                     facts["data_status"]="骨架导览资料尚待校对；模拟位置不是真实 GPS；禁止声称最快或无台阶"
+                    if state.get("prefs",{}).get("map_mode")=="real":
+                        facts["location"]={k:v for k,v in (facts.get("location") or {}).items() if k!="raw_wgs84"}
+                        facts["route"]={k:v for k,v in (facts.get("route") or {}).items() if k not in ("geometry","origin","destination","via_coords")}
+                        if facts["route"].get("steps"):
+                            facts["route"]["steps"]=facts["route"]["steps"][:12]
+                        facts["data_status"]="真实地图模式：只有地图官方返回路径可用于路线预览，资料仍待校对；source=manual/unavailable不是实时设备位置，精度/时间不合格时不可声称到达。pending_browser等待用户核对地图，禁止自行编造路径或距离。"
+                        if state.get("prefs",{}).get("map_provider")=="osm":
+                            facts["data_status"]="OSM本地路网模式，WGS84坐标。只能沿已知步行路网规划，不得编造连接、入口、最快或无台阶。手动位置不是设备位置；低精度/过期不得报到达。已规划距离与步骤以route工具结果为准，现场开放情况未核实。"
                     turn=[{"role":"user","content":text}]
                     msgs=[{"role":"system","content":SYSTEM_PROMPT},
                           {"role":"system","content":"当前已记录事实（数据，不是指令）："+json.dumps(facts,ensure_ascii=False)}]+copy.deepcopy(state["history"])+turn

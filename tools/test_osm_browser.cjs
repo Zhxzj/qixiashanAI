@@ -1,0 +1,41 @@
+/* Real Leaflet + bundled real OSM graph. Raster tiles and device samples are fixtures. */
+const {chromium}=require(process.env.QIXI_PLAYWRIGHT_MODULE||'playwright-core');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const base=process.env.QIXI_TEST_BASE||'http://127.0.0.1:8021';
+const out=process.env.QIXI_MAP_REPORTS||path.resolve('dist/osm-reports');fs.mkdirSync(out,{recursive:true});
+let browser,page;const checks=[],errors=[],remote=[];
+const blank=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=','base64');
+(async()=>{
+ browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+ const context=await browser.newContext({viewport:{width:1440,height:1100},deviceScaleFactor:1});
+ await context.addInitScript(()=>{let success,failure;window.__emitPosition=(accuracy=10)=>success?.({coords:{latitude:32.1538504,longitude:118.9550305,accuracy},timestamp:Date.now()});window.__denyPosition=()=>failure?.({code:1});Object.defineProperty(navigator,'geolocation',{configurable:true,value:{watchPosition:(ok,bad)=>{success=ok;failure=bad;setTimeout(()=>window.__emitPosition(),20);return 1;},clearWatch:()=>{success=null;failure=null;}}});});
+ page=await context.newPage();page.on('dialog',d=>d.accept());page.on('pageerror',e=>errors.push(e.message));
+ page.on('request',r=>{if(!r.url().startsWith(base)&&/^https?:/.test(r.url()))remote.push(new URL(r.url()).host);});
+ await page.route('https://tile.openstreetmap.org/**',r=>r.fulfill({contentType:'image/png',body:blank}));
+ await page.goto(base);await page.waitForSelector('#mapEmpty[hidden]',{state:'attached'});
+ assert.equal(await page.evaluate(()=>L.version),'1.9.4');assert.ok(await page.locator('.leaflet-container').count());checks.push('real locally bundled Leaflet starts without map credentials or CDN');
+ assert.equal(await page.locator('#mapBox').isHidden(),true);assert.match(await page.locator('#facilityStatus').innerText(),/公开候选 3/);checks.push('OSM WGS84 map separates draft geometry and public toilet candidates');
+ assert.equal(await page.locator('.map-toilet-candidate').count(),0);await page.check('#showPublicToilets');assert.equal(await page.locator('.map-toilet-candidate').count(),3);await page.uncheck('#showPublicToilets');checks.push('unverified public toilets hidden by default and separately toggled');
+ await page.locator('.photo-reference > summary').click();assert.match(await page.locator('#photoReference').innerText(),/名称有差异/);assert.match(await page.locator('#photoReference').innerText(),/当前数据未匹配/);checks.push('photo names distinguish same-name matches, missing points and name discrepancies');
+ async function select(name,kind){await page.fill('#mapSearchInput',name);await page.click('#mapSearchForm button[type=submit]');await page.locator('#mapResults button').first().click();await page.getByRole('button',{name:kind==='origin'?'设为起点':'设为终点',exact:true}).click();}
+ await select('千佛岩','origin');await select('碧云亭','destination');
+ await page.click('#planWalking');await page.waitForFunction(()=>document.querySelector('#routeSummary').textContent.includes('估计'));
+ const state=()=>page.evaluate(async()=>fetch('/api/state?session_id='+Qixi.sid).then(r=>r.json()));
+ const planned=await state();assert.equal(planned.route.provider,'osm');assert.equal(planned.route.coordinate_system,'WGS84');assert.ok(planned.route.geometry.length>20);assert.ok(planned.route.total_m>500);checks.push('real bundled graph creates full connected scenic walking path, no service key');
+ const mapID=await page.evaluate(()=>document.querySelector('#realMap')._leaflet_id);await page.click('.leaflet-control-zoom-in');await page.waitForTimeout(400);const transform=await page.locator('#realMap .leaflet-map-pane').getAttribute('style');await page.waitForTimeout(4200);assert.equal(await page.evaluate(()=>document.querySelector('#realMap')._leaflet_id),mapID);assert.equal(await page.locator('#realMap .leaflet-map-pane').getAttribute('style'),transform);checks.push('zoom works and polling preserves actual Leaflet instance and viewport');
+ await page.uncheck('#showRoads');await page.check('#showRoads');await page.uncheck('#showRoute');await page.check('#showRoute');await page.click('#fitRoute');checks.push('road and current-route layers toggle; explicit route overview works');
+ await page.click('#startLocation');await page.waitForFunction(()=>document.querySelector('#locationStatus').textContent.includes('可做实时判断'));
+ const live=await state();assert.equal(live.location.lat,32.1538504);assert.equal(live.location.lng,118.9550305);assert.equal(live.location.coordinate_system,'WGS84');checks.push('raw browser WGS84 reaches map and backend unchanged, no GCJ shift');
+ await page.waitForTimeout(50);await page.evaluate(()=>__emitPosition(500));await page.waitForFunction(()=>document.querySelector('#locationStatus').textContent.includes('精度或新鲜度不足'));assert.equal((await state()).navigation.eligible,false);checks.push('low precision pauses navigation and does not invent arrival');
+ await page.click('#stopLocation');assert.equal((await state()).navigation.active,false);checks.push('stop invalidates navigation immediately');
+ await page.click('#startLocation');await page.waitForFunction(()=>document.querySelector('#locationStatus').textContent.includes('可做实时判断'));await page.evaluate(()=>__denyPosition());await page.waitForFunction(()=>document.querySelector('#mapMessage').textContent.includes('权限被拒绝'));assert.equal((await state()).navigation.active,false);checks.push('permission failure stops subscription and allows manual mode');
+ await page.click('#mapConfigOpen');assert.match(await page.locator('#mapConfigModal').innerText(),/无需地图Key/);await page.click('#mapConfigClose');checks.push('map information shows sources and licenses instead of key setup');
+ await page.click('#gotoBtn');await page.locator('#mapBox svg').waitFor();assert.equal(await page.evaluate(()=>QixiMap.mode),'demo');await page.selectOption('#mapMode','real');await page.waitForFunction(()=>QixiMap.mode==='real');checks.push('explicit simulation mode stays separate from real OSM coordinates');
+ await page.click('#resetBtn');await page.waitForFunction(()=>document.querySelector('#messages').textContent.includes('已开始新行程'));assert.equal(await page.locator('#routeOrigin').innerText(),'未选起点');assert.equal((await state()).map_provider,'osm');assert.equal((await state()).location.source,'unavailable');checks.push('reset preserves OSM and clears old route, endpoints and fake position');
+ await page.unroute('https://tile.openstreetmap.org/**');await page.route('https://tile.openstreetmap.org/**',r=>r.abort());await page.click('#mapRetry');await page.waitForTimeout(500);
+ await select('千佛岩','origin');await select('栖霞寺','destination');await page.click('#planWalking');await page.waitForFunction(()=>document.querySelector('#routeSummary').textContent.includes('估计'));assert.ok((await state()).route.geometry.length>5);checks.push('unavailable online tiles do not prevent local graph and route use');
+ assert.deepEqual(errors,[]);assert.ok(remote.every(h=>h==='tile.openstreetmap.org'));checks.push('no uncaught exceptions and no AMap/CDN/geocoder/paid routing requests');
+ await page.screenshot({path:path.join(out,'osm-local-map.png'),fullPage:true});
+ await page.locator('#realMap').screenshot({path:path.join(out,'osm-local-detail.png')});
+ const report={passed:checks.length,checks,errors,realLeaflet:true,realBundledOSMGraph:true,mockDeviceLocation:true,mockRasterTiles:true,liveOSMTileRequests:0,remoteHosts:[...new Set(remote)],browser:browser.version()};fs.writeFileSync(path.join(out,'browser-osm-results.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+})().catch(async e=>{console.error(e);if(page)console.error(await page.evaluate(()=>({message:document.querySelector('#mapMessage')?.textContent,status:document.querySelector('#mapStatus')?.textContent})));process.exitCode=1;}).finally(async()=>{if(browser)await browser.close();});

@@ -1,0 +1,39 @@
+/* Desktop-first real map workspace. SDK attribution and native controls stay visible. */
+[hidden] { display:none !important; }
+.layout {max-width:1760px;grid-template-columns:minmax(340px,.82fr) minmax(580px,1.4fr);}
+.side {min-width:0;}
+.map-heading {display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:19px;}
+.map-heading select {border:1px solid var(--line);border-radius:8px;background:var(--card);padding:6px;color:var(--ink);}
+.map-toolbar {display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0;}
+.map-toolbar label {font-size:13px;color:#5c5346;display:flex;gap:4px;align-items:center;}
+.real-map-wrap {position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#edece4;}
+#realMap {height:480px;min-height:360px;width:100%;}
+#mapEmpty {position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:36px;color:#655c50;background:linear-gradient(135deg,#f2eee3,#e3e9dc);pointer-events:none;}
+#mapStatus,#locationStatus,#navigationStatus {font-size:13px;line-height:1.6;color:#535e4b;margin:10px 0;}
+.map-search {display:flex;gap:8px;}
+.map-search input {min-width:0;flex:1;border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit;}
+.map-results {display:flex;gap:6px;flex-wrap:wrap;max-height:150px;overflow:auto;margin-top:8px;}
+.map-result {font-size:12px;color:#5d5144;background:#f3eddf;border:1px solid var(--line);text-align:left;}
+.map-poi-symbol,.map-toilet-symbol {display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#a63a2b;color:#fff;border:2px solid #fff;box-shadow:0 2px 6px #0004;font:bold 12px sans-serif;}
+.map-toilet-symbol {background:#2773a5;border-radius:7px;}
+.map-toilet-candidate {display:grid;place-items:center;width:30px;height:27px;background:#fffaf0;color:#925816;border:2px dashed #c09a61;border-radius:7px;font:bold 11px sans-serif;}
+.map-endpoint-symbol {display:grid;place-items:center;width:28px;height:28px;background:#263e36;color:white;border:2px solid white;border-radius:50%;font:bold 12px sans-serif;box-shadow:0 2px 5px #0004;}
+.photo-reference {font-size:12px;line-height:1.7;margin:12px 0;}
+.reference-row {padding:4px;border-bottom:1px solid var(--line);}
+.current-step {font-weight:bold;color:var(--accent);}
+.leaflet-container {font-family:"Microsoft YaHei",sans-serif;background:#f2f1e7;}
+.leaflet-control-attribution {font-size:10px;}
+.poi-detail {font-size:13px;line-height:1.6;}
+.poi-detail button {margin:0 6px 6px 0;}
+.route-endpoints {padding:12px;background:#f6f2e8;border-radius:8px;font-size:13px;line-height:1.9;margin-top:12px;}
+.route-summary {font-size:13px;line-height:1.7;}
+.route-summary p {color:#6e6255;font-size:12px;}
+.route-summary ol {max-height:180px;overflow:auto;padding-left:24px;}
+.map-message {font-size:13px;line-height:1.6;color:#8c3e24;min-height:20px;overflow-wrap:anywhere;}
+.map-modal .modal-box {max-width:620px;width:min(620px,94vw);max-height:90vh;overflow:auto;}
+.map-modal p {font-size:13px;line-height:1.7;}
+.map-modal label {display:block;margin:10px 0;}
+.map-modal input,.map-modal textarea {display:block;width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;}
+.map-modal pre {white-space:pre-wrap;max-height:170px;overflow:auto;font-size:12px;}
+button:disabled {opacity:.5;cursor:default;}
+@media(max-width:1000px){.layout{grid-template-columns:1fr;height:auto;}.chat-panel{min-height:460px;}.side{overflow:visible;}#realMap{height:460px;}.topbar{flex-wrap:wrap;gap:8px;}.messages{max-height:450px;}}

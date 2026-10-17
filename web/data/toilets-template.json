@@ -1,0 +1,14 @@
+[
+  {
+    "id": "toilet_001",
+    "name": "",
+    "lat": null,
+    "lng": null,
+    "coordinate_system": "WGS84",
+    "source": "",
+    "verified_at": "",
+    "opening_hours": null,
+    "accessible": null,
+    "notes": "填写并核实全部必填项后再导入；本模板没有真实点位。"
+  }
+]

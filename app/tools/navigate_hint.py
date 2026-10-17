@@ -29,6 +29,17 @@ async def run(args, ctx):
     route=state.get("route")
     if not route or route.get("status")!="ready":
         return {"error":{"code":"no_route","message":"请先规划一条有效路线"}}
+    if route.get("provider") in ("amap","osm"):
+        from app.services.map_navigation import navigation_view
+        view=navigation_view(state)
+        if not view["eligible"]:
+            return {"text":"当前为路线预览，实时定位未就绪；请在地图开始定位并核对精度。", "navigation":view}
+        if view["status"] in ("off_route","checking_deviation"):
+            return {"text":"当前位置可能偏离路线，请查看地图并核对实际可通行道路。", "navigation":view}
+        if view["status"]=="destination_nearby":
+            return {"text":"定位显示接近目的地，请现场核对入口。", "navigation":view}
+        if route["remaining_m"]<=2 or route["current_step"]>=len(route["steps"]):
+            return {"text":"已接近路线末端，请核对实际入口；当前位置尚不足以确认到达。", "navigation":view}
     index=route["current_step"]
     if args.get("action")=="skip":
         index=min(index+1,len(route["steps"]))

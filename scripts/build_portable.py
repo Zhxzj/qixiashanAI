@@ -150,7 +150,7 @@ def main():
     resource=ROOT/"dist/guide-resource.o"
     run([windres,"guide.rc","-O","coff","-o",resource],cwd=ROOT/"native")
     run([compiler,"-municode","-mwindows","-Os","-static","-Wall","-Wextra","-Werror","-Wl,--no-insert-timestamp",ROOT/"native/portable.c",resource,"-o",native,"-lbcrypt","-lcabinet","-lshell32"])
-    (STAGE/"使用说明.txt").write_text("双击启动.bat；主交付请使用同目录外的栖霞山小向导.exe。\n首次启动自动准备用户缓存；无需管理员、Python或命令行。\n应用会保持运行，请点击页面右上角‘退出应用’；关闭浏览器不会停止服务。\n无 Key 时地图、模拟游览、照片手工选点和模板日记可用；对话需在设置里配置并测试。\n诊断：页面右上角‘诊断’。配置、行程和日志在 %LOCALAPPDATA%/QixiGuide。\n照片不保存到该目录；开启云识别时压缩照片会发往 DeepSeek。\n新版本运行前请先退出旧版本。删除 EXE 不会清除用户数据。\n缓存管理：退出全部实例后运行 EXE --clean-cache，仅清理版本及未完成展开，保留 config/state/logs。\n资料和路线为示意草稿，正式出行请核对园区信息。\n",encoding="utf-8-sig")
+    (STAGE/"使用说明.txt").write_text("双击启动.bat；主交付请使用同目录外的栖霞山小向导.exe。\n首次启动自动准备用户缓存；无需管理员、Python或命令行。\n应用会保持运行，请点击页面右上角‘退出应用’；关闭浏览器不会停止服务。\n默认Leaflet＋OpenStreetMap地图无需地图Key；在线底图需要联网，本地道路、景点和步行规划不依赖付费接口。\n对话另需模型Key；模拟游览、照片手工选点和模板日记可不配置模型。\n电脑定位以精度和采样时间为准，不保证米级；手动起点不代表实际位置。厕所位置待用户提供。\nOSM道路和照片参考未完成现场通行核实；路线不保证实时开放。公开厕所候选默认隐藏，等待核实。\n诊断：页面右上角‘诊断’。配置、行程和日志在 %LOCALAPPDATA%/QixiGuide。\n照片不保存到该目录；开启云识别时压缩照片会发往 DeepSeek。\n新版本运行前请先退出旧版本。删除 EXE 不会清除用户数据。\n缓存管理：退出全部实例后运行 EXE --clean-cache，仅清理版本及未完成展开，保留 config/state/logs。\n旧讲解资料和演示路线为草稿，正式出行请核对园区信息。\n",encoding="utf-8-sig")
     bat='@echo off\r\ncd /d "%~dp0"\r\nstart "" "%~dp0runtime\\python\\pythonw.exe" -B "%~dp0launcher.py"\r\n'
     (STAGE/"start.bat").write_bytes(bat.encode("ascii"))
     (STAGE/"启动.bat").write_bytes(bat.encode("ascii"))

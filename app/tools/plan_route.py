@@ -34,6 +34,8 @@ SCHEMA = {
 async def run(args, ctx):
     services = ctx["services"]
     locator = services["location"]
+    if ctx["state"].get("prefs",{}).get("map_mode")=="real" and ctx["state"].get("prefs",{}).get("map_provider")=="osm":
+        return services["osm"].plan_for_state(ctx["state"],args.get("to") or "",args.get("via") or [],locator.pois)
     key = (args.get("to") or "").strip()
     poi = locator.poi(key)
     if poi is None:

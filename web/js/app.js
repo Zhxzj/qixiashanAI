@@ -3,6 +3,7 @@
  */
 const SID = Qixi.sid;
 let uiGeneration = 0;
+let stateRequestSequence = 0;
 const chats = new Map();
 const seenArrivals = new Set();
 const $ = (s) => document.querySelector(s);
@@ -38,6 +39,8 @@ async function init() {
   const health = api("/api/health").then((h) => setKeyStatus(!!h.key_configured));
   refreshConditions().catch(() => { $("#conditions").textContent = "天气暂不可用"; });
   await Promise.all([core, health]);
+  await QixiMap.init({data:DATA,refresh:refreshState});
+  await refreshState();
   setInterval(() => refreshState().catch(() => {}), 2000);
 }
 
@@ -55,8 +58,9 @@ function fillPoiSelect() {
 
 async function refreshState() {
   const epoch = uiGeneration;
+  const requestSequence = ++stateRequestSequence;
   const st = await api(`/api/state?session_id=${SID}`);
-  if (epoch !== uiGeneration) return st;
+  if (epoch !== uiGeneration || requestSequence !== stateRequestSequence) return st;
   Qixi.generation = st.generation;
   if (st.arrived) onArrive(st.arrived, st.location?.snapped?.poi_distance_m);
   renderMap(st);
@@ -69,7 +73,7 @@ function renderStateInfo(st) {
   const loc = st.location || {};
   const snapped = loc.snapped || {};
   const poi = DATA.pois.find((p) => p.poi_id === snapped.poi_id);
-  $("#stateInfo").textContent = `${Number(loc.lat).toFixed(4)}, ${Number(loc.lng).toFixed(4)}${
+  $("#stateInfo").textContent = loc.lat == null ? "尚无真实位置；可手动选起点" : `${loc.source === "sim" ? "模拟位置 · " : loc.source === "manual" ? "手动起点 · " : "设备位置 · "}${Number(loc.lat).toFixed(4)}, ${Number(loc.lng).toFixed(4)}${
     poi ? " · 在" + poi.name : ""
   }`;
 }
@@ -82,7 +86,7 @@ function renderTripMini(st) {
     return;
   }
   const names = visited
-    .map((v) => (DATA.pois.find((p) => p.poi_id === v.poi_id) || {}).name || v.poi_id)
+    .map((v) => ((DATA.pois.find((p) => p.poi_id === v.poi_id) || {}).name || v.poi_id) + (v.source === "sim" ? "（演示）" : ""))
     .map((n) => `<span class="chip">${n}</span>`)
     .join("");
   const mem = memories.length ? `<div class="muted">记下 ${memories.length} 条</div>` : "";
@@ -92,6 +96,11 @@ function renderTripMini(st) {
 // ---------- 地图 ----------
 
 function renderMap(st) {
+  if (window.QixiMap && QixiMap.update(st)) return;
+  renderDraftMap(st);
+}
+
+function renderDraftMap(st) {
   const box = $("#mapBox");
   const pts = [];
   DATA.routes.forEach((r) => (r.geometry || []).forEach((g) => pts.push(g)));
@@ -317,6 +326,7 @@ async function onArrive(info, meters) {
 
 async function demoCall(path, payload, opts = {}) {
   const epoch = uiGeneration;
+  if (!path.endsWith("reset") && window.QixiMap && QixiMap.mode !== "demo") await QixiMap.setMode("demo");
   const r = await api(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -454,7 +464,9 @@ function bindEvents() {
     state.visits = {};
     state.voiceOn = true;
     $("#arrivedCard").style.display = "none";
-    addNote("已重置到山门。");
+    await QixiMap.reset();
+    await refreshState();
+    addNote(QixiMap.mode === "demo" ? "已重置演示到山门。" : "已开始新行程，请重新选择起点或开启定位。");
     return r;
   });
 

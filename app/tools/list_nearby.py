@@ -59,6 +59,17 @@ def _bearing_angle(a, b) -> float:
 async def run(args, ctx):
     locator = ctx["services"]["location"]
     loc = locator.ensure(ctx["state"])
+    if ctx["state"].get("prefs",{}).get("map_mode")=="real":
+        from app.services.map_navigation import quality
+        if not quality(ctx["state"]):
+            return {"items":[],"notice":"真实定位未就绪，请在地图定位或搜索景点；不使用草稿坐标估算周边。"}
+        items=[]
+        for pid,p in ctx["state"].get("_map_pois",{}).items():
+            distance=dist_m([loc["lat"],loc["lng"]],p["coord"])
+            if distance<=int(args.get("radius_m",300) or 300):
+                items.append({"poi_id":pid,"name":p["name"],"distance_m":round(distance),"source":"amap_sdk"})
+        return {"items":sorted(items,key=lambda x:x["distance_m"])[:max(1,min(20,int(args.get("limit",5) or 5)))],
+                "notice":"仅列本次已匹配的景点，不代表高德全量搜索；无法确认左右前后方向。"}
     radius = int(args.get("radius_m", 300) or 300)
     limit = int(args.get("limit", 5) or 5)
     direction = args.get("direction", "all")

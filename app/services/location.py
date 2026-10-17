@@ -93,6 +93,9 @@ class LocationService:
 
     def ensure(self, state: dict) -> dict:
         if not state.get("location"):
+            if state.get("prefs", {}).get("map_mode") == "real":
+                state["location"] = {"lat": None, "lng": None, "source": "unavailable", "snapped": {}}
+                return state["location"]
             sm = self.pois[0]
             lat, lng = sm["coord"]
             state["location"] = {

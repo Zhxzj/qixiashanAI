@@ -4,7 +4,9 @@ import os
 import tempfile
 from app.runtime import USER_DIR
 CONFIG_PATH = USER_DIR / "config" / "config.json"
-DEFAULTS = {"schema_version": 1, "deepseek_api_key": "", "model": "deepseek-flash", "port": 8017}
+DEFAULTS = {"schema_version": 1, "deepseek_api_key": "", "model": "deepseek-flash", "port": 8017,
+            "amap_js_key": "", "amap_security_code": "",
+            "osm_tile_url":"https://tile.openstreetmap.org/{z}/{x}/{y}.png"}
 def load_config():
     cfg = dict(DEFAULTS)
     if CONFIG_PATH.exists():

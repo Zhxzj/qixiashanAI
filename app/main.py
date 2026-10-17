@@ -25,6 +25,9 @@ from app.services.route import RouteService
 from app.services.session import SessionStore
 from app.services.weather import ConditionsService
 from app.services.provider import Provider
+from app.services.osm_map import OSMMapService
+from app.services import map_navigation as map_nav
+from app.map_api import router as map_router
 
 WEB_DIR=resource_path("web")
 DATA_DIR=resource_path("app/data")
@@ -33,6 +36,8 @@ cfg=load_config()
 sessions=SessionStore(user_path("state/sessions.sqlite3"))
 provider=Provider()
 services={"location":LocationService(DATA_DIR),"route":RouteService(DATA_DIR),"weather":ConditionsService(DATA_DIR),"photos":PhotoService(DATA_DIR,cfg),"provider":provider}
+services["osm"]=OSMMapService(DATA_DIR)
+services["route"].osm=services["osm"]
 agent=AgentLoop(cfg,sessions,services)
 INSTANCE_ID=os.environ.get("QIXI_INSTANCE_ID") or uuid.uuid4().hex
 CONTROL_TOKEN=os.environ.get("QIXI_CONTROL_TOKEN") or secrets.token_urlsafe(32)
@@ -53,7 +58,7 @@ async def lifespan(app):
         await asyncio.gather(*recap_tasks.values(),return_exceptions=True)
     await provider.close()
 
-app=FastAPI(title="栖霞山小向导",version="0.2.0",lifespan=lifespan)
+app=FastAPI(title="栖霞山小向导",version="0.4.0",lifespan=lifespan)
 
 @app.middleware("http")
 async def local_guard(request:Request,call_next):
@@ -62,6 +67,8 @@ async def local_guard(request:Request,call_next):
     origin=request.headers.get("origin")
     if origin and origin!=str(request.base_url).rstrip("/"):
         return JSONResponse({"detail":"只允许本机应用页面操作"},403)
+    if request.url.path.startswith(("/api/map/","/_AMapService/")) and request.headers.get("sec-fetch-site")=="cross-site":
+        return JSONResponse({"detail":"地图仅允许本机应用页面使用"},403)
     if request.method=="POST":
         try:
             if int(request.headers.get("content-length","0"))>17_000_000:
@@ -77,15 +84,24 @@ def _sse(obj):
     return "data: "+json.dumps(obj,ensure_ascii=False)+"\n\n"
 
 def _state_view(state):
-    return {k:state.get(k) for k in ("session_id","generation","revision","location","route","visited","memory","announced")}
+    navigation = map_nav.navigation_view(state)
+    return {**{k:state.get(k) for k in ("session_id","generation","revision","location","route","visited","memory","announced")},
+            "map_mode":state.get("prefs",{}).get("map_mode","demo"), "map_provider":map_nav.provider(state), "map_intent":state.get("_map_intent"), "navigation":navigation}
 
 def _sync_arrival(state,now=None):
     now=time.monotonic() if now is None else now
     loc=state.get("location") or {}
+    if map_nav.real_mode(state):
+        if not map_nav.quality(state):
+            state.pop("_arrival_pending",None)
+            return None
     snap=loc.get("snapped") or {}
     pid=snap.get("poi_id")
     poi=services["location"].poi(pid)
-    distance=dist_m((loc["lat"],loc["lng"]),poi["coord"]) if poi else float("inf")
+    reference = (state.get("_map_pois",{}).get(pid) or {}).get("coord") if map_nav.real_mode(state) else (poi or {}).get("coord")
+    distance=dist_m((loc["lat"],loc["lng"]),reference) if poi and reference else float("inf")
+    if map_nav.real_mode(state):
+        distance += loc.get("accuracy_m",float("inf"))
     pending=state.get("_arrival_pending")
     if pending:
         visit=next((v for v in reversed(state["visited"]) if v["poi_id"]==pending["poi_id"]),None)
@@ -99,9 +115,11 @@ def _sync_arrival(state,now=None):
     if pid in state["announced"]:
         return None
     if not pending or pending["poi_id"]!=pid:
-        state["_arrival_pending"]={"poi_id":pid,"entered":now}
+        state["_arrival_pending"]={"poi_id":pid,"entered":now,"sample_at":loc.get("sample_at",0)}
         return None
     if now-pending["entered"]<8:
+        return None
+    if map_nav.real_mode(state) and loc.get("sample_at",0)-pending.get("sample_at",0)<5:
         return None
     state["announced"].append(pid)
     state["visited"].append({"poi_id":pid,"ts":int(time.time()),"stay_s":int(now-pending["entered"]),"source":loc.get("source","sim")})
@@ -287,6 +305,8 @@ async def recap(body:RecapIn):
 async def goto(body:GotoIn):
     async with sessions.lock(body.session_id):
         st=checked_state(body)
+        map_nav.stop(st)
+        st["prefs"]["map_mode"]="demo"
         if services["location"].jump_to_poi(st,body.poi_id) is None:
             raise HTTPException(404,"没有这个点位")
         st["route"]=None
@@ -298,6 +318,11 @@ async def goto(body:GotoIn):
 async def advance(body:AdvanceIn):
     async with sessions.lock(body.session_id):
         st=checked_state(body)
+        map_nav.stop(st)
+        if map_nav.real_mode(st):
+            st["prefs"]["map_mode"]="demo"
+            st["location"]=None
+            st["route"]=None
         services["location"].advance(st,body.meters)
         event=_sync_arrival(st)
         sessions.save(st)
@@ -305,8 +330,15 @@ async def advance(body:AdvanceIn):
 
 @app.post("/api/demo/reset")
 async def reset(body:SessionIn):
+    previous_mode=sessions.get(body.session_id).get("prefs",{}).get("map_mode","demo")
+    previous_provider=map_nav.provider(sessions.get(body.session_id))
     st=sessions.reset(body.session_id)
+    st["prefs"]["map_mode"]=previous_mode
+    st["prefs"]["map_provider"]=previous_provider
+    st["prefs"]["map_bounds"]=services["osm"].data["bounds"] if previous_provider=="osm" else map_nav.BOUNDS
+    if previous_provider=="osm":st["_map_pois"]=services["osm"].internal_matches(services["location"].pois)
     services["location"].ensure(st)
+    sessions.save(st,bump=False)
     return {"state":_state_view(st),"arrived":None}
 
 @app.post("/api/chat/cancel")
@@ -334,6 +366,7 @@ async def audio(poi_id:str):
         raise HTTPException(404,"no audio")
     return FileResponse(path,media_type="audio/mpeg")
 
+app.include_router(map_router(cfg,sessions,services,checked_state))
 app.mount("/samples",StaticFiles(directory=DATA_DIR/"samples"),name="samples")
 app.mount("/",StaticFiles(directory=WEB_DIR,html=True),name="web")
 

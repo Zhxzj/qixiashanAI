@@ -54,6 +54,18 @@ class RouteService:
         return None
 
     def plan(self,state,to,via=None,theme="classic",consider_weather=True,conditions=None):
+        if state.get("prefs",{}).get("map_mode")=="real" and state.get("prefs",{}).get("map_provider")=="osm" and hasattr(self,"osm"):
+            return self.osm.plan_for_state(state,to,via or [],list(self.pois.values()))
+        if state.get("prefs",{}).get("map_mode")=="real":
+            import uuid
+            # The official JS SDK runs in the browser. Never calculate a draft fallback here.
+            intent={"id":uuid.uuid4().hex,"to":to,"via":via or [],"theme":theme,
+                    "consider_weather":consider_weather}
+            state["_map_intent"]=intent
+            state["route"]=None
+            from app.services.map_navigation import stop
+            stop(state)
+            return {"status":"pending_browser","message":"已请求地图规划；请在地图核对景点和起点，完成后以地图返回的真实步行路线为准。主题/天气条件尚未用于高德算路。"}
         via=via or []
         targets=[]
         for key in [*via,to]:

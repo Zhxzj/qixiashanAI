@@ -1,0 +1,166 @@
+{
+  "baseline_commit": "25e21154d88b28e8efd96ba99d4612e614fd8644",
+  "files": [
+    {
+      "path": "README.md",
+      "change": "modified",
+      "bytes": 3424,
+      "sha256": "94decab96e8b5b9c7258a41486926eb54a23a5c57447250c1f8f4dc51a80842d"
+    },
+    {
+      "path": "app/agent/loop.py",
+      "change": "modified",
+      "bytes": 14643,
+      "sha256": "b4e59f0505a8b95fcb28b6606b0f666b03ba590c2fc4101e42ef240af7ef3c6f"
+    },
+    {
+      "path": "app/config.py",
+      "change": "modified",
+      "bytes": 1243,
+      "sha256": "ed07ffe612d656de65f79a4ca91baf44a8930517b1943f0faa5f5565ec8f9a07"
+    },
+    {
+      "path": "app/main.py",
+      "change": "modified",
+      "bytes": 16069,
+      "sha256": "ffc6c0652f3def1ef6b7f123a005588bd9b6b7009d41f45660e638c0c22df378"
+    },
+    {
+      "path": "app/map_api.py",
+      "change": "new",
+      "bytes": 13463,
+      "sha256": "7ff8aadaeb93d7a523b4a0afd423b23268a6c983320e74836c3eaa1a0eaaa4b6"
+    },
+    {
+      "path": "app/runtime.py",
+      "change": "modified",
+      "bytes": 1056,
+      "sha256": "16419106554559097fab1d4bd06df36156b31e1e9d453a0b2917cdbf368ff5b0"
+    },
+    {
+      "path": "app/services/location.py",
+      "change": "modified",
+      "bytes": 5713,
+      "sha256": "dd4d81d373995953b01b4f737ea3d92ebc0dca5fc17b00913769d1c150fb5101"
+    },
+    {
+      "path": "app/services/map_navigation.py",
+      "change": "new",
+      "bytes": 9465,
+      "sha256": "d4c5d189727826c9266e8679a3fd6decba136380292d0bbe6eb4f465ba8c68ac"
+    },
+    {
+      "path": "app/services/provider.py",
+      "change": "modified",
+      "bytes": 1127,
+      "sha256": "04dba6a2a665453cf2bc0f9f6a1194580b0eecbe8df78fd6419a85bd04e22406"
+    },
+    {
+      "path": "app/services/route.py",
+      "change": "modified",
+      "bytes": 6084,
+      "sha256": "7da67cfa1f43ebb255fb6c80c15a36e27f2674be3236d64a31453f3ce919451c"
+    },
+    {
+      "path": "app/services/session.py",
+      "change": "modified",
+      "bytes": 4625,
+      "sha256": "95790c041e015a02aec3e74532d9c95189ccdd2e05193947f5c9c4a3eac2bb7a"
+    },
+    {
+      "path": "app/tools/get_location.py",
+      "change": "modified",
+      "bytes": 1488,
+      "sha256": "617e09146c7426b9f5ce945197788b17de35a189af02272c24861a504c1b90b7"
+    },
+    {
+      "path": "app/tools/list_nearby.py",
+      "change": "modified",
+      "bytes": 4348,
+      "sha256": "5245b00e830f86e4a557b399b7df445a5573f222d0b0717586b4e929395584d0"
+    },
+    {
+      "path": "app/tools/navigate_hint.py",
+      "change": "modified",
+      "bytes": 2822,
+      "sha256": "a45d5cf3fa1773bb6b2149802a157d67c4ff2be4f6c11deab6854b0b6090d67d"
+    },
+    {
+      "path": "docs/电脑地图接口变更-2026-10-17.md",
+      "change": "new",
+      "bytes": 2201,
+      "sha256": "ea95e8c8b508e8e3599b2ae790fe89fbee01fbef679c740b6054ac66f5ff9851"
+    },
+    {
+      "path": "docs/电脑真实地图使用与配置.md",
+      "change": "new",
+      "bytes": 5227,
+      "sha256": "3530745c96f100323a4bda462e9ded136924cdfc42cb66afca9c35b922f9d583"
+    },
+    {
+      "path": "scripts/build_portable.py",
+      "change": "modified",
+      "bytes": 10024,
+      "sha256": "cc808236d206329accfed8c6a2bb8d4dc8b64bcd37cce7a06ac0879efcd3a792"
+    },
+    {
+      "path": "scripts/selftest_portable.py",
+      "change": "modified",
+      "bytes": 6740,
+      "sha256": "22a32d12aa1738e0ac3badd21a7cd62e8047e76a8f6bde896758e5316ab0b699"
+    },
+    {
+      "path": "scripts/test_map_delivery.py",
+      "change": "new",
+      "bytes": 2357,
+      "sha256": "05b10f7877c1ba2cc3c49a4502f3bdb83f0dee1b0656e025cfda9cbb9a05f06b"
+    },
+    {
+      "path": "tests/test_map_navigation.py",
+      "change": "new",
+      "bytes": 14039,
+      "sha256": "b49e005d281c58105f2bf39a0398e3ca02d7e1a078022b42319f71c9b3092dd7"
+    },
+    {
+      "path": "tools/test_map_browser.cjs",
+      "change": "new",
+      "bytes": 11158,
+      "sha256": "f3041f1e2d28c0e98e1a868defc34bd692d7fe55efc59a7f48f049f72ef00a55"
+    },
+    {
+      "path": "web/css/map.css",
+      "change": "new",
+      "bytes": 2876,
+      "sha256": "cc6c56382202f2afefff25b64d4f2b6ccf5072898c663457b81e7cb553a2fc4d"
+    },
+    {
+      "path": "web/data/toilets-template.json",
+      "change": "new",
+      "bytes": 318,
+      "sha256": "1f8896d6de0783bf0514e50d93b7232a6fc40c7d64d1bb4fa13f1e4dd247bc45"
+    },
+    {
+      "path": "web/index.html",
+      "change": "modified",
+      "bytes": 9340,
+      "sha256": "edf13b6c2562965324038e5d6dc0d2154cb820ef2c8389cb9fe8cf70be18bd7b"
+    },
+    {
+      "path": "web/js/app.js",
+      "change": "modified",
+      "bytes": 19155,
+      "sha256": "5325f085b2c4a733bf8623de0af8455eb7496eff1eab6ef2e80b407945083310"
+    },
+    {
+      "path": "web/js/map.js",
+      "change": "new",
+      "bytes": 27433,
+      "sha256": "bb838cbc426104005cdd382bed09acfbc6d6b7c8997e463d5398a788a0f24f39"
+    }
+  ],
+  "excluded": [
+    "原有图片资料/、文字资料/",
+    "dist/.tmp/用户配置及凭据",
+    "本清单和设计文档自身（避免递归哈希）"
+  ]
+}

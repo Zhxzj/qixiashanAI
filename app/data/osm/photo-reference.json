@@ -1,0 +1,69 @@
+{
+  "sources": [
+    "用户提供全景导览牌照片29bb225c25a2c4006c6de4b754eaab45.jpg",
+    "用户提供森林步道牌照片bb331e83a339fe8174b0bcd1c41d6034.jpg"
+  ],
+  "coordinate_extraction": false,
+  "items": [
+    {
+      "photo_name": "虎山服务站",
+      "osm_id": null,
+      "status": "not_in_extract",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "虎山瀑布",
+      "osm_id": null,
+      "status": "not_in_extract",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "碧云亭",
+      "osm_id": "node/5599488218",
+      "status": "name_match_not_field_verified",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "读枫阁",
+      "osm_id": null,
+      "status": "name_difference",
+      "note": "OSM标注“读枫”，不能直接认定与照片的“读枫阁”同一名称"
+    },
+    {
+      "photo_name": "揽秋湖",
+      "osm_id": null,
+      "status": "not_in_extract",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "叠浪岩",
+      "osm_id": null,
+      "status": "not_in_extract",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "德云亭",
+      "osm_id": "node/4771298532",
+      "status": "name_match_not_field_verified",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "桃花扇亭",
+      "osm_id": "node/5599488222",
+      "status": "name_match_not_field_verified",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "桃花涧",
+      "osm_id": null,
+      "status": "not_in_extract",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    },
+    {
+      "photo_name": "珍珠泉",
+      "osm_id": "node/5604273225",
+      "status": "name_match_not_field_verified",
+      "note": "仅名称核对；现场位置、通行情况未核实"
+    }
+  ]
+}
