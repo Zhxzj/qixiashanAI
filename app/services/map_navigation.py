@@ -190,7 +190,11 @@ def navigation_view(state, now=None):
         route["remaining_m"] = round(max(0, route["total_m"] - offset))
         route["current_step"] = next((i for i, s in enumerate(route["steps"]) if s["at_m"] > offset + 2), len(route["steps"]))
         # Projection alone is not arrival; require actual proximity with uncertainty included.
-        if dist_m(pos, route["destination"]) + loc["accuracy_m"] <= 35:
+        target = next((p for p in route.get("annotation_targets", []) if p["role"] == "destination"), None)
+        if target:
+            if dist_m(pos, target["road_endpoint"]) + loc["accuracy_m"] <= 35:
+                status = "road_endpoint_nearby"
+        elif dist_m(pos, route["destination"]) + loc["accuracy_m"] <= 35:
             status = "destination_nearby"
     route["navigation_status"] = status
     return {"active": True, "eligible": True, "status": status, "off_route_m": round(off),

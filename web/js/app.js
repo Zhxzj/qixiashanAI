@@ -35,13 +35,19 @@ async function api(path, opts) {
 // ---------- 初始化 ----------
 
 async function init() {
-  const core = api("/api/data").then((d) => { DATA = d; fillPoiSelect(); return refreshState(); });
-  const health = api("/api/health").then((h) => setKeyStatus(!!h.key_configured));
   refreshConditions().catch(() => { $("#conditions").textContent = "天气暂不可用"; });
-  await Promise.all([core, health]);
-  await QixiMap.init({data:DATA,refresh:refreshState});
-  await refreshState();
+  const core=api('/api/data').then(d=>{DATA=d;fillPoiSelect();return refreshState();});
+  const health=api('/api/health').then(h=>setKeyStatus(!!h.key_configured));
+  const status=await Promise.allSettled([core,health]);
+  status.forEach(x=>{if(x.status==='rejected')addNote('部分数据加载失败：'+x.reason.message);});
+  try { await QixiMap.init({data:DATA,refresh:refreshState}); }
+  catch(e){const warning=$('#mapLoadError');warning.hidden=false;warning.textContent='地图加载失败：'+e.message+'。请点击重试底图。';}
+  await refreshState().catch(e=>addNote('会话暂不可用：'+e.message));
   setInterval(() => refreshState().catch(() => {}), 2000);
+  $('#appVersion').textContent=window.QIXI_FRONTEND?.version||'版本待核对';
+  $('#reloadVersion').onclick=()=>location.reload();
+  async function checkVersion(){try{const current=await api('/api/ui-version');if(current.web_revision!==window.QIXI_FRONTEND?.web_revision||current.build_id!==window.QIXI_FRONTEND?.build_id)$('#versionNotice').hidden=false;}catch{}}
+  checkVersion();setInterval(checkVersion,15000);
 }
 
 function setKeyStatus(ok) {
@@ -326,7 +332,7 @@ async function onArrive(info, meters) {
 
 async function demoCall(path, payload, opts = {}) {
   const epoch = uiGeneration;
-  if (!path.endsWith("reset") && window.QixiMap && QixiMap.mode !== "demo") await QixiMap.setMode("demo");
+  if (!path.endsWith("reset") && window.QixiMap && QixiMap.mode !== "demo") { addNote("这是演示操作。请先明确切换到演示草稿；真实地图不会因跳点而自动隐藏。"); return {}; }
   const r = await api(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

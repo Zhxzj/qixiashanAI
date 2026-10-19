@@ -9,13 +9,23 @@
 .real-map-wrap {position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#edece4;}
 #realMap {height:480px;min-height:360px;width:100%;}
 #mapEmpty {position:absolute;inset:0;display:grid;place-content:center;text-align:center;padding:36px;color:#655c50;background:linear-gradient(135deg,#f2eee3,#e3e9dc);pointer-events:none;}
-#mapStatus,#locationStatus,#navigationStatus {font-size:13px;line-height:1.6;color:#535e4b;margin:10px 0;}
+#locationStatus,#navigationStatus {font-size:13px;line-height:1.6;color:#535e4b;margin:10px 0;}
 .map-search {display:flex;gap:8px;}
 .map-search input {min-width:0;flex:1;border:1px solid var(--line);border-radius:8px;padding:9px;font:inherit;}
 .map-results {display:flex;gap:6px;flex-wrap:wrap;max-height:150px;overflow:auto;margin-top:8px;}
 .map-result {font-size:12px;color:#5d5144;background:#f3eddf;border:1px solid var(--line);text-align:left;}
 .map-poi-symbol,.map-toilet-symbol {display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:#a63a2b;color:#fff;border:2px solid #fff;box-shadow:0 2px 6px #0004;font:bold 12px sans-serif;}
 .map-toilet-symbol {background:#2773a5;border-radius:7px;}
+.map-user-toilet-symbol,.map-gate-symbol,.map-preview-symbol,.map-road-end-symbol {display:grid;place-items:center;width:32px;height:32px;border:3px solid white;box-shadow:0 2px 6px #0006;color:white;background:#763798;border-radius:7px;font:bold 17px sans-serif;}
+.map-gate-symbol {background:#17624e;border-radius:3px;}
+.leaflet-tooltip.facility-label {padding:2px 5px;background:#fffef9;border:1px solid #9c81ac;color:#432451;font:bold 11px "Microsoft YaHei",sans-serif;box-shadow:0 1px 3px #0003;}
+.map-alert {padding:10px;background:#fff0d6;border:1px solid #bc792a;color:#713b15;border-radius:7px;font-size:13px;line-height:1.7;}
+.map-preview-symbol {background:#b56d08;border-radius:50%;}
+.map-road-end-symbol {background:#374e71;border-radius:50%;font-size:10px;}
+.selected-place .map-user-toilet-symbol,.selected-place .map-gate-symbol {outline:3px solid #e5b344;transform:scale(1.1);}
+.annotation-editor {padding:14px;border:2px solid #a67bb8;border-radius:10px;background:#fcf7ff;line-height:1.7;font-size:13px;}
+.annotation-editor select {max-width:100%;padding:8px;font:inherit;}
+.annotation-editor h3 {margin-top:0;}
 .map-toilet-candidate {display:grid;place-items:center;width:30px;height:27px;background:#fffaf0;color:#925816;border:2px dashed #c09a61;border-radius:7px;font:bold 11px sans-serif;}
 .map-endpoint-symbol {display:grid;place-items:center;width:28px;height:28px;background:#263e36;color:white;border:2px solid white;border-radius:50%;font:bold 12px sans-serif;box-shadow:0 2px 5px #0004;}
 .photo-reference {font-size:12px;line-height:1.7;margin:12px 0;}
@@ -25,6 +35,25 @@
 .leaflet-control-attribution {font-size:10px;}
 .poi-detail {font-size:13px;line-height:1.6;}
 .poi-detail button {margin:0 6px 6px 0;}
+.map-workspace .real-map-wrap {align-self:start;}
+.map-workspace {min-width:0;container-type:inline-size;display:grid;grid-template-columns:minmax(0,1fr);gap:14px;}
+.map-workspace.has-place {grid-template-columns:minmax(360px,1fr) 290px;}
+.poi-detail {min-width:0;max-height:600px;overflow:auto;padding:14px;border:1px solid var(--line);border-radius:10px;background:#fffcf5;overflow-wrap:anywhere;}
+.poi-detail h3 {margin:4px 0 12px;font-size:24px;}
+.poi-detail .place-summary {font-size:21px;line-height:1.6;color:var(--ink);font-weight:600;}
+.poi-detail .place-detail-text {font-size:15px;line-height:1.8;}
+.poi-detail .place-credit {font-size:12px;line-height:1.6;color:#5c5346;}
+.place-photo-button {display:block;padding:0;width:100%;border:0;background:#eee9dd;aspect-ratio:4/3;overflow:hidden;border-radius:8px;cursor:zoom-in;}
+.place-photo-button img {width:100%;height:100%;object-fit:cover;}
+.selected-place .map-poi-symbol {outline:4px solid #e5b344;transform:scale(1.15);}
+.map-result[aria-pressed=true] {outline:2px solid var(--accent);font-weight:bold;}
+.place-photo-dialog {width:min(960px,94vw);max-height:94vh;border:1px solid #bbb;border-radius:12px;background:#fffcf5;padding:14px;}
+.place-photo-dialog::backdrop {background:#000b;}
+.place-photo-dialog img {display:block;max-width:100%;height:auto;max-height:73vh;margin:auto;object-fit:contain;}
+.place-photo-dialog p {font-size:13px;line-height:1.6;}
+.map-workspace.stacked.has-place {grid-template-columns:minmax(0,1fr);}
+.map-workspace.stacked .poi-detail {max-height:none;}
+@media(prefers-reduced-motion:reduce){.leaflet-zoom-animated{transition:none !important;}}
 .route-endpoints {padding:12px;background:#f6f2e8;border-radius:8px;font-size:13px;line-height:1.9;margin-top:12px;}
 .route-summary {font-size:13px;line-height:1.7;}
 .route-summary p {color:#6e6255;font-size:12px;}

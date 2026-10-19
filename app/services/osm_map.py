@@ -20,6 +20,7 @@ class OSMMapService:
 
     def public_data(self):
         result={k:self.data[k] for k in ("schema_version","coordinate_system","bounds","view_center","graph_sha256","source_url","license","license_url","attribution","source_sha256","retrieved_at","field_verified","roads","pois","areas")}
+        result["pois"]=[p for p in self.data["pois"] if p["category"]!="toilet_candidate"]
         result["photo_reference"]=json.loads((self.path.parent/"photo-reference.json").read_text(encoding="utf-8"))
         return result
 
@@ -29,6 +30,16 @@ class OSMMapService:
         matches=[p for p in self.data["pois"] if p["id"]==key or p["name"]==key]
         if len(matches)!=1:raise ValueError("该地名在本地OSM数据中缺失或有歧义，请在地图选择已有点位")
         return matches[0]
+
+    def ensure_route_version(self, state):
+        route = state.get("route") or {}
+        if route.get("provider") == "osm" and route.get("status") == "ready" and route.get("data_version") != self.data["graph_sha256"]:
+            from app.services import map_navigation as nav
+            nav.stop(state)
+            route["status"] = "no_path"
+            route["error"] = {"code": "stale_graph", "message": "路网版本已更新，请重新规划"}
+            return False
+        return True
 
     def plan_for_state(self,state,to,via,internal_pois,avoid_steps=False):
         from app.services import map_navigation as nav

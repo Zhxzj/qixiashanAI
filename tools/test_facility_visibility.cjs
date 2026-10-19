@@ -1,0 +1,37 @@
+/* Visibility contracts: actual Leaflet coordinates, pixels and failure modes, not DOM counts alone. */
+const {chromium}=require(process.env.QIXI_PLAYWRIGHT_MODULE||'playwright-core');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const base=process.env.QIXI_TEST_BASE||'http://127.0.0.1:8024',out=process.env.QIXI_MAP_REPORTS||path.resolve('dist/visibility-reports');
+const checks=[],errors=[];fs.mkdirSync(out,{recursive:true});let browser,page;
+const blank=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=','base64');
+(async()=>{
+ browser=await chromium.launch({executablePath:'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',headless:true});
+ const context=await browser.newContext({viewport:{width:1440,height:1000},reducedMotion:'reduce'});
+ await context.addInitScript(()=>document.addEventListener('DOMContentLoaded',()=>{const el=document.querySelector('#showToilets');if(el)el.checked=false;}));
+ page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+ await page.route('https://tile.openstreetmap.org/**',r=>r.fulfill({contentType:'image/png',body:blank}));
+ const ready=()=>page.locator('#mapEmpty[hidden]').waitFor({state:'attached'});
+ async function pixels(){
+  const mb=await page.locator('#realMap').boundingBox();const ids=[];
+  for(const el of await page.locator('[data-annotation-id]').all()){
+   const b=await el.boundingBox();assert.ok(b&&b.width>10&&b.height>10);assert.ok(b.x>=mb.x&&b.y>=mb.y&&b.x+b.width<=mb.x+mb.width&&b.y+b.height<=mb.y+mb.height,'marker outside visible map');ids.push(await el.getAttribute('data-annotation-id'));
+  }
+  assert.equal(ids.filter(id=>id.startsWith('toilet_')).length,12);return ids;
+ }
+ await page.goto(base);await ready();await page.click('#homeMap');await page.waitForTimeout(120);
+ const initial=await page.evaluate(()=>QixiMap.inspect());assert.equal(initial.showToilets,true);assert.equal(initial.markers.length,14);assert.ok(initial.markers.every(p=>p.onMap&&p.inBounds));await pixels();checks.push('twelve toilets and two sourced gate records occupy visible map pixels at startup');
+ assert.equal(await page.locator('.map-user-toilet-symbol').first().innerText(),'厕');assert.equal(await page.locator('.facility-label').count(),14);assert.equal(await page.locator('#mapStatus,#viewAllToilets,#viewAllFacilities,#facilityVisibility,#facilityStatus,#showPublicToilets').count(),0);assert.ok((await page.locator('.facility-label').allTextContents()).every(t=>t==='厕所'||t==='大门'));checks.push('unnumbered toilet and gate labels; candidate control and entire requested status region absent');
+ const data=await page.evaluate(()=>fetch('/api/map/annotations').then(r=>r.json()));for(const m of initial.markers)assert.deepEqual(m.coord,data.items.find(p=>p.id===m.id).coord);checks.push('every real Leaflet marker retains its exact data coordinate, no road snapping');
+ await page.locator('#mapWorkspace').screenshot({path:path.join(out,'visible-all-facilities.png')});
+ await page.click('#gotoBtn');assert.equal(await page.evaluate(()=>QixiMap.mode),'real');assert.equal(await page.locator('.map-user-toilet-symbol').count(),12);checks.push('legacy jump cannot silently switch away from real map and hide facilities');
+ await page.selectOption('#mapMode','demo');await page.locator('#mapModeNotice').waitFor({state:'visible'});await page.click('#returnRealMap');await page.waitForFunction(()=>QixiMap.mode==='real');await page.waitForTimeout(120);await pixels();checks.push('explicit demo has a visible warning and one-click return restores real facilities');
+ await page.uncheck('#showToilets');assert.equal(await page.locator('.map-user-toilet-symbol').count(),0);await page.check('#showToilets');await page.click('#homeMap');await page.waitForTimeout(120);await pixels();checks.push('toilet layer and existing home control restore all twelve visible icons');
+ await page.route('**/api/map/places',r=>r.fulfill({status:503,contentType:'application/json',body:'{"detail":"fixture"}'}));await page.reload();await ready();assert.equal(await page.locator('.map-user-toilet-symbol').count(),12);assert.match(await page.locator('#mapLoadError').innerText(),/景点介绍/);await page.unroute('**/api/map/places');await page.click('#mapRetry');await page.waitForFunction(()=>document.querySelector('#mapLoadError').hidden);checks.push('place-catalog failure cannot block facility map; retry restores missing module');
+ await page.route('**/api/map/annotations',r=>r.fulfill({status:503,contentType:'application/json',body:'{"detail":"fixture"}'}));await page.reload();await ready();assert.ok(await page.locator('.leaflet-container').count());assert.match(await page.locator('#mapLoadError').innerText(),/厕所和大门加载失败/);await page.unroute('**/api/map/annotations');await page.click('#mapRetry');await page.waitForFunction(()=>document.querySelectorAll('.map-user-toilet-symbol').length===12);checks.push('facility-fetch failure is explicit while base map survives and retry reloads data');
+ await page.route('**/api/data',r=>r.fulfill({status:503,contentType:'application/json',body:'{"detail":"fixture"}'}));await page.reload();await ready();assert.equal(await page.locator('.map-user-toilet-symbol').count(),12);await page.unroute('**/api/data');checks.push('chat/core startup failure does not suppress standalone facility viewing');
+ await page.reload();await ready();const v=await page.evaluate(()=>fetch('/api/ui-version').then(r=>r.json()));assert.deepEqual(await page.evaluate(()=>QIXI_FRONTEND),v);const js=(await page.locator('script[src*="map-osm.js"]').getAttribute('src'));assert.ok(js.includes(v.web_revision));checks.push('HTML and API have same build/content version; app assets use revision URLs');
+ await page.route('**/api/ui-version',async r=>r.fulfill({contentType:'application/json',body:JSON.stringify({...v,web_revision:'stale-fixture'})}));await page.reload();await ready();await page.locator('#versionNotice').waitFor();await page.unroute('**/api/ui-version');checks.push('retained stale page receives an explicit version mismatch notice');
+ await page.reload();await ready();await page.setViewportSize({width:640,height:1000});await page.click('#homeMap');await page.waitForTimeout(120);await pixels();assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await page.locator('#mapWorkspace').screenshot({path:path.join(out,'visible-all-narrow.png')});checks.push('all twelve markers fit narrow viewport without horizontal page overflow');
+ assert.deepEqual(errors,[]);checks.push('no page exceptions during startup degradation, retry, modes and version checks');
+ const report={passed:checks.length,checks,errors,visibleIds:initial.markers.map(p=>p.id),realLeaflet:true,mockRasterTiles:true,originalUserWindowCaptured:false,officialWestSouthVerified:false,browser:browser.version()};fs.writeFileSync(path.join(out,'browser-visibility-results.json'),JSON.stringify(report,null,2));console.log(JSON.stringify(report,null,2));
+})().catch(async e=>{console.error(e);if(page){console.error(await page.locator('#mapLoadError').innerText());await page.screenshot({path:path.join(out,'visibility-failure.png'),fullPage:true}).catch(()=>{});}process.exitCode=1;}).finally(async()=>{await browser?.close();});

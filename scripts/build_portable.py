@@ -83,6 +83,7 @@ def main():
     ap.add_argument("--skip-download",action="store_true")
     ap.add_argument("--no-zip",action="store_true")
     ap.add_argument("--source-commit",default=None)
+    ap.add_argument("--output",type=Path,default=ROOT/"dist/栖霞山小向导.exe")
     args=ap.parse_args()
     if os.name!="nt" or sys.version_info[:2]!=(3,14) or struct.calcsize("P")!=8:
         raise RuntimeError("构建机需要 Windows + Python 3.14 x64")
@@ -150,7 +151,7 @@ def main():
     resource=ROOT/"dist/guide-resource.o"
     run([windres,"guide.rc","-O","coff","-o",resource],cwd=ROOT/"native")
     run([compiler,"-municode","-mwindows","-Os","-static","-Wall","-Wextra","-Werror","-Wl,--no-insert-timestamp",ROOT/"native/portable.c",resource,"-o",native,"-lbcrypt","-lcabinet","-lshell32"])
-    (STAGE/"使用说明.txt").write_text("双击启动.bat；主交付请使用同目录外的栖霞山小向导.exe。\n首次启动自动准备用户缓存；无需管理员、Python或命令行。\n应用会保持运行，请点击页面右上角‘退出应用’；关闭浏览器不会停止服务。\n默认Leaflet＋OpenStreetMap地图无需地图Key；在线底图需要联网，本地道路、景点和步行规划不依赖付费接口。\n对话另需模型Key；模拟游览、照片手工选点和模板日记可不配置模型。\n电脑定位以精度和采样时间为准，不保证米级；手动起点不代表实际位置。厕所位置待用户提供。\nOSM道路和照片参考未完成现场通行核实；路线不保证实时开放。公开厕所候选默认隐藏，等待核实。\n诊断：页面右上角‘诊断’。配置、行程和日志在 %LOCALAPPDATA%/QixiGuide。\n照片不保存到该目录；开启云识别时压缩照片会发往 DeepSeek。\n新版本运行前请先退出旧版本。删除 EXE 不会清除用户数据。\n缓存管理：退出全部实例后运行 EXE --clean-cache，仅清理版本及未完成展开，保留 config/state/logs。\n旧讲解资料和演示路线为草稿，正式出行请核对园区信息。\n",encoding="utf-8-sig")
+    (STAGE/"使用说明.txt").write_text("双击启动.bat；主交付请使用同目录外的栖霞山小向导.exe。\n首次启动自动准备用户缓存；无需管理员、Python或命令行。\n应用会保持运行，请点击页面右上角‘退出应用’；关闭浏览器不会停止服务。\n默认Leaflet＋OpenStreetMap地图无需地图Key；在线底图需要联网，本地道路、景点和步行规划不依赖付费接口。点击景点可聚焦放大并查看实景照片和分层介绍，缺失资料明确待补；照片来源及许可收在详情默认折叠的资料来源中。\n对话另需模型Key；模拟游览、照片手工选点和模板日记可不配置模型。\n电脑定位以精度和采样时间为准，不保证米级；手动起点不代表实际位置。本次12处厕所按用户OSM截图标注，位置近似；门图层只显示用户黄色标出的两处大门；厕所没有序号，已删除公开候选和设施计数区域。点击“回到景区”可全览，演示操作不再自动隐藏真实地图。位置保存在本机并可导出，点选不代表现场测量或入口通行核实。\nOSM道路和照片参考未完成现场通行核实；路线不保证实时开放。\n诊断：页面右上角‘诊断’。配置、行程和日志在 %LOCALAPPDATA%/QixiGuide。\n照片不保存到该目录；开启云识别时压缩照片会发往 DeepSeek。\n新版本运行前请先退出旧版本。删除 EXE 不会清除用户数据。\n缓存管理：退出全部实例后运行 EXE --clean-cache，仅清理版本及未完成展开，保留 config/state/logs。\n旧讲解资料和演示路线为草稿，正式出行请核对园区信息。\n",encoding="utf-8-sig")
     bat='@echo off\r\ncd /d "%~dp0"\r\nstart "" "%~dp0runtime\\python\\pythonw.exe" -B "%~dp0launcher.py"\r\n'
     (STAGE/"start.bat").write_bytes(bat.encode("ascii"))
     (STAGE/"启动.bat").write_bytes(bat.encode("ascii"))
@@ -163,7 +164,9 @@ def main():
     build_id=hashlib.sha256(json.dumps(manifest,sort_keys=True).encode()).hexdigest()
     manifest["build_id"]=build_id
     (STAGE/"manifest.json").write_text(json.dumps(manifest,ensure_ascii=False,sort_keys=True,indent=2),encoding="utf-8")
-    exe=ROOT/"dist/栖霞山小向导.exe"
+    exe=args.output.resolve()
+    if exe.parent!=(ROOT/"dist").resolve() or exe.suffix.lower()!=".exe":
+        raise RuntimeError("成品必须输出到项目dist目录下的EXE文件")
     pack(STAGE,native,exe,build_id)
     if not args.no_zip:
         shutil.make_archive(str(STAGE),"zip",root_dir=STAGE)

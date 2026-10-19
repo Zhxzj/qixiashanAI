@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "baseline_version": "20261019-approved-map-v3",
+  "coordinate_system": "WGS84",
+  "source": {
+    "kind": "user_osm_screenshot",
+    "date": "2026-10-19",
+    "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+    "image_size": [
+      1285,
+      700
+    ]
+  },
+  "registration": {
+    "method": "x=ax*lng+bx; y=ay*degrees(asinh(tan(radians(lat))))+by",
+    "control_rms_px": 0.55,
+    "control_max_px": 0.83,
+    "holdout_errors_px": [
+      0.54,
+      0.7
+    ],
+    "approx_ground_m_per_px": 2.7,
+    "field_accuracy_m": null,
+    "note": "控制点与圈中心为人工对应的截图像素，不是实地测绘；不表示入口或通行核实。",
+    "schema_version": 1,
+    "icon_center_compensation_px": 0.75,
+    "parameters": {
+      "ax": 34907.62545462367,
+      "bx": -4152046.5003706138,
+      "ay": -35017.40323587211,
+      "by": 1190644.4890534603
+    },
+    "controls": [
+      {
+        "name": "凤翔峰",
+        "visible_pixel_center": [
+          735,
+          204.5
+        ],
+        "coord": [
+          32.1603375,
+          118.9649161
+        ],
+        "residual_px": 0.8232519983383033
+      },
+      {
+        "name": "读枫",
+        "visible_pixel_center": [
+          382.5,
+          275
+        ],
+        "coord": [
+          32.1586514,
+          118.9547934
+        ],
+        "residual_px": 0.38688727891779984
+      },
+      {
+        "name": "虎山",
+        "visible_pixel_center": [
+          319.5,
+          275
+        ],
+        "coord": [
+          32.1586643,
+          118.9530129
+        ],
+        "residual_px": 0.7810668408828474
+      },
+      {
+        "name": "德云亭",
+        "visible_pixel_center": [
+          387,
+          341
+        ],
+        "coord": [
+          32.1570495,
+          118.9549355
+        ],
+        "residual_px": 0.18949580624690412
+      },
+      {
+        "name": "桃花扇亭",
+        "visible_pixel_center": [
+          421.5,
+          357.5
+        ],
+        "coord": [
+          32.1566601,
+          118.9559186
+        ],
+        "residual_px": 0.24418101828242994
+      },
+      {
+        "name": "珍珠泉",
+        "visible_pixel_center": [
+          468,
+          315.5
+        ],
+        "coord": [
+          32.15768,
+          118.9572475
+        ],
+        "residual_px": 0.4599688849574245
+      },
+      {
+        "name": "幽居庵",
+        "visible_pixel_center": [
+          511.5,
+          303.5
+        ],
+        "coord": [
+          32.1579559,
+          118.9584868
+        ],
+        "residual_px": 0.4827011241532284
+      },
+      {
+        "name": "待月亭",
+        "visible_pixel_center": [
+          425,
+          465.5
+        ],
+        "coord": [
+          32.1540381,
+          118.9560107
+        ],
+        "residual_px": 0.4457714173151245
+      },
+      {
+        "name": "如來堂",
+        "visible_pixel_center": [
+          370.5,
+          476
+        ],
+        "coord": [
+          32.1537847,
+          118.954451
+        ],
+        "residual_px": 0.3892958586582718
+      },
+      {
+        "name": "栖霞寺",
+        "visible_pixel_center": [
+          319.5,
+          473
+        ],
+        "coord": [
+          32.153864812500004,
+          118.95302253125
+        ],
+        "residual_px": 0.8136460790160467
+      }
+    ],
+    "holdouts": [
+      {
+        "name": "碧云亭",
+        "visible_pixel_center": [
+          342,
+          260
+        ],
+        "coord": [
+          32.1590028,
+          118.9536551
+        ],
+        "residual_px": 0.5398870070084548
+      },
+      {
+        "name": "了凡问道",
+        "visible_pixel_center": [
+          538.5,
+          348.5
+        ],
+        "coord": [
+          32.1568848,
+          118.9592866
+        ],
+        "residual_px": 0.6996483324450276
+      }
+    ],
+    "rms_control_px": 0.5467978761761351,
+    "max_control_px": 0.8232519983383033,
+    "method_version": 1,
+    "script_sha256": "0fdb1971cde2bd8af9c62e1a411dc929e5584f3fd10e607a1843959ef6b21747",
+    "source_image_checked": true
+  },
+  "items": [
+    {
+      "id": "toilet_T01",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1606921,
+        118.9587171
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T01",
+        "pixel_center": [
+          519.84,
+          191.25
+        ]
+      }
+    },
+    {
+      "id": "toilet_T02",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1613859,
+        118.9627222
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T02",
+        "pixel_center": [
+          659.65,
+          162.55
+        ]
+      }
+    },
+    {
+      "id": "toilet_T03",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1602161,
+        118.9663779
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T03",
+        "pixel_center": [
+          787.26,
+          210.94
+        ]
+      }
+    },
+    {
+      "id": "toilet_T04",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1586966,
+        118.9592582
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T04",
+        "pixel_center": [
+          538.73,
+          273.79
+        ]
+      }
+    },
+    {
+      "id": "toilet_T05",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1580146,
+        118.9546687
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T05",
+        "pixel_center": [
+          378.52,
+          302.0
+        ]
+      }
+    },
+    {
+      "id": "toilet_T06",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.157542,
+        118.9638661
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T06",
+        "pixel_center": [
+          699.58,
+          321.55
+        ]
+      }
+    },
+    {
+      "id": "toilet_T07",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1550196,
+        118.9544965
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T07",
+        "pixel_center": [
+          372.51,
+          425.88
+        ]
+      }
+    },
+    {
+      "id": "toilet_T08",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1548538,
+        118.9518177
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T08",
+        "pixel_center": [
+          279.0,
+          432.74
+        ]
+      }
+    },
+    {
+      "id": "toilet_T09",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1531824,
+        118.9496543
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T09",
+        "pixel_center": [
+          203.48,
+          501.87
+        ]
+      }
+    },
+    {
+      "id": "toilet_T10",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1535463,
+        118.9557914
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T10",
+        "pixel_center": [
+          417.71,
+          486.82
+        ]
+      }
+    },
+    {
+      "id": "toilet_T11",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.1520956,
+        118.9595988
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T11",
+        "pixel_center": [
+          550.62,
+          546.82
+        ]
+      }
+    },
+    {
+      "id": "toilet_T12",
+      "name": "公共厕所",
+      "category": "toilet",
+      "coord": [
+        32.152086,
+        118.9627964
+      ],
+      "position_status": "screenshot_approximate",
+      "source": {
+        "kind": "user_osm_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+        "image_size": [
+          1285,
+          700
+        ],
+        "marker": "T12",
+        "pixel_center": [
+          662.24,
+          547.22
+        ]
+      }
+    },
+    {
+      "id": "gate_marked_west",
+      "name": "大门",
+      "category": "gate",
+      "coord": [
+        32.1526788,
+        118.95011
+      ],
+      "position_status": "user_marked",
+      "source": {
+        "kind": "user_yellow_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "7892cfe47733b45c4ecf00bb53092d7f4dc621ddf9b22815b2f92cc7377d0411",
+        "image_size": [
+          1285,
+          822
+        ],
+        "pixel_center": [
+          219.3879142300195,
+          522.6978557504873
+        ],
+        "note": "用户确认的黄色标记位置；截图配准坐标，未现场测量，不推定入口道路已核实"
+      }
+    },
+    {
+      "id": "gate_marked_south",
+      "name": "大门",
+      "category": "gate",
+      "coord": [
+        32.1485661,
+        118.9604266
+      ],
+      "position_status": "user_marked",
+      "source": {
+        "kind": "user_yellow_screenshot",
+        "date": "2026-10-19",
+        "image_sha256": "7892cfe47733b45c4ecf00bb53092d7f4dc621ddf9b22815b2f92cc7377d0411",
+        "image_size": [
+          1285,
+          822
+        ],
+        "pixel_center": [
+          579.5139318885449,
+          692.7987616099072
+        ],
+        "note": "用户确认的黄色标记位置；截图配准坐标，未现场测量，不推定入口道路已核实"
+      }
+    }
+  ],
+  "gate_source": {
+    "image_sha256": "7892cfe47733b45c4ecf00bb53092d7f4dc621ddf9b22815b2f92cc7377d0411",
+    "image_size": [
+      1285,
+      822
+    ],
+    "count": 2,
+    "method": "reuse unchanged OSM screenshot geographic control points"
+  }
+}

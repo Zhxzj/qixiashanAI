@@ -1,0 +1,126 @@
+{
+  "baseline": "a535a6ba4c75854702bb06f1b7498099acdd30d5",
+  "scope": "2026-10-18 place detail changes; excludes original material folders, generated build, secrets and self-referential design/inventory hashes",
+  "files": [
+    {
+      "path": "app/data/map_overrides.json",
+      "bytes": 181,
+      "sha256": "4691562e329567a8532a6aeba79e06d9502800724c08cb557d02fd46e77fecd6"
+    },
+    {
+      "path": "app/data/map_places.json",
+      "bytes": 5849,
+      "sha256": "acea649fcd31d94793e5d1feee4cde8d97ddf70bb9f7416524bbb79fa2e6a982"
+    },
+    {
+      "path": "app/data/map_review.json",
+      "bytes": 9462,
+      "sha256": "031a3296aaf9d793441a62566c68d932342c61e9e2cb3a306c5df4e3a996ebc1"
+    },
+    {
+      "path": "app/data/place_content.json",
+      "bytes": 7440,
+      "sha256": "12bc0da1c2354b41529756d16a642b4b58f6bf2de5f6f5c2527b4d88d9bea9ba"
+    },
+    {
+      "path": "app/main.py",
+      "bytes": 16839,
+      "sha256": "c3bd3698f941d4699fac43cbd17df037b41702fef2052c4f51dc129e47c07062"
+    },
+    {
+      "path": "app/map_api.py",
+      "bytes": 18180,
+      "sha256": "075a367e7007f024a5b95114c0b6f513d77285b4cc3ff909c6ed7c3e343eff40"
+    },
+    {
+      "path": "app/runtime.py",
+      "bytes": 1066,
+      "sha256": "f616c8aa0693661a7198e800c94a1f88a835015897da99616132e9a9f7a3393a"
+    },
+    {
+      "path": "app/services/osm_map.py",
+      "bytes": 8706,
+      "sha256": "65a9012c8da29a53fb9e286708dc5f158162efbcc2336e21a5272165ab0b2870"
+    },
+    {
+      "path": "app/services/places.py",
+      "bytes": 1325,
+      "sha256": "762dc5739774aee8f5bae30dbb569a525b1024a17ccbac370de695e7aa88d984"
+    },
+    {
+      "path": "docs/OSM电脑版使用说明.md",
+      "bytes": 3154,
+      "sha256": "59aa69f3814953c0c85ffb4e4962717f46859e868e223126a6727232bb825a45"
+    },
+    {
+      "path": "docs/景点素材来源与核实台账.md",
+      "bytes": 1982,
+      "sha256": "cd869fb7ddc5a56153f9aa1cd09f09098052115157fae86329bebf3e4aedf0e3"
+    },
+    {
+      "path": "docs/景点详情接口变更-2026-10-18.md",
+      "bytes": 742,
+      "sha256": "b530a45aed2b43cb4a2b5338f722307aa8e322494e59a3c0372fb163b5ea0400"
+    },
+    {
+      "path": "scripts/build_portable.py",
+      "bytes": 10370,
+      "sha256": "fa215948e26355201ce5f3bfffff61f9a9df812930ffb76dacfb6e730677e4cd"
+    },
+    {
+      "path": "scripts/selftest_portable.py",
+      "bytes": 7752,
+      "sha256": "4a65b2ac132cc28920ccc0e93877c1626f612071b28f33d5eb3a7fbfe5edbf7e"
+    },
+    {
+      "path": "scripts/test_place_details_delivery.py",
+      "bytes": 2867,
+      "sha256": "ba89d1cc3ffeee413bf9a70adc6ff594d854d510dbb37bbb4c50bae304beaca3"
+    },
+    {
+      "path": "tests/test_place_details.py",
+      "bytes": 5472,
+      "sha256": "71925efc320fe780da699eae81e04da946e0444dba6c2473f19bc16577d07057"
+    },
+    {
+      "path": "tools/test_osm_browser.cjs",
+      "bytes": 8328,
+      "sha256": "8a7a6af365093fc354c2dc5afd74b5cab8a0fc1b08db6202f7d040a0de6a6fd8"
+    },
+    {
+      "path": "tools/test_place_details_browser.cjs",
+      "bytes": 10641,
+      "sha256": "6bbe7352cf7c82433fe4f670d3cf832502c83f744c771884c71c21ebecac41fe"
+    },
+    {
+      "path": "web/assets/places/LICENSES.md",
+      "bytes": 1250,
+      "sha256": "f816bff4528fef64c8867ad72b3db1a0d548d2b2e24080366354182b83bf394b"
+    },
+    {
+      "path": "web/assets/places/qianfoyan-statue.jpg",
+      "bytes": 467326,
+      "sha256": "923c6a697fc78ccc3a1826dec87aadde17eea08376a7986c538a58e14fa1b46c"
+    },
+    {
+      "path": "web/assets/places/qixiasi-gate.jpg",
+      "bytes": 364365,
+      "sha256": "95bc17523bc872ec76103a6c97263230299411903fff0e7f44bf75d0caad3528"
+    },
+    {
+      "path": "web/css/map.css",
+      "bytes": 5276,
+      "sha256": "43f91e699f5438485e4dd9f4d8228f9b22c2e8db2aa54f085bed4cc091f5cfef"
+    },
+    {
+      "path": "web/index.html",
+      "bytes": 10631,
+      "sha256": "8c23298f947e88de5c1182ff48886e2b62efd6803dc374e37d3581cb8a986615"
+    },
+    {
+      "path": "web/js/map-osm.js",
+      "bytes": 28158,
+      "sha256": "e17d558fd8810da959d02fdd8ef823a3ac2a68f7584afd457952acbd226b7667"
+    }
+  ]
+}

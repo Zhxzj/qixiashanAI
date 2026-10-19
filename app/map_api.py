@@ -96,6 +96,9 @@ class Facility(Input):
     opening_hours: str | None = Field(default=None, max_length=100)
     accessible: bool | None = None
     notes: str = Field(default="", max_length=500)
+    entrance_coord: list[float] | None = Field(default=None, min_length=2, max_length=2)
+    access_verified: bool = False
+    access_source: str = Field(default="", max_length=500)
 
 
 class Facilities(Input):
@@ -105,6 +108,13 @@ class Facilities(Input):
 class OSMPlan(RouteStart):
     name: str = Field(default="步行目的地",max_length=100)
     avoid_steps: bool = False
+    annotation_targets: list["AnnotationTarget"] = Field(default_factory=list, max_length=7)
+
+
+class AnnotationTarget(Input):
+    id: str = Field(min_length=1, max_length=96)
+    role: str = Field(pattern=r"^(origin|destination|via:[0-4])$")
+    position_revision: str = Field(min_length=64, max_length=64)
 
 
 def router(cfg, sessions, services, checked_state):
@@ -134,6 +144,12 @@ def router(cfg, sessions, services, checked_state):
                 raise ValueError("厕所名称与来源不能为空")
             if item.id in ids:
                 raise ValueError("厕所ID重复")
+            if item.entrance_coord is not None:
+                nav.coordinate(item.entrance_coord, services["osm"].data["bounds"])
+            if item.access_verified:
+                if item.coordinate_system != "WGS84" or not item.entrance_coord or not item.access_source.strip():
+                    raise ValueError("核实厕所接入需WGS84入口坐标及接入证据来源")
+                services["osm"].snap(item.entrance_coord, max_distance=3)
             ids.add(item.id)
         return [i.model_dump() for i in body.items]
 
@@ -213,6 +229,21 @@ def router(cfg, sessions, services, checked_state):
             sessions.save(state)
             return {"mode": body.mode}
 
+    @api.get("/api/map/places")
+    async def places(major: bool = False):
+        return services["places"].catalog(major)
+
+    @api.get("/api/map/place")
+    async def place(place_id: str):
+        result = services["places"].detail(place_id)
+        if result is None:
+            raise HTTPException(404, "没有这个景点")
+        return result
+
+    @api.get("/api/map/review")
+    async def review():
+        return services["places"].review
+
     @api.get("/api/map/osm/data")
     async def osm_data():
         result=services["osm"].public_data()
@@ -240,11 +271,22 @@ def router(cfg, sessions, services, checked_state):
             if nav.provider(state)!="osm":raise HTTPException(409,"请先切换到OSM地图")
             if body.sequence<=state.get("_map_plan_sequence",-1):raise HTTPException(409,"路线请求已过期")
             try:
+                from app.services.map_annotations import AnnotationConflict
+                coords={"origin":body.origin,"destination":body.destination,**{f"via:{i}":p for i,p in enumerate(body.via)}}
+                try:
+                    targets=services["annotations"].targets([p.model_dump() for p in body.annotation_targets],coords)
+                except AnnotationConflict as e:
+                    raise HTTPException(409,str(e))
                 pending=nav.start_route(state,body.origin,body.destination,body.via)
                 state["_map_plan_sequence"]=body.sequence
                 result=services["osm"].plan(body.origin,body.destination,body.via,body.name,body.avoid_steps)
                 route=nav.commit_route(state,pending["request_id"],result)
                 route.update({k:result[k] for k in ("access_notes","data_version","way_ids","avoid_steps")})
+                for target in targets:
+                    snap=services["osm"].snap(target["coord"])
+                    target.update(road_endpoint=snap["point"],gap_straight_m=round(snap["distance"],1))
+                    route["access_notes"].append(f"{target['name']}：路线仅覆盖已知道路；设施与道路端点直线相距约{round(snap['distance'])}米，后续通行及入口请现场确认。")
+                route["annotation_targets"]=targets
                 route["constraints"]["avoid_steps"]=body.avoid_steps
                 if (state.get("location") or {}).get("source")!="device":
                     state["location"]={"lat":body.origin[0],"lng":body.origin[1],"source":"manual","coordinate_system":"WGS84","snapped":{}}
@@ -315,6 +357,10 @@ def router(cfg, sessions, services, checked_state):
     @api.post("/api/map/location")
     async def sample(body: Sample):
         state = check(body)
+        if not services["annotations"].ensure_route_version(state):
+            raise HTTPException(409,"设施位置已更新，请重新规划")
+        if not services["osm"].ensure_route_version(state):
+            raise HTTPException(409, "路网版本已更新，请重新规划")
         try:
             result = nav.location_sample(state, body.model_dump())
         except ValueError as e:

@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "version": "overrides-20261018-1",
+  "roads": [],
+  "toilets": [],
+  "note": "尚无足够地理/接入证据的新数据，不改变现有OSM图"
+}

@@ -14,13 +14,14 @@ from app.runtime import APP_ID,API_VERSION,BUILD_ID,user_path,resource_path,desc
 PORT_CANDIDATES=(8017,8018,8019,8020,8021,8022)
 def _healthy(port,timeout=1.0,instance_id=None,build_id=BUILD_ID):
     try:
-        with urllib.request.urlopen(f"http://127.0.0.1:{port}/api/health",timeout=timeout) as response:
+        with urllib.request.build_opener(urllib.request.ProxyHandler({})).open(f"http://127.0.0.1:{port}/api/health",timeout=timeout) as response:
             data=json.load(response)
         return data.get("ok") is True and data.get("app_id")==APP_ID and data.get("api_version")==API_VERSION and data.get("build_id")==build_id and (instance_id is None or data.get("instance_id")==instance_id)
     except Exception:
         return False
 
 def _open_browser(url):
+    url += ("&" if "?" in url else "?") + "build=" + BUILD_ID
     if os.environ.get("QIXI_NO_BROWSER"):
         return
     for pf,rel in (("ProgramFiles(x86)","Microsoft/Edge/Application/msedge.exe"),("ProgramFiles","Microsoft/Edge/Application/msedge.exe"),("ProgramFiles","Google/Chrome/Application/chrome.exe")):

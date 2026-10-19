@@ -1,0 +1,144 @@
+{
+  "baseline_backup": "D:\\Codex\\2026-10-16\\bug\\work\\before-approved-map-20261019\\source.zip",
+  "changes": [
+    {
+      "path": "app/data/map_annotations.json",
+      "before_sha256": "c85ec35ceafde34d393733b24858a0eebba266bccea2a6a94cbb37dbccf127a3",
+      "after_sha256": "e20bd5ab9390d5765798bcac67c94bfca9093cc24fcb08ec1a1413277565509d"
+    },
+    {
+      "path": "app/main.py",
+      "before_sha256": "9f04a24f849f9d2c0fd0d55b82077759e6ac07543ae3aacba6bad322ce515123",
+      "after_sha256": "3f7aa2b9913fe391c0c58b3f376573f692d075be2c22a6c80635828ae783f9e0"
+    },
+    {
+      "path": "app/runtime.py",
+      "before_sha256": "8ca52fb40839ff4f015ed44a52cdbe80c7d2bb050eaa5e9ba9f494fc503e3132",
+      "after_sha256": "ad3d164fde0881ea6ed4d5f154951b498d77f5a762041dcc9b081cc4da103650"
+    },
+    {
+      "path": "app/services/osm_map.py",
+      "before_sha256": "65a9012c8da29a53fb9e286708dc5f158162efbcc2336e21a5272165ab0b2870",
+      "after_sha256": "50994ecbd67a6a334f5bd05dc18d72a6f86488329866442ee44e7007fe57a602"
+    },
+    {
+      "path": "app/ui_version.py",
+      "before_sha256": "0d86e9d358b7cceb8f7020884e677d2cae650afb8f69dba526faa4ffe43d39c2",
+      "after_sha256": "cd0d4eafd4c909d30d7a4e0063532630630acd05a9d354ff05c8c0eed7358b59"
+    },
+    {
+      "path": "docs/OSM电脑版使用说明.md",
+      "before_sha256": "c03def013ea249f8e41c2d6c69c5def78f4eda5cfdafbc4dc12887d256f8c0d0",
+      "after_sha256": "be107f31973d4761114962dd3d9bbe2bc01f1f5a745f492ad472b17475c1e759"
+    },
+    {
+      "path": "docs/地图设施标注交付复盘与诊改方案.md",
+      "before_sha256": "aeddbddffab3158cb3ebf848cdcb846b21bfb31c0201e39d752fefbd7e29fe2c",
+      "after_sha256": "a98b6c893da4fdeca70f97b335bbc49ad4a43d359983990d4535484e81a5b5a6"
+    },
+    {
+      "path": "docs/电脑端大门与紫色标注厕所改造设计.md",
+      "before_sha256": "ba39af3050be240ca5f1795a21a4c0ea7da7d76b438cb49b173bc756b1708780",
+      "after_sha256": "4047cf0dd4adf98a0f3492691eef8bdeba924b67992dcc42258140cd498bb3d5"
+    },
+    {
+      "path": "docs/确认地图配准复现记录-2026-10-19.json",
+      "before_sha256": null,
+      "after_sha256": "5f1252f6663f111e0f37227dd6ea29bd1ce148a62468d570fa9683eda39dd0a4"
+    },
+    {
+      "path": "docs/确认示意图实施接口-2026-10-19.md",
+      "before_sha256": null,
+      "after_sha256": "6fd8a8befb92b41abd404108aeb43e67b616948ab57bd1fb032ce5a0e9ef9d9c"
+    },
+    {
+      "path": "scripts/build_portable.py",
+      "before_sha256": "8539a289c7e233b42d0db712bfae2ddfb7c45a0091c67958c3e140a42fd5fcd6",
+      "after_sha256": "2684060e107fd2c5be91780ba941c874118933f2db7e537a44cea5c9aee45c47"
+    },
+    {
+      "path": "scripts/register_annotations.py",
+      "before_sha256": "0fdb1971cde2bd8af9c62e1a411dc929e5584f3fd10e607a1843959ef6b21747",
+      "after_sha256": "fa3424a2d68118b615b21701b33cce5e7ab0bfc733a5ac158164c21113cd428b"
+    },
+    {
+      "path": "scripts/test_place_details_delivery.py",
+      "before_sha256": "1d1bd0f23a15b0d26c90a84998940db35eb59a7a3dcba31fa2902058df56d6dc",
+      "after_sha256": "ac4791374cad217ab5c7708e524bae1dd4ab9ba1b84877c0d2678fd4580c03c7"
+    },
+    {
+      "path": "tests/test_map_annotations.py",
+      "before_sha256": "d44423371a58ce1704a7c4f659e357a441b91d2ecec4acfcd40ae3633e60a588",
+      "after_sha256": "96d2dabef5e4fae2f2d671d7be2a56d12620bd683fb88c5406a43b7cab5c542f"
+    },
+    {
+      "path": "tests/test_visible_facilities.py",
+      "before_sha256": "ac7b96563073db797437b28512b96745d65b389fb2ee36d5d52eef599bb5ef90",
+      "after_sha256": "0ffeeb0a9df707f5a53834360e8ccfd4e23cee0c491d13e2aa7ef931aa5e8991"
+    },
+    {
+      "path": "tools/capture_live_facilities.cjs",
+      "before_sha256": "26bc197ec0467edf7c6bc9d4726cdb4e5708c89018110d225527b92b4f963dd3",
+      "after_sha256": "a5c195bb86bd4cc612cbb4dccbf3519173ce9edf614659661cf1a02524dd7bfa"
+    },
+    {
+      "path": "tools/test_annotations_browser.cjs",
+      "before_sha256": "2d54f9bd92f5f0c39461a95644a8aaaf7e2cc1d4ee8043c99cef6d493cedf2fe",
+      "after_sha256": "1157d0aa6839bba180db301147aebe3ba39cc6f3f029b32112e01c43f4c19ea1"
+    },
+    {
+      "path": "tools/test_facility_visibility.cjs",
+      "before_sha256": "789109960bed092ebe27eeded0c339467360e6435909c5afc088d530baa71b1a",
+      "after_sha256": "3368602c3c78340b4bd3cce39bb3d61f57c837acbecce4c7a6e985fe603b9a66"
+    },
+    {
+      "path": "tools/test_osm_browser.cjs",
+      "before_sha256": "15592d2106441d6a9a6a224a1bd11d4ffd2b651a16fde261dd800066e343af2c",
+      "after_sha256": "a2ca4c9ef47eafc9723ca8a2bf4c7e4c999e774dc9823101e36972164a4c6485"
+    },
+    {
+      "path": "web/css/map.css",
+      "before_sha256": "333b4277152a89d93ab7e3a725ef8adcf6a95da24570cafd151bede79a31cda5",
+      "after_sha256": "0cdbd35c6bb4614fa3601cc808c8f229f4e3a4b58ff6ff122f253f2adea35baa"
+    },
+    {
+      "path": "web/index.html",
+      "before_sha256": "ea7dca1f466d24ed28373486a41888f14c7d5250205f3748eed8700f8f2909d2",
+      "after_sha256": "d51e4604ab03fa0b9132dbf71ddca3b625f8045035f9bda422e8d8b26be2f056"
+    },
+    {
+      "path": "web/js/map-osm.js",
+      "before_sha256": "e0692a9d220c8b0cce0ff0a62767bea5e0f809ac4885dc1f492ab00c7561223a",
+      "after_sha256": "e8f5b171bd85b28e675d3f7de23851d2cab5efae7523e372cd1910f0eba8198b"
+    },
+    {
+      "path": "README.md",
+      "before_sha256": "bf825913e41aa0761f2dd65a949e79dce4d5946db24a7ac2385110521674fa5a",
+      "after_sha256": "ecc9136081bf42f3c0549def6c7a890d05b3867204db9b56d546ffe6a7279d61",
+      "purpose": "GitHub交付入口与实际地图截图"
+    },
+    {
+      "path": "docs/images/地图-0.4.4.png",
+      "before_sha256": null,
+      "after_sha256": "6a19ad338c7e5de2dd3213ebf583f289e016156ca735fb81378f77e57905aae6",
+      "purpose": "GitHub交付入口与实际地图截图"
+    },
+    {
+      "path": "tools/test_place_details_browser.cjs",
+      "before_sha256": "fdb7d21125370477f4fb52d6c040c11943da92ea897c690a374ac8a119ceb1ad",
+      "after_sha256": "ba214ede8a2aa3a1c4b75e3cb62955a5f79ef924174d947ce0ba9e9bd06fd84a",
+      "purpose": "提交前去除测试脚本末尾多余空行，不改变行为"
+    }
+  ],
+  "unchanged_geographic_and_photo_files": {
+    "app/data/osm/map.json": true,
+    "app/data/osm/source.osm.gz": true,
+    "app/data/map_places.json": true,
+    "app/data/place_content.json": true,
+    "web/assets/places/qixiasi-gate.jpg": true,
+    "web/assets/places/qianfoyan-statue.jpg": true
+  },
+  "inventory_self_excluded": true,
+  "main_exe_sha256": "cff67395a49fd70d55b8f3a7c7a3a6dab34047e52b7f32d231642915368c6fdc",
+  "build_id": "f2693c6ca0319a8329ea47d2685d6e9c3e7d58098a0786cae3ae77aaf318cb34"
+}

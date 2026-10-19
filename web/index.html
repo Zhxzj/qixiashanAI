@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>栖霞山小向导</title>
-  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/app.css?v=__WEB_REVISION__">
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="/css/map.css">
+  <link rel="stylesheet" href="/css/map.css?v=__WEB_REVISION__">
+  <script>window.QIXI_FRONTEND=__UI_INFO__;</script>
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">栖霞山小向导 <span class="sub">· 小栖</span></div>
+    <div class="brand">栖霞山小向导 <span class="sub">· 小栖</span> <small id="appVersion">0.4.4</small></div>
     <div class="top-right">
       <span id="keyStatus" class="pill">未配置 Key</span>
       <a class="toplink" href="/poster.html">游后日记 →</a>
@@ -18,6 +19,7 @@
     </div>
   <a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="exitApp">退出应用</button>
   </header>
+  <div id="versionNotice" class="map-alert" role="alert" hidden>应用版本已更新，当前页面需要重新载入。<button id="reloadVersion">加载当前版本</button></div>
 
   <main class="layout">
     <section class="chat-panel">
@@ -45,19 +47,30 @@
           <select id="mapMode" aria-label="地图模式"><option value="real">OSM真实地图</option><option value="demo">演示草稿（非GPS）</option></select>
         </div>
         <div class="map-toolbar"><button id="mapConfigOpen" class="ghost">地图数据说明</button><button id="mapRetry" class="ghost">重试底图</button><button id="homeMap" class="ghost">回到景区</button><button id="fitRoute" class="ghost">路线全览</button></div>
-        <p id="mapStatus" role="status">准备地图…</p>
-        <div id="realMapWrap" class="real-map-wrap"><div id="realMap" aria-label="OpenStreetMap交互地图"></div><div id="mapEmpty">本地地图数据加载中，无需地图Key。</div></div>
+        <p id="mapLoadError" class="map-alert" role="alert" hidden></p>
+        <p id="mapModeNotice" class="map-alert" hidden>当前是演示草稿，不显示真实厕所和大门。<button id="returnRealMap">返回真实地图显示设施</button></p>
+        <div id="mapWorkspace" class="map-workspace">
+          <div id="realMapWrap" class="real-map-wrap"><div id="realMap" aria-label="OpenStreetMap交互地图"></div><div id="mapEmpty">本地地图数据加载中，无需地图Key。</div></div>
+          <section id="poiDetail" class="poi-detail" aria-label="选中地点详情" aria-live="polite" hidden></section>
+        </div>
         <div id="mapBox" class="map-box" hidden></div>
         <div id="mapRealTools">
-          <div class="map-toolbar"><label><input type="checkbox" id="showPois" checked>地标（含周边）</label><label><input type="checkbox" id="showToilets" checked>用户核实厕所</label><label><input type="checkbox" id="showRoute" checked>当前路线</label><label><input type="checkbox" id="showRoads" checked>本地路网</label><label><input type="checkbox" id="showPublicToilets">公开厕所候选</label></div>
-          <form id="mapSearchForm" class="map-search"><input id="mapSearchInput" maxlength="80" placeholder="搜索景点，如栖霞寺、千佛岩" aria-label="搜索景点"><button type="submit">搜索</button><button type="button" id="majorPois" class="ghost">显示全部地标</button></form>
-          <div id="mapResults" class="map-results"></div><div id="poiDetail" class="poi-detail" aria-live="polite"></div>
+          <div class="map-toolbar"><label><input type="checkbox" id="showPois" checked>地标（含周边）</label><label><input type="checkbox" id="showToilets" checked>厕所</label><label><input type="checkbox" id="showGates" checked>大门</label><label><input type="checkbox" id="showRoute" checked>当前路线</label><label><input type="checkbox" id="showRoads" checked>本地路网</label></div>
+          <form id="mapSearchForm" class="map-search"><input id="mapSearchInput" maxlength="80" placeholder="搜索景点，如栖霞寺、千佛岩" aria-label="搜索景点"><button type="submit">搜索</button><button type="button" id="majorPois" class="ghost">主要景点</button></form>
+          <div id="mapResults" class="map-results"></div>
+          <p id="mapFollowStatus" class="muted" hidden>镜头跟随已暂停，可继续查看景点。<button id="resumeFollow" class="ghost">回到我的位置</button></p>
           <div class="route-endpoints"><div>起点：<strong id="routeOrigin">未选起点</strong></div><div>终点：<strong id="routeDestination">未选终点</strong></div><div id="routeVia" class="muted">未设置途经点</div></div>
           <div class="map-toolbar"><button id="pickOrigin" class="ghost">点地图选起点</button><button id="pickDestination" class="ghost">点地图选终点</button><button id="clearVia" class="ghost">清空途经</button><label><input type="checkbox" id="avoidSteps">避开已标注台阶</label><button id="planWalking">规划步行路线</button></div>
           <div id="routeSummary" class="route-summary"></div>
           <div class="map-toolbar"><button id="startLocation">开始定位导航</button><button id="stopLocation" class="ghost">停止定位</button><button id="useDeviceOrigin" class="ghost">以本次位置为起点</button></div>
           <p id="locationStatus">定位未开启 · 手动起点仅用于路线预览</p><p id="navigationStatus" role="status"></p>
-          <details class="photo-reference"><summary>两张导览牌照片的地名核对</summary><div id="photoReference"></div></details><p id="facilityStatus" class="muted">用户核实厕所待补充；公开厕所候选可单独查看，不保证开放。</p><button id="facilitiesOpen" class="ghost">导入厕所点位</button>
+          <div class="map-toolbar"><button id="annotationsOpen" class="ghost">大门与厕所校对</button><a class="ghost" href="/api/map/annotations/export" download>导出设施位置备份</a><button id="facilitiesOpen" class="ghost">导入已有核实厕所</button></div>
+          <section id="annotationEditor" class="annotation-editor" aria-label="设施位置校对" hidden>
+            <h3>大门与厕所位置校对</h3><p>选择设施后点“开始地图点选”，在地图上点位置，预览后确认保存。点选不代表现场测量或道路通行核实。</p>
+            <label for="annotationSelect">设施位置</label><select id="annotationSelect"></select>
+            <p id="annotationPreview" role="status"></p>
+            <div class="map-toolbar"><button id="annotationPick">开始地图点选</button><button id="annotationSave" disabled>确认保存位置</button><button id="annotationReset" class="ghost">恢复此点默认位置</button><button id="annotationCancel" class="ghost">取消校对</button></div>
+          </section>
         </div><p id="mapMessage" class="map-message" role="status"></p>
       </div>
       <div class="card">
@@ -103,6 +116,9 @@
     </aside>
   </main>
 
+  <dialog id="placePhotoDialog" class="place-photo-dialog" aria-label="景点照片大图">
+    <button id="placePhotoClose" class="ghost">关闭大图</button><img id="placePhotoFull" alt="">
+  </dialog>
   <div id="keyModal" class="modal" style="display:none">
     <div class="modal-box">
       <h3>DeepSeek API Key</h3>
@@ -118,7 +134,7 @@
   <div id="mapConfigModal" class="modal map-modal" hidden><div class="modal-box">
     <h3>Leaflet＋OpenStreetMap · 无需地图Key</h3><div id="mapDataInfo"></div>
     <p>在线底图按当前视野请求，遵守缓存和署名要求；不下载离线瓦片。断网仍显示本地道路、地标并可算路。公共瓦片服务无可用性保证。</p>
-    <p>本地路网由OSM公开数据生成，未完成现场开放/入口核实；照片仅作名称和道路关系参考，没有从图片生成坐标。</p>
+    <p>本地路网由OSM公开数据生成，未完成现场开放/入口核实。本次12处厕所由2026-10-19用户紫色标注的真实OSM截图配准，位置近似，未经现场测量；不使用以前导览图补点补路。两处大门按用户黄色标记定位。</p>
     <p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM署名与许可</a> · <a href="/api/map/osm/database" download>本地数据（ODbL）</a> · <a href="/api/map/osm/source" download>原始OSM导出</a> · <a href="/vendor/leaflet/LICENSE" target="_blank">Leaflet许可</a></p>
     <div class="modal-actions"><button id="mapConfigClose" class="ghost">关闭</button></div>
   </div></div>
@@ -128,10 +144,10 @@
     <textarea id="facilitiesInput" rows="8" aria-label="厕所JSON点位数组">[]</textarea><pre id="facilitiesPreviewText"></pre>
     <div class="modal-actions"><button id="facilitiesPreview">校验并预览</button><button id="facilitiesSave" disabled>确认导入</button><button id="facilitiesClose" class="ghost">关闭</button></div>
   </div></div>
-  <script src="/js/session.js"></script>
+  <script src="/js/session.js?v=__WEB_REVISION__"></script>
   <script src="/vendor/leaflet/leaflet.js"></script>
-  <script src="/js/map-osm.js"></script>
-  <script src="/js/app.js"></script>
+  <script src="/js/map-osm.js?v=__WEB_REVISION__"></script>
+  <script src="/js/app.js?v=__WEB_REVISION__"></script>
   <script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
 </body>
 </html>

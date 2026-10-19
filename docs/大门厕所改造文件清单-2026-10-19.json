@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-19",
+  "version": "0.4.2",
+  "build_id": "4c1fdd8e805cd68d47a5005551c6fba1342eaf6feb0680adef1767851a50df03",
+  "exe_sha256": "77f62ee4b123bbb679639aa16ae1834d72db1bac6786f67452918c39ca8b9bad",
+  "exe_bytes": 31257880,
+  "files": [
+    {
+      "path": "app/annotations_api.py",
+      "kind": "added",
+      "sha256": "7a7fe04d7f65fad329c3416af25c0e7451dc378265bac33e1feb797131dd2002",
+      "before_sha256": null
+    },
+    {
+      "path": "app/main.py",
+      "kind": "modified",
+      "sha256": "ff652fc79533ff0143cb79d3190abd8050e3a23c428352e1fe051c690acfca71",
+      "before_sha256": "c3bd3698f941d4699fac43cbd17df037b41702fef2052c4f51dc129e47c07062"
+    },
+    {
+      "path": "app/map_api.py",
+      "kind": "modified",
+      "sha256": "64bd38d580afd257cd493697c1fc5a877b2165d1bb2329323086082d07f64f0c",
+      "before_sha256": "075a367e7007f024a5b95114c0b6f513d77285b4cc3ff909c6ed7c3e343eff40"
+    },
+    {
+      "path": "app/runtime.py",
+      "kind": "modified",
+      "sha256": "9737994696b5494167e548843799c38306f836a43174d42c18e0757b0d657dee",
+      "before_sha256": "f616c8aa0693661a7198e800c94a1f88a835015897da99616132e9a9f7a3393a"
+    },
+    {
+      "path": "app/data/map_annotations.json",
+      "kind": "added",
+      "sha256": "cf0cfbc74ba105800f3333494940c337eb0c31b10a771f6bbe196a7b4f3f881d",
+      "before_sha256": null
+    },
+    {
+      "path": "app/services/map_annotations.py",
+      "kind": "added",
+      "sha256": "bfa978fc11c21d651c10ffd1e3c546a76786c2ba6275908489b01e89ee7f9142",
+      "before_sha256": null
+    },
+    {
+      "path": "app/services/map_navigation.py",
+      "kind": "modified",
+      "sha256": "092d52c7dfbca3ddee10467b55c5ba36b09f75a06dd48719b45cace2cfbbca7c",
+      "before_sha256": "2f8a2fd496a902beb0afeb5a147cf1e74cab98c3e17229cd797e6cc6e91e1050"
+    },
+    {
+      "path": "web/index.html",
+      "kind": "modified",
+      "sha256": "122c5167340d24683f495b67a119fd1d98ff01586c603d5b3b91933288eb33a3",
+      "before_sha256": "8c23298f947e88de5c1182ff48886e2b62efd6803dc374e37d3581cb8a986615"
+    },
+    {
+      "path": "web/css/map.css",
+      "kind": "modified",
+      "sha256": "0940136e227c27c25c4c5702e547a2524144012040c2aa0c4ff3edddb23bb5e0",
+      "before_sha256": "43f91e699f5438485e4dd9f4d8228f9b22c2e8db2aa54f085bed4cc091f5cfef"
+    },
+    {
+      "path": "web/js/map-osm.js",
+      "kind": "modified",
+      "sha256": "0425a711aa8fc75b69f28f63b89a2c2f7b8009a39fc4e42fea05f19a71e165a1",
+      "before_sha256": "e17d558fd8810da959d02fdd8ef823a3ac2a68f7584afd457952acbd226b7667"
+    },
+    {
+      "path": "scripts/build_portable.py",
+      "kind": "modified",
+      "sha256": "088ce651be83128294f05bac0b623e4601ff676faa96e3eb5f9c1c715a732721",
+      "before_sha256": "fa215948e26355201ce5f3bfffff61f9a9df812930ffb76dacfb6e730677e4cd"
+    },
+    {
+      "path": "scripts/register_annotations.py",
+      "kind": "added",
+      "sha256": "0fdb1971cde2bd8af9c62e1a411dc929e5584f3fd10e607a1843959ef6b21747",
+      "before_sha256": null
+    },
+    {
+      "path": "scripts/test_place_details_delivery.py",
+      "kind": "modified",
+      "sha256": "020acb29dce7d7dea18ccfb654f42ae0731e73bc12c7b1078b93ba57d8595244",
+      "before_sha256": "ba89d1cc3ffeee413bf9a70adc6ff594d854d510dbb37bbb4c50bae304beaca3"
+    },
+    {
+      "path": "tests/test_map_annotations.py",
+      "kind": "added",
+      "sha256": "066c8b5253a6dde9816a65e2578a833e1e5dee492411daa7978a0f2b809a3c82",
+      "before_sha256": null
+    },
+    {
+      "path": "tools/test_annotations_browser.cjs",
+      "kind": "added",
+      "sha256": "1a686e894c6d39368040cfa0d249addcb2c6f71ce31b97c8373e6a48e42dbf88",
+      "before_sha256": null
+    },
+    {
+      "path": "tools/test_osm_browser.cjs",
+      "kind": "modified",
+      "sha256": "3758e40de8f802219835de5b534e3f7bc04e26a538b3742a9ac996025546c8a9",
+      "before_sha256": "8a7a6af365093fc354c2dc5afd74b5cab8a0fc1b08db6202f7d040a0de6a6fd8"
+    },
+    {
+      "path": "tools/test_place_details_browser.cjs",
+      "kind": "modified",
+      "sha256": "7f7a111f0890e1a74e4303c31f54368ffa236aa0fa436520e7cfed0d5b218d01",
+      "before_sha256": "6bbe7352cf7c82433fe4f670d3cf832502c83f744c771884c71c21ebecac41fe"
+    },
+    {
+      "path": "docs/OSM电脑版使用说明.md",
+      "kind": "modified",
+      "sha256": "a20da0be82a00d55af8a72c9bd3fabe9861042c1aaea9b69d622a86fb07036d6",
+      "before_sha256": "59aa69f3814953c0c85ffb4e4962717f46859e868e223126a6727232bb825a45"
+    },
+    {
+      "path": "docs/大门厕所标注接口变更-2026-10-19.md",
+      "kind": "added",
+      "sha256": "4123faddc308ee1852038d231ec62330c4d59d9e7bf76ed18deeeaf769153ab1",
+      "before_sha256": null
+    },
+    {
+      "path": "docs/电脑端大门与紫色标注厕所改造设计.md",
+      "kind": "added",
+      "sha256": "c9a96df5471056550fe893dfaf01ee38f59919dcd0ac0ecc9c638d0d789b5bab",
+      "before_sha256": null
+    },
+    {
+      "path": "docs/紫色厕所配准复现记录-2026-10-19.json",
+      "kind": "added",
+      "sha256": "8c0d730660837141c224f90f0164ccec35f9602fae9d389f3c07b13a89f39c6b",
+      "before_sha256": null
+    }
+  ],
+  "excluded_self": "docs/大门厕所改造文件清单-2026-10-19.json",
+  "original_graph_and_photos_unchanged": true,
+  "packaged_app_web_match_source": true,
+  "git_pushed": false
+}

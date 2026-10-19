@@ -1,0 +1,121 @@
+{
+  "version": "0.4.3",
+  "build_id": "bbab198bd7b9f86c70475624133556a29c71a92079a134baa839a73e35774f13",
+  "files": [
+    {
+      "path": "app/main.py",
+      "kind": "modified",
+      "sha256": "9f04a24f849f9d2c0fd0d55b82077759e6ac07543ae3aacba6bad322ce515123"
+    },
+    {
+      "path": "app/runtime.py",
+      "kind": "modified",
+      "sha256": "8ca52fb40839ff4f015ed44a52cdbe80c7d2bb050eaa5e9ba9f494fc503e3132"
+    },
+    {
+      "path": "app/ui_version.py",
+      "kind": "added",
+      "sha256": "0d86e9d358b7cceb8f7020884e677d2cae650afb8f69dba526faa4ffe43d39c2"
+    },
+    {
+      "path": "app/data/map_annotations.json",
+      "kind": "modified",
+      "sha256": "c85ec35ceafde34d393733b24858a0eebba266bccea2a6a94cbb37dbccf127a3"
+    },
+    {
+      "path": "web/index.html",
+      "kind": "modified",
+      "sha256": "ea7dca1f466d24ed28373486a41888f14c7d5250205f3748eed8700f8f2909d2"
+    },
+    {
+      "path": "web/css/map.css",
+      "kind": "modified",
+      "sha256": "333b4277152a89d93ab7e3a725ef8adcf6a95da24570cafd151bede79a31cda5"
+    },
+    {
+      "path": "web/js/app.js",
+      "kind": "modified",
+      "sha256": "9b004859434b0e9fc2d76fa58b1b8f92c3d6321a7b41b935634ac376e1c2852d"
+    },
+    {
+      "path": "web/js/map-osm.js",
+      "kind": "modified",
+      "sha256": "e0692a9d220c8b0cce0ff0a62767bea5e0f809ac4885dc1f492ab00c7561223a"
+    },
+    {
+      "path": "scripts/build_portable.py",
+      "kind": "modified",
+      "sha256": "8539a289c7e233b42d0db712bfae2ddfb7c45a0091c67958c3e140a42fd5fcd6"
+    },
+    {
+      "path": "scripts/test_place_details_delivery.py",
+      "kind": "modified",
+      "sha256": "1d1bd0f23a15b0d26c90a84998940db35eb59a7a3dcba31fa2902058df56d6dc"
+    },
+    {
+      "path": "tools/capture_live_facilities.cjs",
+      "kind": "added",
+      "sha256": "26bc197ec0467edf7c6bc9d4726cdb4e5708c89018110d225527b92b4f963dd3"
+    },
+    {
+      "path": "tools/test_annotations_browser.cjs",
+      "kind": "modified",
+      "sha256": "2d54f9bd92f5f0c39461a95644a8aaaf7e2cc1d4ee8043c99cef6d493cedf2fe"
+    },
+    {
+      "path": "tools/test_facility_visibility.cjs",
+      "kind": "added",
+      "sha256": "789109960bed092ebe27eeded0c339467360e6435909c5afc088d530baa71b1a"
+    },
+    {
+      "path": "tools/test_osm_browser.cjs",
+      "kind": "modified",
+      "sha256": "15592d2106441d6a9a6a224a1bd11d4ffd2b651a16fde261dd800066e343af2c"
+    },
+    {
+      "path": "tools/test_place_details_browser.cjs",
+      "kind": "modified",
+      "sha256": "fdb7d21125370477f4fb52d6c040c11943da92ea897c690a374ac8a119ceb1ad"
+    },
+    {
+      "path": "tests/test_map_annotations.py",
+      "kind": "modified",
+      "sha256": "d44423371a58ce1704a7c4f659e357a441b91d2ecec4acfcd40ae3633e60a588"
+    },
+    {
+      "path": "tests/test_visible_facilities.py",
+      "kind": "added",
+      "sha256": "ac7b96563073db797437b28512b96745d65b389fb2ee36d5d52eef599bb5ef90"
+    },
+    {
+      "path": "docs/OSM电脑版使用说明.md",
+      "kind": "modified",
+      "sha256": "c03def013ea249f8e41c2d6c69c5def78f4eda5cfdafbc4dc12887d256f8c0d0"
+    },
+    {
+      "path": "docs/地图设施标注交付复盘与诊改方案.md",
+      "kind": "added",
+      "sha256": "aeddbddffab3158cb3ebf848cdcb846b21bfb31c0201e39d752fefbd7e29fe2c"
+    },
+    {
+      "path": "docs/电脑端大门与紫色标注厕所改造设计.md",
+      "kind": "modified",
+      "sha256": "ba39af3050be240ca5f1795a21a4c0ea7da7d76b438cb49b173bc756b1708780"
+    },
+    {
+      "path": "docs/设施可见性诊改接口-2026-10-19.md",
+      "kind": "added",
+      "sha256": "834d5abff938290d9cc2ed05ea7ab02563a430d5cf4bbe965ea3701fe0523cbe"
+    },
+    {
+      "path": "launcher.py",
+      "kind": "modified",
+      "sha256": "dc6be76ad4ddf4d8f80bfca86e117a67b013b122a6dc56ae3d9c10162f18313d"
+    }
+  ],
+  "official_west_south_verified": false,
+  "original_user_window_captured": false,
+  "actual_service_independent_page_verified": true,
+  "graph_and_photos_unchanged": true,
+  "git_pushed": false
+}

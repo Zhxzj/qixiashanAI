@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "image_sha256": "2761197375510103c0025bf215695466634ad9d492ca6143364aa59a2c3ea68e",
+  "gate_source": {
+    "image_sha256": "7892cfe47733b45c4ecf00bb53092d7f4dc621ddf9b22815b2f92cc7377d0411",
+    "image_size": [
+      1285,
+      822
+    ],
+    "count": 2,
+    "method": "reuse unchanged OSM screenshot geographic control points"
+  },
+  "gates": [
+    {
+      "id": "gate_marked_west",
+      "pixel_center": [
+        219.3879142300195,
+        522.6978557504873
+      ],
+      "coord": [
+        32.1526788,
+        118.95011
+      ]
+    },
+    {
+      "id": "gate_marked_south",
+      "pixel_center": [
+        579.5139318885449,
+        692.7987616099072
+      ],
+      "coord": [
+        32.1485661,
+        118.9604266
+      ]
+    }
+  ],
+  "image_size": [
+    1285,
+    700
+  ],
+  "method": "x=ax*lng+bx; y=ay*degrees(asinh(tan(radians(lat))))+by",
+  "icon_center_compensation_px": 0.75,
+  "parameters": {
+    "ax": 34907.62545462367,
+    "bx": -4152046.5003706138,
+    "ay": -35017.40323587211,
+    "by": 1190644.4890534603
+  },
+  "controls": [
+    {
+      "name": "凤翔峰",
+      "visible_pixel_center": [
+        735,
+        204.5
+      ],
+      "coord": [
+        32.1603375,
+        118.9649161
+      ],
+      "residual_px": 0.8232519983383033
+    },
+    {
+      "name": "读枫",
+      "visible_pixel_center": [
+        382.5,
+        275
+      ],
+      "coord": [
+        32.1586514,
+        118.9547934
+      ],
+      "residual_px": 0.38688727891779984
+    },
+    {
+      "name": "虎山",
+      "visible_pixel_center": [
+        319.5,
+        275
+      ],
+      "coord": [
+        32.1586643,
+        118.9530129
+      ],
+      "residual_px": 0.7810668408828474
+    },
+    {
+      "name": "德云亭",
+      "visible_pixel_center": [
+        387,
+        341
+      ],
+      "coord": [
+        32.1570495,
+        118.9549355
+      ],
+      "residual_px": 0.18949580624690412
+    },
+    {
+      "name": "桃花扇亭",
+      "visible_pixel_center": [
+        421.5,
+        357.5
+      ],
+      "coord": [
+        32.1566601,
+        118.9559186
+      ],
+      "residual_px": 0.24418101828242994
+    },
+    {
+      "name": "珍珠泉",
+      "visible_pixel_center": [
+        468,
+        315.5
+      ],
+      "coord": [
+        32.15768,
+        118.9572475
+      ],
+      "residual_px": 0.4599688849574245
+    },
+    {
+      "name": "幽居庵",
+      "visible_pixel_center": [
+        511.5,
+        303.5
+      ],
+      "coord": [
+        32.1579559,
+        118.9584868
+      ],
+      "residual_px": 0.4827011241532284
+    },
+    {
+      "name": "待月亭",
+      "visible_pixel_center": [
+        425,
+        465.5
+      ],
+      "coord": [
+        32.1540381,
+        118.9560107
+      ],
+      "residual_px": 0.4457714173151245
+    },
+    {
+      "name": "如來堂",
+      "visible_pixel_center": [
+        370.5,
+        476
+      ],
+      "coord": [
+        32.1537847,
+        118.954451
+      ],
+      "residual_px": 0.3892958586582718
+    },
+    {
+      "name": "栖霞寺",
+      "visible_pixel_center": [
+        319.5,
+        473
+      ],
+      "coord": [
+        32.153864812500004,
+        118.95302253125
+      ],
+      "residual_px": 0.8136460790160467
+    }
+  ],
+  "holdouts": [
+    {
+      "name": "碧云亭",
+      "visible_pixel_center": [
+        342,
+        260
+      ],
+      "coord": [
+        32.1590028,
+        118.9536551
+      ],
+      "residual_px": 0.5398870070084548
+    },
+    {
+      "name": "了凡问道",
+      "visible_pixel_center": [
+        538.5,
+        348.5
+      ],
+      "coord": [
+        32.1568848,
+        118.9592866
+      ],
+      "residual_px": 0.6996483324450276
+    }
+  ],
+  "points": [
+    {
+      "id": "toilet_T01",
+      "pixel_center": [
+        519.84,
+        191.25
+      ],
+      "coord": [
+        32.1606921,
+        118.9587171
+      ]
+    },
+    {
+      "id": "toilet_T02",
+      "pixel_center": [
+        659.65,
+        162.55
+      ],
+      "coord": [
+        32.1613859,
+        118.9627222
+      ]
+    },
+    {
+      "id": "toilet_T03",
+      "pixel_center": [
+        787.26,
+        210.94
+      ],
+      "coord": [
+        32.1602161,
+        118.9663779
+      ]
+    },
+    {
+      "id": "toilet_T04",
+      "pixel_center": [
+        538.73,
+        273.79
+      ],
+      "coord": [
+        32.1586966,
+        118.9592582
+      ]
+    },
+    {
+      "id": "toilet_T05",
+      "pixel_center": [
+        378.52,
+        302.0
+      ],
+      "coord": [
+        32.1580146,
+        118.9546687
+      ]
+    },
+    {
+      "id": "toilet_T06",
+      "pixel_center": [
+        699.58,
+        321.55
+      ],
+      "coord": [
+        32.157542,
+        118.9638661
+      ]
+    },
+    {
+      "id": "toilet_T07",
+      "pixel_center": [
+        372.51,
+        425.88
+      ],
+      "coord": [
+        32.1550196,
+        118.9544965
+      ]
+    },
+    {
+      "id": "toilet_T08",
+      "pixel_center": [
+        279.0,
+        432.74
+      ],
+      "coord": [
+        32.1548538,
+        118.9518177
+      ]
+    },
+    {
+      "id": "toilet_T09",
+      "pixel_center": [
+        203.48,
+        501.87
+      ],
+      "coord": [
+        32.1531824,
+        118.9496543
+      ]
+    },
+    {
+      "id": "toilet_T10",
+      "pixel_center": [
+        417.71,
+        486.82
+      ],
+      "coord": [
+        32.1535463,
+        118.9557914
+      ]
+    },
+    {
+      "id": "toilet_T11",
+      "pixel_center": [
+        550.62,
+        546.82
+      ],
+      "coord": [
+        32.1520956,
+        118.9595988
+      ]
+    },
+    {
+      "id": "toilet_T12",
+      "pixel_center": [
+        662.24,
+        547.22
+      ],
+      "coord": [
+        32.152086,
+        118.9627964
+      ]
+    }
+  ],
+  "rms_control_px": 0.5467978761761351,
+  "max_control_px": 0.8232519983383033,
+  "field_accuracy_m": null,
+  "method_version": 1,
+  "script_sha256": "fa3424a2d68118b615b21701b33cce5e7ab0bfc733a5ac158164c21113cd428b",
+  "note": "控制点与圈中心为人工对应的截图像素，不是实地测绘；不表示入口或通行核实。",
+  "source_image_checked": true,
+  "checked_image_sha256": "7892cfe47733b45c4ecf00bb53092d7f4dc621ddf9b22815b2f92cc7377d0411"
+}

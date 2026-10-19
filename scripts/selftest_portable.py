@@ -86,13 +86,18 @@ def main():
         check("不停止无关 HTTP 200 服务",get_json(f"http://127.0.0.1:{occupied}/api/health")["ok"] is True)
         with urllib.request.urlopen(f"http://127.0.0.1:{instance['port']}/poster.html") as page:
             check("实际成品提供海报工作台",b"poster-app.js" in page.read())
-        for relative in ("js/map-osm.js","css/map.css","data/toilets-template.json","vendor/leaflet/leaflet.js","vendor/leaflet/leaflet.css","vendor/leaflet/LICENSE"):
+        for relative in ("js/map-osm.js","css/map.css","data/toilets-template.json","vendor/leaflet/leaflet.js","vendor/leaflet/leaflet.css","vendor/leaflet/LICENSE","assets/places/qixiasi-gate.jpg","assets/places/qianfoyan-statue.jpg"):
             with urllib.request.urlopen(f"http://127.0.0.1:{instance['port']}/"+relative) as response:
                 check("成品包含当前地图资源 "+relative,response.read()==(ROOT/"web"/relative).read_bytes())
         map_config=get_json(f"http://127.0.0.1:{instance['port']}/api/map/config")
         check("成品无用户地图Key和安全密钥",map_config.get("configured") is False and not map_config.get("js_key") and "security_code" not in map_config)
         osm=get_json(f"http://127.0.0.1:{instance['port']}/api/map/osm/data")
         check("成品提供真实本地OSM道路",len(osm.get("roads",[]))>100)
+        place=get_json(f"http://127.0.0.1:{instance['port']}/api/map/place?place_id=qxs-qixiasi")
+        check("成品提供两层已核实景点介绍",place["status"]=="reviewed" and len(place["detail"])<=200)
+        check("成品照片有作者及许可",place["photo"]["author"]=="Farm" and place["photo"]["license"]=="CC BY-SA 3.0")
+        review=get_json(f"http://127.0.0.1:{instance['port']}/api/map/review")
+        check("成品不将图片候选当新核准厕所",review["approved_new_toilets"]==0 and all(p["coord"] is None for p in review["toilets"]))
         shutdown(instance)
         check("实例凭证退出，EXE 返回零",process.wait(timeout=15)==0)
         check("退出移除本实例描述",not (user/"instance/current.json").exists())

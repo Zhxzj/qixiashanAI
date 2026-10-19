@@ -1,0 +1,172 @@
+{
+  "schema_version": 1,
+  "version": "content-20261018-1",
+  "items": {
+    "qxs-fengxiangfeng": {
+      "summary": "栖霞山的主峰，与龙山、虎山组成三峰山势。",
+      "detail": "中国天气网江苏站资料记载，这座山峰海拔约286米；龙山在东北，虎山在西北。景区管理处供稿还记载，中峰轮廓似伞，因此有“伞山”之称。历史地理资料不能代替实时开放公告或现场路标。",
+      "status": "reviewed",
+      "sources": [
+        {
+          "title": "中国天气网江苏站：栖霞山",
+          "url": "https://www.weather.com.cn/jiangsu/qxkp/rdzt/11/2224868.shtml",
+          "checked_at": "2026-10-18"
+        },
+        {
+          "title": "景区管理处供稿：栖霞山",
+          "url": "https://tour.jschina.com.cn/lyjs/202211/t20221128_3119835.shtml",
+          "checked_at": "2026-10-18"
+        }
+      ],
+      "photo": null
+    },
+    "osm-node-4771286828": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-deyunting": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "osm-node-5524060188": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-biyunting": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "osm-node-5599488219": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-taohuashanting": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-qianfoyan": {
+      "summary": "依山崖开凿的佛教造像群，保存着南京南朝石刻的记忆。",
+      "detail": "千佛岩位于栖霞寺舍利塔东侧。南京市地方志资料记载，齐梁时期，人们利用山岩高低、深浅的变化在石壁开龛造像。文物保护名录采用“千佛崖石窟及明征君碑”这一名称，其中石窟位于寺东山崖，明征君碑位于寺前，二者不能混作同一个点位。",
+      "status": "reviewed",
+      "sources": [
+        {
+          "title": "南京市地方志：古刹摄山",
+          "url": "https://dfz.nanjing.gov.cn/gzdt/202409/t20240930_4778265.html",
+          "checked_at": "2026-10-18"
+        },
+        {
+          "title": "南京文旅局：文物保护名录",
+          "url": "https://wlj.nanjing.gov.cn/zwgk/wwbhml/202501/P020251127641809511607.pdf",
+          "checked_at": "2026-10-18"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/qianfoyan-statue.jpg",
+        "title": "南京千佛岩造像",
+        "author": "Farm",
+        "license": "CC BY-SA 3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Statue1_of_Qianfoya_Nanjing.jpg",
+        "captured_at": "2009-09-30（EXIF）",
+        "published_at": "2009-11-22（文件页）",
+        "historical": true,
+        "processing": "原始JPEG，未裁切或重编码；卡片预览可能视觉裁切，大图完整展示",
+        "sha256": "923c6a697fc78ccc3a1826dec87aadde17eea08376a7986c538a58e14fa1b46c",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/9/91/Statue1_of_Qianfoya_Nanjing.jpg"
+      }
+    },
+    "osm-node-5599488242": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-liaofanwendao": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-huashanting": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "osm-node-5602528570": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-zhenzhuquan": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "osm-node-11552972794": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    },
+    "qxs-qixiasi": {
+      "summary": "栖霞山麓的千年古刹，也是佛教三论宗的重要祖庭。",
+      "detail": "据南京市民族宗教事务局记载，南齐永明二年（484年），明僧绍舍宅，法度禅师以栖霞精舍为基础创立寺院。唐代曾称功德寺，后恢复栖霞寺之名；明清多次修建，留下了延续至今的历史脉络。",
+      "status": "reviewed",
+      "sources": [
+        {
+          "title": "南京市民族宗教事务局：栖霞寺简介",
+          "url": "https://mzzjj.nanjing.gov.cn/mzzj/njzjgk/njfj/201809/t20180927_1198633.html",
+          "checked_at": "2026-10-18"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/qixiasi-gate.jpg",
+        "title": "栖霞寺正门",
+        "author": "Farm",
+        "license": "CC BY-SA 3.0",
+        "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+        "source_url": "https://commons.wikimedia.org/wiki/File:Gate_of_Qixia_Temple_nanjing.jpg",
+        "captured_at": "2009-09-30（EXIF）",
+        "published_at": "2009-11-22（文件页）",
+        "historical": true,
+        "processing": "原始JPEG，未裁切或重编码；卡片预览可能视觉裁切，大图完整展示",
+        "sha256": "95bc17523bc872ec76103a6c97263230299411903fff0e7f44bf75d0caad3528",
+        "original_url": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Gate_of_Qixia_Temple_nanjing.jpg"
+      }
+    },
+    "osm-way-1525414285": {
+      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
+      "detail": "详细介绍待核实。",
+      "status": "pending",
+      "sources": [],
+      "photo": null
+    }
+  }
+}

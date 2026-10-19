@@ -1,0 +1,311 @@
+{
+  "schema_version": 1,
+  "version": "review-20261018-1",
+  "source": {
+    "filename": "2d074f148ffa7ca4d5ae6612364401a6.png",
+    "sha256": "283ab81bd1e342f595d2fee8d2aec7cd8938beaa6bc7f03df8faac0eba993868",
+    "width": 1660,
+    "height": 1209,
+    "date": "unknown",
+    "coordinate_extraction": false
+  },
+  "toilets": [
+    {
+      "candidate_id": "ref-20261018-wc-001",
+      "label": "图上方始皇临江处附近",
+      "image_bbox": [
+        1284,
+        79,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-002",
+      "label": "图上方栈道沿线",
+      "image_bbox": [
+        967,
+        125,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-003",
+      "label": "凤翔峰图右侧游览道路附近",
+      "image_bbox": [
+        1569,
+        190,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-004",
+      "label": "乾隆御花园附近",
+      "image_bbox": [
+        1033,
+        313,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-005",
+      "label": "太虚亭附近",
+      "image_bbox": [
+        1419,
+        364,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-006",
+      "label": "读枫阁下方园路附近",
+      "image_bbox": [
+        702,
+        356,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-007",
+      "label": "千佛岩附近",
+      "image_bbox": [
+        713,
+        643,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-008",
+      "label": "明镜湖图上方道路附近",
+      "image_bbox": [
+        462,
+        682,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-009",
+      "label": "图左侧游览道路附近",
+      "image_bbox": [
+        324,
+        747,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-010",
+      "label": "紫峰阁附近",
+      "image_bbox": [
+        763,
+        774,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-011",
+      "label": "图左下游客服务中心",
+      "image_bbox": [
+        323,
+        920,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-012",
+      "label": "陆羽茶庄附近",
+      "image_bbox": [
+        1044,
+        961,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-013",
+      "label": "紫云亭下方道路附近",
+      "image_bbox": [
+        1286,
+        909,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    },
+    {
+      "candidate_id": "ref-20261018-wc-014",
+      "label": "图右下游客服务中心",
+      "image_bbox": [
+        1321,
+        1105,
+        16,
+        16
+      ],
+      "status": "image_candidate_pending",
+      "coordinate_system": null,
+      "coord": null,
+      "osm_match": null,
+      "navigation_allowed": false,
+      "note": "人工初步标记图中符号，框选及身份待复核；图标不是精确地理位置"
+    }
+  ],
+  "roads": [
+    {
+      "candidate_id": "ref-20261018-road-001",
+      "label": "寺庙及千佛岩片区园路",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-002",
+      "label": "桃花涧—桃花扇亭—德云亭一带",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-003",
+      "label": "碧云亭—读枫阁一带园路及栈道",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-004",
+      "label": "乾隆御花园—话山亭一带",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-005",
+      "label": "图右侧环线及太虚亭一带",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-006",
+      "label": "图上方半月池及江边环线",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-007",
+      "label": "图下方九龙坡—陆羽茶庄栈道",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    },
+    {
+      "candidate_id": "ref-20261018-road-008",
+      "label": "图右下游客服务区至紫云亭游览道路",
+      "status": "topology_reference_only",
+      "geometry": null,
+      "navigation_allowed": false,
+      "note": "缺少可靠测绘几何或通行证据，不更新现有算路图"
+    }
+  ],
+  "known_osm_toilets": [
+    "node/4771286826",
+    "node/4771298527",
+    "node/4771298531"
+  ],
+  "approved_new_roads": 0,
+  "approved_new_toilets": 0
+}

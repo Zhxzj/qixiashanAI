@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 import httpx
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
+from fastapi.responses import FileResponse, StreamingResponse, JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from app.agent.loop import AgentLoop
@@ -26,8 +26,12 @@ from app.services.session import SessionStore
 from app.services.weather import ConditionsService
 from app.services.provider import Provider
 from app.services.osm_map import OSMMapService
+from app.services.places import PlaceService
 from app.services import map_navigation as map_nav
 from app.map_api import router as map_router
+from app.annotations_api import router as annotations_router
+from app.services.map_annotations import AnnotationStore
+from app.ui_version import info as ui_info, WEB_REVISION
 
 WEB_DIR=resource_path("web")
 DATA_DIR=resource_path("app/data")
@@ -37,6 +41,8 @@ sessions=SessionStore(user_path("state/sessions.sqlite3"))
 provider=Provider()
 services={"location":LocationService(DATA_DIR),"route":RouteService(DATA_DIR),"weather":ConditionsService(DATA_DIR),"photos":PhotoService(DATA_DIR,cfg),"provider":provider}
 services["osm"]=OSMMapService(DATA_DIR)
+services["places"]=PlaceService(DATA_DIR)
+services["annotations"]=AnnotationStore(DATA_DIR/"map_annotations.json", user_path("config/map-annotations.json"), services["osm"].data["bounds"])
 services["route"].osm=services["osm"]
 agent=AgentLoop(cfg,sessions,services)
 INSTANCE_ID=os.environ.get("QIXI_INSTANCE_ID") or uuid.uuid4().hex
@@ -58,7 +64,8 @@ async def lifespan(app):
         await asyncio.gather(*recap_tasks.values(),return_exceptions=True)
     await provider.close()
 
-app=FastAPI(title="栖霞山小向导",version="0.4.0",lifespan=lifespan)
+app=FastAPI(title="栖霞山小向导",version="0.4.4",lifespan=lifespan)
+app.include_router(annotations_router(services["annotations"]))
 
 @app.middleware("http")
 async def local_guard(request:Request,call_next):
@@ -70,13 +77,15 @@ async def local_guard(request:Request,call_next):
     if request.url.path.startswith(("/api/map/","/_AMapService/")) and request.headers.get("sec-fetch-site")=="cross-site":
         return JSONResponse({"detail":"地图仅允许本机应用页面使用"},403)
     if request.method=="POST":
+        if request.url.path.startswith("/api/map/annotations") and len(await request.body())>4096:
+            return JSONResponse({"detail":"标注请求过大"},413)
         try:
             if int(request.headers.get("content-length","0"))>17_000_000:
                 return JSONResponse({"detail":"请求太大，请压缩照片后再试"},413)
         except ValueError:
             return JSONResponse({"detail":"无效请求大小"},400)
     response=await call_next(request)
-    if request.url.path.startswith("/api/"):
+    if request.url.path.startswith(("/api/","/js/","/css/")) or request.url.path in ("/","/index.html"):
         response.headers["Cache-Control"]="no-store"
     return response
 
@@ -84,11 +93,18 @@ def _sse(obj):
     return "data: "+json.dumps(obj,ensure_ascii=False)+"\n\n"
 
 def _state_view(state):
+    services["annotations"].ensure_route_version(state)
+    services["osm"].ensure_route_version(state)
     navigation = map_nav.navigation_view(state)
     return {**{k:state.get(k) for k in ("session_id","generation","revision","location","route","visited","memory","announced")},
             "map_mode":state.get("prefs",{}).get("map_mode","demo"), "map_provider":map_nav.provider(state), "map_intent":state.get("_map_intent"), "navigation":navigation}
 
 def _sync_arrival(state,now=None):
+    if not services["annotations"].ensure_route_version(state):
+        return None
+    if not services["osm"].ensure_route_version(state):
+        state.pop("_arrival_pending", None)
+        return None
     now=time.monotonic() if now is None else now
     loc=state.get("location") or {}
     if map_nav.real_mode(state):
@@ -178,6 +194,16 @@ def _decode_data_url(value):
 @app.get("/api/health")
 async def health():
     return {"ok":True,"app_id":APP_ID,"build_id":BUILD_ID,"api_version":API_VERSION,"instance_id":INSTANCE_ID,"model":cfg["model"],"key_configured":bool(cfg["deepseek_api_key"])}
+
+@app.get("/api/ui-version")
+async def ui_version():
+    return ui_info()
+
+@app.get("/")
+@app.get("/index.html")
+async def index():
+    html=(WEB_DIR/"index.html").read_text(encoding="utf-8")
+    return HTMLResponse(html.replace("__WEB_REVISION__",WEB_REVISION).replace("__UI_INFO__",json.dumps(ui_info(),ensure_ascii=False)))
 
 @app.post("/api/config")
 async def set_config(body:ConfigIn):
