@@ -53,7 +53,7 @@ async function init() {
 function setKeyStatus(ok) {
   window.QixiUI?.keyStatus(ok);
   const el = $("#keyStatus");
-  el.textContent = ok ? "Key 已保存（可测试连接）" : "对话尚未配置";
+  el.textContent = ok ? "Key 已输入（仅本次页面）" : "对话尚未配置";
   el.classList.toggle("ok", ok);
 }
 
@@ -504,22 +504,24 @@ function bindEvents() {
     $("#keyModal").style.display = "flex";
   });
   $("#keyClose").addEventListener("click", () => {
+    $("#keyInput").value = "";
     $("#keyModal").style.display = "none";
   });
   $("#keySave").addEventListener("click", async () => {
     const key = $("#keyInput").value.trim();
     if (!key) return;
-    $("#keyMsg").textContent = "保存中…";
+    $("#keyMsg").textContent = "正在启用本次 Key…";
     try {
     await api("/api/config", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ deepseek_api_key: key }),
     });
+    $("#keyInput").value = "";
     $("#keyMsg").textContent = "测试连接中…";
     const t = await api("/api/config/test", { method: "POST" });
     $("#keyMsg").textContent = t.ok ? "连接正常 ✓" : `连接失败：${t.message}`;
-    $("#keyStatus").textContent = t.ok ? "模型已连通" : "Key 已保存，连接未通过";
+    $("#keyStatus").textContent = t.ok ? "模型已连通（仅本次页面）" : "Key 仅在内存，连接未通过";
     window.QixiUI?.keyStatus(true);
     } catch (e) { $("#keyMsg").textContent = e.message; }
   });

@@ -1,0 +1,26 @@
+/* Small glass highlights. Static gradients/shadows; only transform/opacity animate. */
+:root{--ui-feedback-out:cubic-bezier(.23,1,.32,1)}
+.qixi-glass-anchor{position:relative}
+button.qixi-glass,summary.qixi-glass,a.qixi-glass{isolation:isolate;transform-origin:center;transition:transform 160ms var(--ease-out,var(--ui-feedback-out));-webkit-tap-highlight-color:transparent}
+.qixi-glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;box-sizing:border-box;border:1px solid rgba(255,255,255,.6);background:linear-gradient(115deg,rgba(255,255,255,.38),rgba(255,255,255,.04) 43%,transparent 65%,rgba(255,255,255,.18)),linear-gradient(180deg,rgba(255,255,255,.18),transparent 48%);box-shadow:inset 0 1px 0 #ffffffe6,inset 0 -1px 0 #133d6b12,0 7px 16px #1b4e8120;opacity:0;transition:opacity 160ms var(--ease-out,var(--ui-feedback-out))}
+.qixi-glass.qixi-pressed{transition-duration:120ms}.qixi-glass.qixi-pressed::after{opacity:.95;transition-duration:120ms}
+button.qixi-glass:hover,a.qixi-glass:hover{filter:none}
+@media(hover:hover) and (pointer:fine){
+ html:not([data-qixi-input=keyboard]) .qixi-glass:not(:disabled):not([aria-disabled=true]):hover{transform:scale(1.04)}
+ html:not([data-qixi-input=keyboard]) .qixi-glass:not(:disabled):not([aria-disabled=true]):hover::after{opacity:.8}
+ html:not([data-qixi-input=keyboard]) .qixi-glass.qixi-pressed:not(:disabled):not([aria-disabled=true]){transform:scale(.97)}
+ html:not([data-qixi-input=keyboard]) .qixi-glass.qixi-pressed:not(:disabled):not([aria-disabled=true])::after{opacity:.95;transition-duration:120ms}
+ html:not([data-qixi-input=keyboard]) .qixi-glass.qixi-glass-flat:not(:disabled):not([aria-disabled=true]):hover,
+ html:not([data-qixi-input=keyboard]) .qixi-glass.qixi-glass-flat.qixi-pressed:not(:disabled):not([aria-disabled=true]){transform:none}
+}
+html[data-qixi-input=keyboard] .qixi-glass{transform:none;transition:none}
+html[data-qixi-input=keyboard] .qixi-glass::after{transition:none}
+.qixi-glass:focus-visible::after{opacity:.45}.qixi-glass:disabled::after,.qixi-glass[aria-disabled=true]::after{opacity:0!important}
+@media(hover:none),(pointer:coarse){.qixi-glass{transform:none!important;transition:none}.qixi-glass::after{transition:opacity 120ms var(--ui-feedback-out)}}
+@media(prefers-reduced-motion:reduce){button.qixi-glass,summary.qixi-glass,a.qixi-glass{transform:none!important;transition:none}.qixi-glass::after{transition:none}}
+@media(prefers-reduced-transparency:reduce),(prefers-contrast:more){.qixi-glass::after{background:none;box-shadow:none;border-color:currentColor}.qixi-glass:focus-visible{outline:3px solid #176ab9;outline-offset:3px}}
+
+/* Shortcut cells remain evenly spaced; feedback hugs the actual icon and label. */
+.ui-app button.guide-item.qixi-glass{justify-self:center;width:max-content;max-width:100%;padding-inline:6px}
+.ui-app .guide-item.qixi-glass::after{inset:0 auto auto 50%;width:52px;height:52px;transform:translateX(-50%);border-radius:18px}
+@media(max-width:600px){.ui-app .guide-item.qixi-glass::after{width:44px;height:44px;border-radius:15px}}

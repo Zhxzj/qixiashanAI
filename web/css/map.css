@@ -18,7 +18,7 @@
 .map-toilet-symbol {background:#2773a5;border-radius:7px;}
 .map-user-toilet-symbol,.map-gate-symbol,.map-preview-symbol,.map-road-end-symbol {display:grid;place-items:center;width:32px;height:32px;border:3px solid white;box-shadow:0 2px 6px #0006;color:white;background:#763798;border-radius:7px;font:bold 17px sans-serif;}
 .map-gate-symbol {background:#17624e;border-radius:3px;}
-.leaflet-tooltip.facility-label {padding:2px 5px;background:#fffef9;border:1px solid #9c81ac;color:#432451;font:bold 11px "Microsoft YaHei",sans-serif;box-shadow:0 1px 3px #0003;}
+.map-user-toilet-symbol,.map-gate-symbol {width:28px;height:28px;border-width:2px;font-size:15px;}
 .map-alert {padding:10px;background:#fff0d6;border:1px solid #bc792a;color:#713b15;border-radius:7px;font-size:13px;line-height:1.7;}
 .map-preview-symbol {background:#b56d08;border-radius:50%;}
 .map-road-end-symbol {background:#374e71;border-radius:50%;font-size:10px;}

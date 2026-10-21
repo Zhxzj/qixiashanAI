@@ -15,6 +15,8 @@ import httpx
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
 from pydantic import BaseModel, Field
 from app.agent.loop import AgentLoop
 from app.config import load_config, save_config
@@ -32,6 +34,7 @@ from app.map_api import router as map_router
 from app.annotations_api import router as annotations_router
 from app.services.map_annotations import AnnotationStore
 from app.ui_version import info as ui_info, WEB_REVISION
+from app.services import page_credentials
 
 WEB_DIR=resource_path("web")
 DATA_DIR=resource_path("app/data")
@@ -64,7 +67,12 @@ async def lifespan(app):
         await asyncio.gather(*recap_tasks.values(),return_exceptions=True)
     await provider.close()
 
-app=FastAPI(title="栖霞山小向导",version="0.5.0",lifespan=lifespan)
+app=FastAPI(title="栖霞山小向导",version="0.6.0",lifespan=lifespan)
+@app.exception_handler(RequestValidationError)
+async def safe_validation_error(request, error):
+    if request.url.path == "/api/config":
+        return JSONResponse({"detail":"Key格式无效，请重新输入（最多512个字符）"},422,headers={"Cache-Control":"no-store"})
+    return await request_validation_exception_handler(request,error)
 app.include_router(annotations_router(services["annotations"]))
 
 @app.middleware("http")
@@ -84,7 +92,13 @@ async def local_guard(request:Request,call_next):
                 return JSONResponse({"detail":"请求太大，请压缩照片后再试"},413)
         except ValueError:
             return JSONResponse({"detail":"无效请求大小"},400)
-    response=await call_next(request)
+    credential_context = page_credentials.request_key.set(page_credentials.get_key(request.headers.get("x-qixi-page", "")))
+    page_context = page_credentials.request_page.set(request.headers.get("x-qixi-page", ""))
+    try:
+        response=await call_next(request)
+    finally:
+        page_credentials.request_key.reset(credential_context)
+        page_credentials.request_page.reset(page_context)
     if request.url.path.startswith(("/api/","/js/","/css/")) or request.url.path in ("/","/index.html"):
         response.headers["Cache-Control"]="no-store"
     return response
@@ -206,16 +220,22 @@ async def index():
     return HTMLResponse(html.replace("__WEB_REVISION__",WEB_REVISION).replace("__UI_INFO__",json.dumps(ui_info(),ensure_ascii=False)))
 
 @app.post("/api/config")
-async def set_config(body:ConfigIn):
+async def set_config(body:ConfigIn, request:Request):
     global config_revision
-    updated={**cfg,"deepseek_api_key":body.deepseek_api_key.strip()}
     try:
-        save_config(updated)
-    except OSError:
-        raise HTTPException(500,"配置保存失败，请检查用户目录空间和权限")
-    cfg.update(updated)
+        page_credentials.set_key(request.headers.get("x-qixi-page", ""), body.deepseek_api_key.strip())
+    except ValueError as error:
+        raise HTTPException(400,str(error))
     config_revision+=1
-    return {"saved":True,"key_configured":bool(cfg["deepseek_api_key"])}
+    return {"saved":False,"memory_only":True,"key_configured":bool(body.deepseek_api_key.strip())}
+
+@app.post("/api/config/forget")
+async def forget_config(body:dict):
+    page=body.get("page_id", "")
+    if not page_credentials.valid_page(page):
+        raise HTTPException(400,"无效页面")
+    page_credentials.forget(page)
+    return {"forgotten":True}
 
 @app.post("/api/config/test")
 async def test_config():
@@ -307,7 +327,7 @@ async def recap(body:RecapIn):
             raise HTTPException(422,"照片点位无效")
         if p["source"] not in ("manual","gps","sample"):
             p["poi_id"]=None
-    key=hashlib.sha256(json.dumps([body.session_id,snapshot["generation"],snapshot["revision"],snapshot["visited"],photos,cfg["model"],config_revision],sort_keys=True).encode()).hexdigest()
+    key=hashlib.sha256(json.dumps([body.session_id,snapshot["generation"],snapshot["revision"],snapshot["visited"],photos,cfg["model"],config_revision,page_credentials.request_page.get()],sort_keys=True).encode()).hexdigest()
     if key not in recap_tasks:
         if len(recap_tasks)>=32:
             for k,t in list(recap_tasks.items()):

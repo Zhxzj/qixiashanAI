@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "content-20261018-1",
+  "version": "content-20261021-2",
   "items": {
     "qxs-fengxiangfeng": {
       "summary": "栖霞山的主峰，与龙山、虎山组成三峰山势。",
@@ -18,21 +18,75 @@
           "checked_at": "2026-10-18"
         }
       ],
-      "photo": null
+      "photo": {
+        "src": "/assets/places/user-qxs-fengxiangfeng.jpg",
+        "title": "凤翔峰实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "76c4c012867a52a112a77e54bcb1abe4ecca9921a9296de5cb59bd6826afb0e0",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/AL7Kg1nqUu"
+      }
     },
     "osm-node-4771286828": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "虎山片区的赏枫点，换个角度看山林。",
+      "detail": "本地地图原名“读枫”，也可按“读枫阁”搜索。这里适合把赏枫的目光从单株树叶移向整片山林。秋色随气温、光照而变化，不同日期到访，林间色彩也会有所不同。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-osm-node-4771286828.jpg",
+        "title": "读枫阁实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "ed1849d4864955f44112b5402dffa47b5f5900a5ef71aec7c1e59ae9a2a8f51e",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/nVnvo9cN1p"
+      }
     },
     "qxs-deyunting": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "桃花涧一带的山亭，适合停步看林听涧。",
+      "detail": "用户提供的资料将此处与古德云庵及桃花涧的景观联系起来。游览可留意亭边的竹木、山石与水声，再结合附近点位安排停留，不必匆忙走完每一段山路。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-qxs-deyunting.jpg",
+        "title": "德云亭实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "ec8c786b2075b3652e63b77477fff42dc562dfdcada65556d6ab14a4ad009d92",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/4kaVWIMqMQ"
+      }
     },
     "osm-node-5524060188": {
       "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
@@ -42,25 +96,95 @@
       "photo": null
     },
     "qxs-biyunting": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "虎山片区的观景亭，在林间稍作停留。",
+      "detail": "栖霞区政府报道记载，2022年虎山片区整治重现了碧云亭建筑风貌。游览虎山时，可把这里作为观景与歇脚的一站，看看亭阁与周围山林的关系。远景能见度受当天雾气和天气影响。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        },
+        {
+          "title": "栖霞区政府：虎山片区整治与碧云亭风貌",
+          "url": "https://www.njqxq.gov.cn/sjb2018/qxzx/zwyw/202303/t20230313_3860510.html",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-qxs-biyunting.jpg",
+        "title": "碧云亭实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "e60e4d2a3af828b8df6967f12fd9107b51eda4bc2f2347147e01384657d3b0cd",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/gVGwlaLRKn"
+      }
     },
     "osm-node-5599488219": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "栖霞山西北侧的山峰，也是林间步行的去处。",
+      "detail": "虎山与凤翔峰、龙山共同构成栖霞山的山势。沿山路行走，可以把赏枫与登高结合起来。部分路段有起伏和台阶，建议按体力安排往返，雨后留意湿滑路面。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-osm-node-5599488219.jpg",
+        "title": "虎山实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "91e0c1d258e8a0967d000bb3e2b136305f2285e305f3d2138a76965e6ff95c58",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/813xQ5qreR"
+      }
     },
     "qxs-taohuashanting": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "以戏曲为名的山亭，连接山林与金陵故事。",
+      "detail": "亭名让人联想到孔尚任的《桃花扇》。地方传说又将这里与李香君的故事联系起来，听故事时不妨把戏曲、传说与史实分开。景区的赏枫介绍也将此处列入山中游览沿线。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        },
+        {
+          "title": "景区管理处供稿：赏枫游览沿线（2022年报道）",
+          "url": "https://tour.jschina.com.cn/lyjs/202211/t20221128_3119835.shtml",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-qxs-taohuashanting.jpg",
+        "title": "桃花扇亭实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "718359155759f24624cafaec6a572a8916893beba7c9213efcf33f2275157dac",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/KAdVAMA41i"
+      }
     },
     "qxs-qianfoyan": {
       "summary": "依山崖开凿的佛教造像群，保存着南京南朝石刻的记忆。",
@@ -94,46 +218,171 @@
       }
     },
     "osm-node-5599488242": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "山间小亭，把目光从石壁转向林间。",
+      "detail": "“待月”寄托着登临观景的意趣。到千佛岩一带游览时，可以一并在地图上查看此处，沿途留意石壁、林木和山径的变化。山路有起伏，停留观景时请避让行人。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-osm-node-5599488242.jpg",
+        "title": "待月亭实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "94c88484f59c713b604773a5c2e126d55261bc71b876af6320ff2485e502a5e1",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/tW51weaBs0"
+      }
     },
     "qxs-liaofanwendao": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "以问道为题的文化点位，读一段劝善故事。",
+      "detail": "用户资料以袁了凡与云谷禅师相谈的故事介绍此处。可以从景观主题中读到自省与行善的意味；相关叙事属于文化介绍，不宜把其中的对话与细节直接当作已经考证的历史记录。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-qxs-liaofanwendao.jpg",
+        "title": "了凡问道实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "d79a5fecadabf31c5a3a52a98e1a7dad675b2905b276742c8bab6a7b8ea8e139",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/z52Ec7i3DV"
+      }
     },
     "qxs-huashanting": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "在山亭里歇脚，看看身边的林色与山势。",
+      "detail": "景区供稿的赏枫介绍将这里列入山中游览沿线。亭名带着谈山论水的闲适意味：走累时停下来，看看树冠、山石和光影，也是一种游览方式。季节不同，沿途林色也会变化。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        },
+        {
+          "title": "景区管理处供稿：赏枫游览沿线（2022年报道）",
+          "url": "https://tour.jschina.com.cn/lyjs/202211/t20221128_3119835.shtml",
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-qxs-huashanting.jpg",
+        "title": "话山亭实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "ce5cae244764bdb5fde241ccaee0ce33ccc03f8a12f3af09f0739ec95129196e",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/ZPnxjyMLzh"
+      }
     },
     "osm-node-5602528570": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "山林间的庵堂点位，留一段安静的游览时光。",
+      "detail": "用户资料以竹木、流泉和山居意趣描写此处。游览时可留意建筑与周围林地的关系，在山路间放慢脚步。庵堂的开放情况与参观范围，请以现场标识为准。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-osm-node-5602528570.jpg",
+        "title": "幽居庵实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "437538a4e78bee3b3b9e3ac8a4566f2c3defec87957b723988c66c216d372cdf",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/lUIxpe3paE"
+      }
     },
     "qxs-zhenzhuquan": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "栖霞山中的泉景，名字让人想到串串水珠。",
+      "detail": "用户资料中，泉名与水珠上涌的地方传说相联系。看泉、听涧，可以为登山行程留下一段慢时光。这里指栖霞山内的点位，并非南京其他同名景区；不建议直接饮用未经处理的泉水。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-qxs-zhenzhuquan.jpg",
+        "title": "珍珠泉实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "78a67d9c1869ab28bdc86f047f879a145a47e5d62bdd1982faf191baac37e1dd",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/XZo1DGPyg5"
+      }
     },
     "osm-node-11552972794": {
-      "summary": "景点资料正在核对，可先查看地图位置和已有步行路线。",
-      "detail": "详细介绍待核实。",
-      "status": "pending",
-      "sources": [],
-      "photo": null
+      "summary": "栖霞寺内的礼佛殿堂，走近古寺的日常。",
+      "detail": "这里与栖霞寺的院落相连，可以结合古寺参观一起游览。留意门上匾额与殿前空间，感受山中古寺的日常。殿堂内请保持安静，拍摄前先查看现场规定。",
+      "status": "user_adapted",
+      "sources": [
+        {
+          "title": "用户提供《栖霞山景点文案》；具体史实待复核",
+          "url": null,
+          "checked_at": "2026-10-21"
+        }
+      ],
+      "photo": {
+        "src": "/assets/places/user-osm-node-11552972794.jpg",
+        "title": "如来堂实景照片",
+        "author": "项目用户（本人拍摄）",
+        "license": "作者授权用于本项目及随程序分发",
+        "license_url": null,
+        "source_url": null,
+        "captured_at": "未提供",
+        "historical": false,
+        "processing": "使用用户文档所附JPEG原文件，未裁切或重编码；卡片可视觉裁切，大图完整展示",
+        "sha256": "6b5b1e07256e5e153a3915b51082e969fd113b7a1d5bea1fb80e95ca9a7b40b8",
+        "authorization": "用户于2026-10-21在本对话确认照片为本人拍摄，并要求加入程序。",
+        "identity_status": "user_supplied_label",
+        "reference_url": "https://aka.doubaocdn.com/s/9dyzVyPOVW"
+      }
     },
     "qxs-qixiasi": {
       "summary": "栖霞山麓的千年古刹，也是佛教三论宗的重要祖庭。",

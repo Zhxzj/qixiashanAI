@@ -48,11 +48,13 @@ window.QixiMap = (() => {
     if(typeof url==='string'&&/^https:\/\//.test(url)){a.href=url;a.target='_blank';a.rel='noopener noreferrer';}
     return a;
   }
-  function photoCredit(photo){return `${photo.title} · ${photo.author} · ${photo.license} · 拍摄：${photo.captured_at} · 历史照片，不代表当前状态`;}
+  const placeName=p=>placeByOsm.get(p.id)?.name||p.name;
+  const matchesPlace=(p,q)=>[p.name,placeName(p),...(placeByOsm.get(p.id)?.aliases||[])].some(name=>name.includes(q));
+  function photoCredit(photo){return `${photo.title} · ${photo.author} · ${photo.license} · 拍摄：${photo.captured_at}${photo.historical?' · 历史照片，不代表当前状态':' · 用户提供实景，拍摄时间未提供'}`;}
   function renderPlace(p,item){
     const box=$('#poiDetail');box.replaceChildren();box.scrollTop=0;
     box.append(button('关闭详情',closeDetails,'ghost close-place'));
-    const title=document.createElement('h3');title.textContent=p.name;box.append(title);
+    const title=document.createElement('h3');title.textContent=placeName(p);box.append(title);
     if(item){
       if(item.photo){
         const photo=item.photo,open=button('',event=>openPhoto(photo,event),'place-photo-button');
@@ -60,8 +62,10 @@ window.QixiMap = (() => {
         img.onerror=()=>{open.replaceChildren(paragraph('照片加载失败，可继续阅读介绍'));open.disabled=true;};open.append(img);box.append(open);
       }else box.append(paragraph('照片待补充'));
       const summary=paragraph(item.summary),detail=paragraph(item.detail);summary.className='place-summary';detail.className='place-detail-text';box.append(summary,detail);
-      if(item.status!=='reviewed')box.append(paragraph('介绍待核实；当前仅可确认本地OSM记录。'));
+
       const sources=document.createElement('details'),head=document.createElement('summary');head.textContent='资料来源与核实状态';sources.append(head);
+      if(item.status==='user_adapted')sources.append(paragraph('据用户提供文案保守整理；未独立证实的年代、题刻、尺寸及绝对评价已删去，余下细节仍待景区资料复核。'));
+      else if(item.status!=='reviewed')sources.append(paragraph('介绍待核实；当前仅可确认本地OSM记录。'));
       if(item.photo){const credit=paragraph(photoCredit(item.photo));credit.className='place-credit';credit.append(' ',sourceLink('照片来源',item.photo.source_url),' · ',sourceLink('许可',item.photo.license_url));sources.append(credit);}
       item.sources.forEach(x=>{const row=paragraph('');row.append(sourceLink(x.title,x.url));sources.append(row);});
       sources.append(paragraph('位置：OSM快照；现场位置、通行与开放状态未核实。'));box.append(sources);
@@ -112,19 +116,19 @@ window.QixiMap = (() => {
   function drawPois(list){
     poiGroup.clearLayers();markers.clear();
     list.filter(p=>p.category==="poi").forEach(p=>{
-      const marker=L.marker(p.coord,{title:p.name,icon:icon("景","map-poi-symbol")});
-      const label=document.createElement("span");label.textContent=p.name;
+      const marker=L.marker(p.coord,{title:placeName(p),icon:icon("景","map-poi-symbol")});
+      const label=document.createElement("span");label.textContent=placeName(p);
       marker.bindTooltip(label,{direction:"top"});marker.on("click",()=>showPlace(p));poiGroup.addLayer(marker);markers.set(p.id,marker);
     });
     layerToggle(poiGroup,$("#showPois").checked);highlight();
   }
-  function drawResults(list){const box=$('#mapResults');box.replaceChildren();list.forEach(p=>{const b=button(p.name,()=>showPlace(p),'map-result');b.dataset.osmId=p.id;box.append(b);});highlight();}
+  function drawResults(list){const box=$('#mapResults');box.replaceChildren();list.forEach(p=>{const b=button(placeName(p),()=>showPlace(p),'map-result');b.dataset.osmId=p.id;box.append(b);});highlight();}
   function annotationPlaces(){return annotations.items.filter(p=>p.coord).map(p=>({...p,annotation:true,source_record:p.source,source:p.position_status==='osm_record'?'OpenStreetMap原始门记录':'用户截图标注/校对'}));}
   function drawAnnotations(){
     annotationGroup.clearLayers();gateGroup.clearLayers();annotationMarkers.clear();
     annotationPlaces().forEach(p=>{
       const m=L.marker(p.coord,{title:p.name+'（用户位置，未现场测量）',icon:icon(p.category==='gate'?'门':'厕',p.category==='gate'?'map-gate-symbol':'map-user-toilet-symbol')});
-      const label=document.createElement('span');label.textContent=p.category==='toilet'?'厕所':p.name;m.bindTooltip(label,{permanent:true,direction:'right',offset:[12,0],className:'facility-label'});m.on('click',()=>showPlace(p));
+      m.on('click',()=>showPlace(p));
       m.on('add',()=>{if(m.getElement())m.getElement().dataset.annotationId=p.id;});
       (p.category==='gate'?gateGroup:annotationGroup).addLayer(m);annotationMarkers.set(p.id,m);
     });
@@ -136,7 +140,7 @@ window.QixiMap = (() => {
     const positions=(kind==='toilets'?facilities:[...data.pois.filter(p=>placeByOsm.get(p.id)?.major),...facilities]).map(p=>p.coord);
     if(!positions.length){map.setView(data.view_center,15);return;}
     map.invalidateSize({pan:false});map.fitBounds(L.latLngBounds(positions),{paddingTopLeft:[48,48],paddingBottomRight:[125,48],maxZoom:16,animate:false,reset:true});
-    
+
   }
   function mapError(text){$('#mapLoadError').hidden=!text;$('#mapLoadError').textContent=text;}
   async function loadExtras(){
@@ -361,7 +365,7 @@ window.QixiMap = (() => {
     $("#mapMode").onchange=run(e=>setMode(e.target.value));
     $("#mapRetry").onclick=run(async()=>{try{if(!map)await initMap();else{await loadExtras();overview();tileLoads=0;tileErrors=0;tiles.redraw();}}catch(e){mapError("地图加载失败："+e.message);throw e;}});
     $("#mapConfigOpen").onclick=()=>{$("#mapConfigModal").hidden=false;};$("#mapConfigClose").onclick=()=>{$("#mapConfigModal").hidden=true;};
-    $("#mapSearchForm").onsubmit=e=>{e.preventDefault();if(!data)return message("地图数据未就绪，请重试");const q=$("#mapSearchInput").value.trim();const result=[...data.pois,...annotationPlaces()].filter(p=>p.name.includes(q));drawResults(result);drawPois(data.pois);message(result.length?`本地匹配 ${result.length} 个地标或设施，请核对名称和入口。`:"本地数据没有该名称；可在图上已知道路选点，不猜坐标补点。");};
+    $("#mapSearchForm").onsubmit=e=>{e.preventDefault();if(!data)return message("地图数据未就绪，请重试");const q=$("#mapSearchInput").value.trim();const result=[...data.pois,...annotationPlaces()].filter(p=>matchesPlace(p,q));drawResults(result);drawPois(data.pois);message(result.length?`本地匹配 ${result.length} 个地标或设施，请核对名称和入口。`:"本地数据没有该名称；可在图上已知道路选点，不猜坐标补点。");};
     $("#majorPois").onclick=()=>{if(!data)return;drawResults(data.pois.filter(p=>placeByOsm.get(p.id)?.major));drawPois(data.pois);message("主要景点目录；图文待补项单独标明，不代表全园名录或现场核实。");};
     $("#pickOrigin").onclick=()=>{cancelEditor();pick="origin";message("请点击地图上的已知道路附近作为起点");};$("#pickDestination").onclick=()=>{cancelEditor();pick="destination";message("请点击地图终点；离已知道路过远会拒绝算路");};
     $("#clearVia").onclick=()=>{via=[];action++;invalidateSelection();refreshEndpoints();};$("#avoidSteps").onchange=()=>{action++;invalidateSelection();};

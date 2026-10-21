@@ -14,6 +14,12 @@
   function show(view, focus = true) {
     if (!['chat','map','poster'].includes(view)) return;
     active = view;
+    if(view==='chat' && focus) document.body.dataset.conversation='true';
+    const home = $('#uiHome');
+    const isHome = view==='chat' && document.body.dataset.conversation!=='true';
+    home.style.visibility = isHome ? 'hidden' : '';
+    home.inert = isHome;
+    home.setAttribute('aria-hidden',String(isHome));
     document.body.dataset.view = view;
     for (const name of ['chat','map','poster']) $('#view-'+name).hidden = name !== view;
     document.querySelectorAll('.ui-nav button').forEach(b => {
@@ -28,6 +34,7 @@
   }
   window.QixiUI = {
     show, snapshot,
+    home(){document.body.dataset.conversation='false';show('chat',false);window.scrollTo({top:0,behavior:'instant'});const heading=$('.hero-copy h1');heading.setAttribute('tabindex','-1');heading.focus({preventScroll:true});},
     keyStatus(configured){$('#uiKeyMissing').hidden=configured;},
     conditions(c){const now=c.weather?.now||{};$('#uiWeatherBrief').textContent=[now.text || '天气暂无数据',now.temp_c!=null?now.temp_c+'°C':'',c.red_leaf?.text || '红叶暂无数据'].filter(Boolean).join(' · ');},
     conditionsError(){$('#uiWeatherBrief').textContent='天气与红叶暂不可用，可稍后重试';},
@@ -42,7 +49,7 @@
       try { if(latest && latest.epoch===epoch()) post('snapshot',latest); else await window.QixiAppUI.refresh(); }
       catch { if (latest) post('snapshot',latest); else post('unavailable'); }
     } else if (e.data.type === 'busy' && typeof e.data.busy === 'boolean') posterBusy=e.data.busy;
-    else if(e.data.type === 'back') show('chat');
+    else if(e.data.type === 'back') QixiUI.home();
   });
   document.querySelectorAll('[data-view]').forEach(b => {
     if(b === document.body) return;
@@ -52,8 +59,9 @@
       if(b.dataset.shortcut === 'facilities') { for(const id of ['showToilets','showGates']) {$('#'+id).checked=true;$('#'+id).dispatchEvent(new Event('change'));} $('#homeMap').click(); }
     });
   });
-  $('[data-weather]').onclick=()=>{show('chat');$('#uiWeatherDetails').open=true;$('#conditions').scrollIntoView({block:'center'});};
+  $('[data-weather]').onclick=()=>{show('chat',false);$('#uiWeatherDetails').open=true;$('#conditions').scrollIntoView({block:'center'});};
   $('#uiConfigureModel').onclick=()=>$('#keyBtn').click();
+  $('#uiHome').onclick=()=>QixiUI.home();
   $('[data-story]').onclick=()=>{show('map');$('#mapSearchInput').value='栖霞寺';$('#mapSearchForm').requestSubmit();$('#mapResults button')?.click();};
   document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
     $('#uiMore').open=false;
@@ -104,8 +112,6 @@
   }
   $('#uiMore').addEventListener('click',e=>{if(e.target.closest('button,a')) $('#uiMore').open=false;});
   document.addEventListener('pointerdown',e=>{if(!e.target.closest('#uiMore')) $('#uiMore').open=false;});
-  document.addEventListener('pointerdown',e=>{const b=e.target.closest('button');if(b&&!b.closest('.leaflet-container'))b.classList.add('ui-pressed');});
-  for(const evt of ['pointerup','pointercancel','blur'])window.addEventListener(evt,()=>document.querySelectorAll('.ui-pressed').forEach(b=>b.classList.remove('ui-pressed')));
   window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
   show(['chat','map','poster'].includes(location.hash.slice(1))?location.hash.slice(1):'chat',false);
 })();

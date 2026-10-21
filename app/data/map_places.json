@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "version": "places-20261018-1",
+  "version": "places-20261021-1",
   "items": [
     {
       "place_id": "qxs-fengxiangfeng",
@@ -14,13 +14,14 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-node-4771286828",
       "osm_id": "node/4771286828",
-      "name": "读枫",
-      "major": false,
+      "name": "读枫阁",
+      "major": true,
       "coord": [
         32.1586514,
         118.9547934
@@ -28,7 +29,10 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": [
+        "读枫"
+      ]
     },
     {
       "place_id": "qxs-deyunting",
@@ -42,7 +46,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-node-5524060188",
@@ -56,7 +61,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "qxs-biyunting",
@@ -70,13 +76,14 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-node-5599488219",
       "osm_id": "node/5599488219",
       "name": "虎山",
-      "major": false,
+      "major": true,
       "coord": [
         32.1586643,
         118.9530129
@@ -84,7 +91,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "qxs-taohuashanting",
@@ -98,7 +106,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "qxs-qianfoyan",
@@ -112,13 +121,14 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-node-5599488242",
       "osm_id": "node/5599488242",
       "name": "待月亭",
-      "major": false,
+      "major": true,
       "coord": [
         32.1540381,
         118.9560107
@@ -126,7 +136,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "qxs-liaofanwendao",
@@ -140,7 +151,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "qxs-huashanting",
@@ -154,13 +166,14 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-node-5602528570",
       "osm_id": "node/5602528570",
       "name": "幽居庵",
-      "major": false,
+      "major": true,
       "coord": [
         32.1579559,
         118.9584868
@@ -168,7 +181,8 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "qxs-zhenzhuquan",
@@ -182,13 +196,14 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-node-11552972794",
       "osm_id": "node/11552972794",
-      "name": "如來堂",
-      "major": false,
+      "name": "如来堂",
+      "major": true,
       "coord": [
         32.1537847,
         118.954451
@@ -196,7 +211,10 @@
       "position_kind": "point",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": [
+        "如來堂"
+      ]
     },
     {
       "place_id": "qxs-qixiasi",
@@ -210,7 +228,8 @@
       "position_kind": "polygon_representative",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     },
     {
       "place_id": "osm-way-1525414285",
@@ -224,7 +243,8 @@
       "position_kind": "polygon_representative",
       "identity_status": "osm_record",
       "position_status": "osm_snapshot",
-      "field_verified": false
+      "field_verified": false,
+      "aliases": []
     }
   ]
 }

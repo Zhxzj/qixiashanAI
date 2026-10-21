@@ -17,9 +17,9 @@ class PlaceDetailsTests(unittest.TestCase):
     def test_catalog_filters_surrounding_objects_without_losing_them(self):
         self.assertEqual(len(self.service.catalog()["items"]), 16)
         names = {x["name"] for x in self.service.catalog(True)["items"]}
-        self.assertEqual(len(names), 9)
+        self.assertEqual(len(names), 14)
         self.assertTrue({"栖霞寺", "千佛岩", "凤翔峰"} <= names)
-        self.assertFalse({"何家山", "九乡河", "读枫"} & names)
+        self.assertFalse({"何家山", "九乡河"} & names)
 
     def test_curated_content_limits_and_independent_missing_states(self):
         reviewed = [p for p in self.service.items.values() if p["status"] == "reviewed"]
@@ -30,16 +30,20 @@ class PlaceDetailsTests(unittest.TestCase):
             self.assertNotIn(p["summary"], p["detail"])
         peak = self.service.detail("qxs-fengxiangfeng")
         self.assertEqual(peak["status"], "reviewed")
-        self.assertIsNone(peak["photo"])
+        self.assertEqual(peak["photo"]["author"], "项目用户（本人拍摄）")
         self.assertIsNone(self.service.detail("../../config.json"))
 
     def test_photo_identity_license_and_shipped_bytes(self):
         photos = [p["photo"] for p in self.service.items.values() if p["photo"]]
-        self.assertEqual(len(photos), 2)
+        self.assertEqual(len(photos), 14)
         for photo in photos:
-            self.assertEqual(photo["license"], "CC BY-SA 3.0")
-            self.assertEqual(photo["author"], "Farm")
-            self.assertTrue(photo["historical"])
+            if photo["author"] == "Farm":
+                self.assertEqual(photo["license"], "CC BY-SA 3.0")
+                self.assertTrue(photo["historical"])
+            else:
+                self.assertEqual(photo["author"], "项目用户（本人拍摄）")
+                self.assertIn("用户", photo["authorization"])
+                self.assertFalse(photo["historical"])
             self.assertNotIn("samples", photo["src"])
             image = ROOT / "web" / photo["src"].lstrip("/")
             self.assertEqual(hashlib.sha256(image.read_bytes()).hexdigest(), photo["sha256"])
@@ -80,7 +84,7 @@ class PlaceDetailsTests(unittest.TestCase):
     def test_http_readonly_api_missing_id_and_source_no_runtime_model(self):
         import app.main as main
         client = TestClient(main.app, base_url="http://127.0.0.1")
-        self.assertEqual(len(client.get("/api/map/places?major=true").json()["items"]), 9)
+        self.assertEqual(len(client.get("/api/map/places?major=true").json()["items"]), 14)
         self.assertEqual(client.get("/api/map/place", params={"place_id": "missing"}).status_code, 404)
         result = client.get("/api/map/place?place_id=qxs-qixiasi")
         self.assertEqual(result.status_code, 200)

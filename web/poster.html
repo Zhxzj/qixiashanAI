@@ -10,12 +10,11 @@
 <link href="/poster/skill/css/palettes.css" rel="stylesheet"/>
 <link href="/poster/skill/css/type.css" rel="stylesheet"/>
 <link href="/poster/skill/css/base.css" rel="stylesheet"/>
-<link href="/poster/ui-poster.css" rel="stylesheet"/></head>
+<link href="/poster/ui-poster.css" rel="stylesheet"/><link href="/css/button-feedback.css" rel="stylesheet"/></head>
 <body class="poster-page">
 <header class="topbar">
-
 <nav class="topnav">
-<a class="ghost" href="/">← 回到向导</a>
+<a class="ghost" href="/">← 返回首页</a>
 </nav>
 <a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="exitApp">退出应用</button>
 </header>
@@ -32,8 +31,6 @@
 <label class="muted"><input id="cloudDetect" type="checkbox"/>允许将压缩照片发给 DeepSeek 识别地点（不勾选则仅本地候选）</label><div id="photoError" role="status"></div>
 <div class="photo-grid" id="photoGrid"></div>
 <details class="ui-poster-tools"><summary>照片工具</summary><button class="ghost" id="samplesBtn">用示例照片一键体验</button><button class="ghost" id="clearBtn">清空</button></details><div class="console-row">
-
-
 </div>
 </div>
 <div class="card">
@@ -48,10 +45,8 @@
 <div class="card-title">③ 出游记录</div>
 <div class="trip-info muted" id="tripInfo">还没有游踪。先回向导页走一段，再来生成日记。</div>
 <details class="ui-poster-tools"><summary>日记工具</summary><button id="replayBtn">回放小传</button><button class="ghost" id="recapBtn">刷新文案</button><button class="ghost" id="copyDiary">复制日记正文</button></details><div class="console-row">
-
-
 </div>
-<p id="hostTripNotice" role="status" hidden></p>
+<p hidden="" id="hostTripNotice" role="status"></p>
 <div id="diaryBody" style="white-space:pre-wrap;line-height:1.8"></div>
 <div class="replay-box" hidden="" id="replayBox"></div>
 </div>
@@ -106,5 +101,5 @@
 <script src="/poster/skill/renderer/poster-qa.js"></script>
 <script src="/poster/poster-app.js"></script>
 <script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
-</body>
+<script src="/js/button-feedback.js"></script></body>
 </html>

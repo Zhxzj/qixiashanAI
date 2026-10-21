@@ -9,7 +9,7 @@
 <link href="/vendor/leaflet/leaflet.css" rel="stylesheet"/>
 <link href="/css/map.css?v=__WEB_REVISION__" rel="stylesheet"/>
 <script>window.QIXI_FRONTEND=__UI_INFO__;</script>
-<link href="/css/ui-shell.css?v=__WEB_REVISION__" rel="stylesheet"/></head>
+<link href="/css/ui-shell.css?v=__WEB_REVISION__" rel="stylesheet"/><link href="/css/button-feedback.css?v=__WEB_REVISION__" rel="stylesheet"/></head>
 <body class="ui-app" data-conversation="false" data-view="chat"><svg aria-hidden="true" class="svg-library" xmlns="http://www.w3.org/2000/svg"><defs>
 <symbol id="i-leaf" viewbox="0 0 24 24"><path d="m12 2 2 5 4-2-1 5 4 1-5 4 1 4-5-2-5 2 1-4-5-4 4-1-1-5 4 2Z"></path><path d="M12 8v14"></path></symbol>
 <symbol id="i-ai" viewbox="0 0 24 24"><rect height="13" rx="5" width="16" x="4" y="7"></rect><path d="M12 3v4M10 3h4M8 12v2m8-2v2m-6 3h4M1 11v5m22-5v5"></path></symbol>
@@ -25,7 +25,7 @@
 <symbol id="i-plus" viewbox="0 0 24 24"><path d="M12 4v16M4 12h16"></path></symbol>
 <symbol id="i-route" viewbox="0 0 24 24"><circle cx="6" cy="5" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M6 8v7c0 7 8-1 8-7s4-6 4 2v6"></path></symbol>
 </defs></svg>
-<header class="ui-header"><div class="ui-container ui-header-inner"><span aria-hidden="true"></span><nav aria-label="主要功能" class="ui-nav"><button aria-current="page" data-view="chat">AI问答</button><button data-view="map">地图导览</button><button data-view="poster">游记海报</button></nav><div class="ui-global"><details id="uiMore"><summary>更多⌄</summary><div class="ui-more-content"><h3>设置与工具</h3><div id="uiSettings"><span class="pill" id="keyStatus">未配置 Key</span><button class="ghost" id="keyBtn">模型设置</button><a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="mapConfigOpen">地图数据说明</button></div><button data-tool="demo">演示工具</button><button data-tool="annotations">大门与厕所校对</button><button data-tool="facilities">设施数据工具</button><button data-tool="source">地图来源</button><div id="uiTripTools"><button class="ghost" id="resetBtn">开始新行程</button></div><small id="appVersion"></small></div></details><button class="ghost" id="exitApp">退出应用</button></div></div></header>
+<header class="ui-header"><div class="ui-container ui-header-inner"><button class="ghost ui-home" id="uiHome" type="button">← 返回首页</button><nav aria-label="主要功能" class="ui-nav"><button aria-current="page" data-view="chat">AI问答</button><button data-view="map">地图导览</button><button data-view="poster">游记海报</button></nav><div class="ui-global"><details id="uiMore"><summary>更多⌄</summary><div class="ui-more-content"><h3>设置与工具</h3><div id="uiSettings"><span class="pill" id="keyStatus">未配置 Key</span><button class="ghost" id="keyBtn">模型设置</button><a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="mapConfigOpen">地图数据说明</button></div><button data-tool="demo">演示工具</button><button data-tool="annotations">大门与厕所校对</button><button data-tool="facilities">设施数据工具</button><button data-tool="source">地图来源</button><div id="uiTripTools"><button class="ghost" id="resetBtn">开始新行程</button></div><small id="appVersion"></small></div></details><button class="ghost" id="exitApp">退出应用</button></div></div></header>
 <div class="map-alert" hidden="" id="versionNotice" role="alert">应用版本已更新，当前页面需要重新载入。<button id="reloadVersion">加载当前版本</button></div><main id="main"><section aria-labelledby="heroTitle" class="scenic">
 <div class="ui-container scenic-inner"><div class="hero-copy"><span class="hero-kicker"><svg class="icon"><use href="#i-leaf"></use></svg>这个秋天，一起去栖霞</span><h1 id="heroTitle">让这一程，<br/><span>多一点</span>精彩。</h1><p>遇见红枫，问问小栖。好风景，轻松玩。</p><div class="hero-location"><svg class="icon"><use href="#i-pin"></use></svg>南京 · 栖霞山</div></div><div aria-hidden="true" class="hero-sticker"><span>QIXIA</span><strong>把秋天<br/>装进旅程</strong><svg><use href="#i-leaf"></use></svg></div><div class="hero-caption">红枫主题艺术图 · 非景区实拍</div></div>
 </section><div class="ui-container" id="uiContent"><section aria-label="常用功能" class="function-guide">
@@ -58,7 +58,6 @@
 </div>
 </div><div class="card">
 <p id="uiWeatherBrief">天气与红叶加载中</p><div class="card-title">天气与红叶</div>
-
 <details id="uiWeatherDetails"><summary>天气、红叶与资料来源</summary><div class="cond" id="conditions">加载中…</div></details></div><div class="card arrived" id="arrivedCard" style="display:none">
 <div class="card-title"><span id="arrivedName">到点播报</span>
 <span class="muted" id="arrivedPoi"> </span></div>
@@ -109,10 +108,10 @@
 </dialog>
 <div class="modal" id="keyModal" style="display:none">
 <div class="modal-box">
-<h3>DeepSeek API Key</h3>
-<input id="keyInput" placeholder="sk-…（只存本机 config.json）" type="password"/>
+<h3>输入本次使用的模型 Key</h3><p class="muted">重新打开或刷新后需重新输入。Key不写配置或浏览器存储，只发送至本机服务和模型鉴权接口。</p>
+<input autocomplete="off" data-lpignore="true" id="keyInput" placeholder="仅本次页面使用，不保存到本机" type="password"/>
 <div class="modal-actions">
-<button id="keySave">保存并测试</button>
+<button id="keySave">本次使用并测试</button>
 <button class="ghost" id="keyClose">关闭</button>
 </div>
 <div class="muted" id="keyMsg"></div>
@@ -136,5 +135,5 @@
 <script src="/js/map-osm.js?v=__WEB_REVISION__"></script>
 <script src="/js/ui-shell.js?v=__WEB_REVISION__"></script><script src="/js/app.js?v=__WEB_REVISION__"></script>
 <script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
-</body>
+<script src="/js/button-feedback.js?v=__WEB_REVISION__"></script></body>
 </html>

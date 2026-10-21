@@ -19,7 +19,7 @@ class PlaceService:
         self.review = json.loads((root / "map_review.json").read_text(encoding="utf-8"))
 
     def catalog(self, major=False):
-        keys = ("place_id", "osm_id", "name", "major", "coord", "position_kind", "status", "content_version", "field_verified")
+        keys = ("place_id", "osm_id", "name", "major", "coord", "position_kind", "status", "content_version", "field_verified", "aliases")
         return {"version": self.version, "items": [{k: p[k] for k in keys} for p in self.items.values() if not major or p["major"]]}
 
     def detail(self, place_id):

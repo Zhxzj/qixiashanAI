@@ -250,12 +250,15 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.client.post("/api/demo/advance",json={"meters":-1}).status_code,422)
         reset=self.client.post("/api/demo/reset",json={"session_id":"generation"}).json()
         self.assertEqual(self.client.post("/api/demo/advance",json={"session_id":"generation","generation":reset["state"]["generation"]-1}).status_code,409)
-    def test_config_failure_is_transactional(self):
+    def test_page_key_does_not_depend_on_disk_write(self):
         before=dict(self.main.cfg)
+        page=str(uuid.uuid4())
         with patch.object(self.main,"save_config",side_effect=OSError("disk full")):
-            response=self.client.post("/api/config",json={"deepseek_api_key":"fake-not-real"})
-        self.assertEqual(response.status_code,500)
+            response=self.client.post("/api/config",headers={"X-Qixi-Page":page},json={"deepseek_api_key":"fake-not-real"})
+        self.assertEqual(response.status_code,200)
+        self.assertTrue(response.json()["memory_only"])
         self.assertEqual(self.main.cfg,before)
+        self.client.post('/api/config/forget',json={'page_id':page})
     def test_control_and_origin(self):
         self.assertEqual(self.client.post("/api/app/control",json={"token":"wrong"}).status_code,403)
         self.assertEqual(self.client.post("/api/demo/reset",json={},headers={"Origin":"https://other.example"}).status_code,403)
