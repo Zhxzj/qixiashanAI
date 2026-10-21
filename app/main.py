@@ -64,7 +64,7 @@ async def lifespan(app):
         await asyncio.gather(*recap_tasks.values(),return_exceptions=True)
     await provider.close()
 
-app=FastAPI(title="栖霞山小向导",version="0.4.4",lifespan=lifespan)
+app=FastAPI(title="栖霞山小向导",version="0.5.0",lifespan=lifespan)
 app.include_router(annotations_router(services["annotations"]))
 
 @app.middleware("http")

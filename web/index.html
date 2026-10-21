@@ -1,154 +1,140 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>栖霞山小向导</title>
-  <link rel="stylesheet" href="/css/app.css?v=__WEB_REVISION__">
-  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="/css/map.css?v=__WEB_REVISION__">
-  <script>window.QIXI_FRONTEND=__UI_INFO__;</script>
-</head>
-<body>
-  <header class="topbar">
-    <div class="brand">栖霞山小向导 <span class="sub">· 小栖</span> <small id="appVersion">0.4.4</small></div>
-    <div class="top-right">
-      <span id="keyStatus" class="pill">未配置 Key</span>
-      <a class="toplink" href="/poster.html">游后日记 →</a>
-      <button id="keyBtn" class="ghost">模型设置</button>
-    </div>
-  <a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="exitApp">退出应用</button>
-  </header>
-  <div id="versionNotice" class="map-alert" role="alert" hidden>应用版本已更新，当前页面需要重新载入。<button id="reloadVersion">加载当前版本</button></div>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>栖霞山小向导</title>
+<link href="/css/app.css?v=__WEB_REVISION__" rel="stylesheet"/>
+<link href="/vendor/leaflet/leaflet.css" rel="stylesheet"/>
+<link href="/css/map.css?v=__WEB_REVISION__" rel="stylesheet"/>
+<script>window.QIXI_FRONTEND=__UI_INFO__;</script>
+<link href="/css/ui-shell.css?v=__WEB_REVISION__" rel="stylesheet"/></head>
+<body class="ui-app" data-conversation="false" data-view="chat"><svg aria-hidden="true" class="svg-library" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="i-leaf" viewbox="0 0 24 24"><path d="m12 2 2 5 4-2-1 5 4 1-5 4 1 4-5-2-5 2 1-4-5-4 4-1-1-5 4 2Z"></path><path d="M12 8v14"></path></symbol>
+<symbol id="i-ai" viewbox="0 0 24 24"><rect height="13" rx="5" width="16" x="4" y="7"></rect><path d="M12 3v4M10 3h4M8 12v2m8-2v2m-6 3h4M1 11v5m22-5v5"></path></symbol>
+<symbol id="i-map" viewbox="0 0 24 24"><path d="m2 5 6-2 8 3 6-2v16l-6 2-8-3-6 2Zm6-2v16m8-13v16"></path></symbol>
+<symbol id="i-album" viewbox="0 0 24 24"><rect height="20" rx="3" width="16" x="4" y="2"></rect><path d="M8 2v20m3-6 3-3 4 4m-6-9h4"></path></symbol>
+<symbol id="i-arrow" viewbox="0 0 24 24"><path d="M4 12h16m-6-6 6 6-6 6"></path></symbol>
+<symbol id="i-pin" viewbox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></symbol>
+<symbol id="i-sun" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 1v3m0 16v3M1 12h3m16 0h3M4 4l2 2m12 12 2 2M4 20l2-2M18 6l2-2"></path></symbol>
+<symbol id="i-send" viewbox="0 0 24 24"><path d="m3 3 19 9L3 21l3-9ZM6 12h16"></path></symbol>
+<symbol id="i-wc" viewbox="0 0 24 24"><path d="M4 21V3h16v18M2 21h20M8 10v6m8-6v6M7 10h2m6 0h2M8 16v3m8-3v3"></path><circle cx="8" cy="7" r="1"></circle><circle cx="16" cy="7" r="1"></circle></symbol>
+<symbol id="i-gate" viewbox="0 0 24 24"><path d="M3 21h18M5 21V7h14v14M3 7h18L12 2ZM9 21V11h6v10"></path></symbol>
+<symbol id="i-close" viewbox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"></path></symbol>
+<symbol id="i-plus" viewbox="0 0 24 24"><path d="M12 4v16M4 12h16"></path></symbol>
+<symbol id="i-route" viewbox="0 0 24 24"><circle cx="6" cy="5" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="M6 8v7c0 7 8-1 8-7s4-6 4 2v6"></path></symbol>
+</defs></svg>
+<header class="ui-header"><div class="ui-container ui-header-inner"><span aria-hidden="true"></span><nav aria-label="主要功能" class="ui-nav"><button aria-current="page" data-view="chat">AI问答</button><button data-view="map">地图导览</button><button data-view="poster">游记海报</button></nav><div class="ui-global"><details id="uiMore"><summary>更多⌄</summary><div class="ui-more-content"><h3>设置与工具</h3><div id="uiSettings"><span class="pill" id="keyStatus">未配置 Key</span><button class="ghost" id="keyBtn">模型设置</button><a class="ghost" href="/api/diagnostics" target="_blank">诊断</a><button class="ghost" id="mapConfigOpen">地图数据说明</button></div><button data-tool="demo">演示工具</button><button data-tool="annotations">大门与厕所校对</button><button data-tool="facilities">设施数据工具</button><button data-tool="source">地图来源</button><div id="uiTripTools"><button class="ghost" id="resetBtn">开始新行程</button></div><small id="appVersion"></small></div></details><button class="ghost" id="exitApp">退出应用</button></div></div></header>
+<div class="map-alert" hidden="" id="versionNotice" role="alert">应用版本已更新，当前页面需要重新载入。<button id="reloadVersion">加载当前版本</button></div><main id="main"><section aria-labelledby="heroTitle" class="scenic">
+<div class="ui-container scenic-inner"><div class="hero-copy"><span class="hero-kicker"><svg class="icon"><use href="#i-leaf"></use></svg>这个秋天，一起去栖霞</span><h1 id="heroTitle">让这一程，<br/><span>多一点</span>精彩。</h1><p>遇见红枫，问问小栖。好风景，轻松玩。</p><div class="hero-location"><svg class="icon"><use href="#i-pin"></use></svg>南京 · 栖霞山</div></div><div aria-hidden="true" class="hero-sticker"><span>QIXIA</span><strong>把秋天<br/>装进旅程</strong><svg><use href="#i-leaf"></use></svg></div><div class="hero-caption">红枫主题艺术图 · 非景区实拍</div></div>
+</section><div class="ui-container" id="uiContent"><section aria-label="常用功能" class="function-guide">
+<button class="guide-item press" data-view="chat"><span class="guide-icon blue"><svg class="icon"><use href="#i-ai"></use></svg></span><strong>AI问答</strong></button>
+<button class="guide-item press" data-view="map"><span class="guide-icon mint"><svg class="icon"><use href="#i-map"></use></svg></span><strong>地图导览</strong></button>
+<button class="guide-item press" data-shortcut="places" data-view="map"><span class="guide-icon peach"><svg class="icon"><use href="#i-gate"></use></svg></span><strong>景点讲解</strong></button>
+<button class="guide-item press" data-weather=""><span class="guide-icon yellow"><svg class="icon"><use href="#i-sun"></use></svg></span><strong>天气红叶</strong></button>
+<button class="guide-item press" data-view="poster"><span class="guide-icon purple"><svg class="icon"><use href="#i-album"></use></svg></span><strong>游记海报</strong></button>
+<button class="guide-item press" data-shortcut="facilities" data-view="map"><span class="guide-icon aqua"><svg class="icon"><use href="#i-wc"></use></svg></span><strong>厕所与大门</strong></button>
+</section><section class="ui-view" id="view-chat"><div class="ui-ai-grid"><section class="chat-panel"><div class="intro-content"><div class="welcome-top"><span class="availability"><svg class="icon"><use href="#i-ai"></use></svg>小栖 · AI旅行助手</span><div aria-hidden="true" class="bot"><i class="antenna"></i><div class="face"><b></b><b></b></div><span class="ear l"></span><span class="ear r"></span><span class="shine"></span></div></div><h2>Hi，我是小栖<br/>这趟，<span>想怎么玩？</span></h2><p class="welcome-note">问路线 · 听故事 · 留下旅途的好时光</p></div>
+<div hidden="" id="uiKeyMissing"><span>对话尚未配置，先设置模型即可提问。</span><button id="uiConfigureModel" type="button">设置模型</button></div>
+<div aria-label="与小栖的对话" class="messages" id="messages">
+<div class="note">行程和文字记忆保存在这台电脑。讲解资料仍待校对；演示路线与OSM真实道路分开，通行请核对园区信息。</div>
+</div>
+<form class="composer" id="chatForm"><label class="ui-sr" for="chatInput">你的问题</label>
+<input autocomplete="off" id="chatInput" placeholder="告诉小栖，你想怎样游栖霞山……"/>
+<button type="submit">发送</button>
+<button class="ghost" disabled="" id="cancelChatBtn" type="button">取消回答</button>
+</form>
+<div class="quick" id="quickRow">
+<button class="chip-btn" data-q="明天上午到，想看红叶，也看千佛岩，怎么安排？">行前规划</button>
+<button class="chip-btn" data-q="我现在看到的是什么？">这是什么</button>
+<button class="chip-btn" data-q="我有点累了，想看红叶，今天天气怎么样，怎么走最快？">累了怎么走</button>
+<details class="ui-other"><summary>更多问题</summary><button class="chip-btn" data-q="帮我记住这里">记住这里</button><button class="chip-btn" data-q="说重点">说重点</button></details></div>
+</section><aside aria-label="今日游览摘要" class="ui-today"><h2>你的山间小计划</h2><button class="ui-map-link" data-view="map">打开地图，规划这一程 →</button><div class="card">
+<div class="card-title">这一程</div>
+<div class="muted" id="tripMini">走到哪儿，这里就记到哪儿。</div>
+<div class="console-row">
+<button id="toPosterBtn">去写今天的日记 →</button>
+</div>
+</div><div class="card">
+<p id="uiWeatherBrief">天气与红叶加载中</p><div class="card-title">天气与红叶</div>
 
-  <main class="layout">
-    <section class="chat-panel">
-      <div id="messages" class="messages">
-        <div class="note">演示提示：右侧控制台可以「前进」或「跳点」，模拟在山上走。</div>
-        <div class="note">行程和文字记忆保存在这台电脑。讲解资料仍待校对；演示路线与OSM真实道路分开，通行请核对园区信息。</div>
-      </div>
-      <form id="chatForm" class="composer">
-        <input id="chatInput" autocomplete="off" placeholder="跟小栖说点什么，比如：我现在看到的是什么？">
-        <button type="submit">发送</button>
-        <button type="button" id="cancelChatBtn" class="ghost" disabled>取消回答</button>
-      </form>
-      <div class="quick" id="quickRow">
-        <button class="chip-btn" data-q="明天上午到，想看红叶，也看千佛岩，怎么安排？">行前规划</button>
-        <button class="chip-btn" data-q="我现在看到的是什么？">这是什么</button>
-        <button class="chip-btn" data-q="我有点累了，想看红叶，今天天气怎么样，怎么走最快？">累了怎么走</button>
-        <button class="chip-btn" data-q="帮我记住这里">记住这里</button>
-        <button class="chip-btn" data-q="说重点">说重点</button>
-      </div>
-    </section>
-
-    <aside class="side">
-      <div class="card">
-        <div class="card-title map-heading">栖霞山 · 真实地图 <span id="posInfo" class="muted"></span>
-          <select id="mapMode" aria-label="地图模式"><option value="real">OSM真实地图</option><option value="demo">演示草稿（非GPS）</option></select>
-        </div>
-        <div class="map-toolbar"><button id="mapConfigOpen" class="ghost">地图数据说明</button><button id="mapRetry" class="ghost">重试底图</button><button id="homeMap" class="ghost">回到景区</button><button id="fitRoute" class="ghost">路线全览</button></div>
-        <p id="mapLoadError" class="map-alert" role="alert" hidden></p>
-        <p id="mapModeNotice" class="map-alert" hidden>当前是演示草稿，不显示真实厕所和大门。<button id="returnRealMap">返回真实地图显示设施</button></p>
-        <div id="mapWorkspace" class="map-workspace">
-          <div id="realMapWrap" class="real-map-wrap"><div id="realMap" aria-label="OpenStreetMap交互地图"></div><div id="mapEmpty">本地地图数据加载中，无需地图Key。</div></div>
-          <section id="poiDetail" class="poi-detail" aria-label="选中地点详情" aria-live="polite" hidden></section>
-        </div>
-        <div id="mapBox" class="map-box" hidden></div>
-        <div id="mapRealTools">
-          <div class="map-toolbar"><label><input type="checkbox" id="showPois" checked>地标（含周边）</label><label><input type="checkbox" id="showToilets" checked>厕所</label><label><input type="checkbox" id="showGates" checked>大门</label><label><input type="checkbox" id="showRoute" checked>当前路线</label><label><input type="checkbox" id="showRoads" checked>本地路网</label></div>
-          <form id="mapSearchForm" class="map-search"><input id="mapSearchInput" maxlength="80" placeholder="搜索景点，如栖霞寺、千佛岩" aria-label="搜索景点"><button type="submit">搜索</button><button type="button" id="majorPois" class="ghost">主要景点</button></form>
-          <div id="mapResults" class="map-results"></div>
-          <p id="mapFollowStatus" class="muted" hidden>镜头跟随已暂停，可继续查看景点。<button id="resumeFollow" class="ghost">回到我的位置</button></p>
-          <div class="route-endpoints"><div>起点：<strong id="routeOrigin">未选起点</strong></div><div>终点：<strong id="routeDestination">未选终点</strong></div><div id="routeVia" class="muted">未设置途经点</div></div>
-          <div class="map-toolbar"><button id="pickOrigin" class="ghost">点地图选起点</button><button id="pickDestination" class="ghost">点地图选终点</button><button id="clearVia" class="ghost">清空途经</button><label><input type="checkbox" id="avoidSteps">避开已标注台阶</label><button id="planWalking">规划步行路线</button></div>
-          <div id="routeSummary" class="route-summary"></div>
-          <div class="map-toolbar"><button id="startLocation">开始定位导航</button><button id="stopLocation" class="ghost">停止定位</button><button id="useDeviceOrigin" class="ghost">以本次位置为起点</button></div>
-          <p id="locationStatus">定位未开启 · 手动起点仅用于路线预览</p><p id="navigationStatus" role="status"></p>
-          <div class="map-toolbar"><button id="annotationsOpen" class="ghost">大门与厕所校对</button><a class="ghost" href="/api/map/annotations/export" download>导出设施位置备份</a><button id="facilitiesOpen" class="ghost">导入已有核实厕所</button></div>
-          <section id="annotationEditor" class="annotation-editor" aria-label="设施位置校对" hidden>
-            <h3>大门与厕所位置校对</h3><p>选择设施后点“开始地图点选”，在地图上点位置，预览后确认保存。点选不代表现场测量或道路通行核实。</p>
-            <label for="annotationSelect">设施位置</label><select id="annotationSelect"></select>
-            <p id="annotationPreview" role="status"></p>
-            <div class="map-toolbar"><button id="annotationPick">开始地图点选</button><button id="annotationSave" disabled>确认保存位置</button><button id="annotationReset" class="ghost">恢复此点默认位置</button><button id="annotationCancel" class="ghost">取消校对</button></div>
-          </section>
-        </div><p id="mapMessage" class="map-message" role="status"></p>
-      </div>
-      <div class="card">
-        <div class="card-title">天气与红叶</div>
-        <div id="conditions" class="cond">加载中…</div>
-      </div>
-      <div class="card">
-        <div class="card-title">演示控制台</div>
-        <div class="console-row">
-          <button id="scriptBtn">▶ 走一遍剧本（3 分钟）</button>
-        </div>
-        <div id="scriptHint" class="muted script-hint" hidden></div>
-        <div class="console-row">
-          <button data-act="advance" data-val="50">前进 50m</button>
-          <button data-act="advance" data-val="200">前进 200m</button>
-        </div>
-        <div class="console-row">
-          <select id="poiSelect"></select>
-          <button id="gotoBtn">跳到这里</button>
-        </div>
-        <div class="console-row">
-          <button id="resetBtn" class="ghost">开始新行程</button>
-          <span id="stateInfo" class="muted"></span>
-        </div>
-      </div>
-      <div class="card arrived" id="arrivedCard" style="display:none">
-        <div class="card-title"><span id="arrivedName">到点播报</span>
-          <span class="muted" id="arrivedPoi"> </span></div>
-        <div id="arrivedText"></div>
-        <div class="arrived-actions">
-          <button id="playAgainBtn" class="ghost sm">再念一遍</button>
-          <button id="stopVoiceBtn" class="ghost sm">别念了</button>
-          <button id="askMoreBtn" class="ghost sm">讲讲这里</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title">这一程</div>
-        <div id="tripMini" class="muted">走到哪儿，这里就记到哪儿。</div>
-        <div class="console-row">
-          <button id="toPosterBtn">去写今天的日记 →</button>
-        </div>
-      </div>
-    </aside>
-  </main>
-
-  <dialog id="placePhotoDialog" class="place-photo-dialog" aria-label="景点照片大图">
-    <button id="placePhotoClose" class="ghost">关闭大图</button><img id="placePhotoFull" alt="">
-  </dialog>
-  <div id="keyModal" class="modal" style="display:none">
-    <div class="modal-box">
-      <h3>DeepSeek API Key</h3>
-      <input id="keyInput" type="password" placeholder="sk-…（只存本机 config.json）">
-      <div class="modal-actions">
-        <button id="keySave">保存并测试</button>
-        <button id="keyClose" class="ghost">关闭</button>
-      </div>
-      <div id="keyMsg" class="muted"></div>
-    </div>
-  </div>
-
-  <div id="mapConfigModal" class="modal map-modal" hidden><div class="modal-box">
-    <h3>Leaflet＋OpenStreetMap · 无需地图Key</h3><div id="mapDataInfo"></div>
-    <p>在线底图按当前视野请求，遵守缓存和署名要求；不下载离线瓦片。断网仍显示本地道路、地标并可算路。公共瓦片服务无可用性保证。</p>
-    <p>本地路网由OSM公开数据生成，未完成现场开放/入口核实。本次12处厕所由2026-10-19用户紫色标注的真实OSM截图配准，位置近似，未经现场测量；不使用以前导览图补点补路。两处大门按用户黄色标记定位。</p>
-    <p><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OSM署名与许可</a> · <a href="/api/map/osm/database" download>本地数据（ODbL）</a> · <a href="/api/map/osm/source" download>原始OSM导出</a> · <a href="/vendor/leaflet/LICENSE" target="_blank">Leaflet许可</a></p>
-    <div class="modal-actions"><button id="mapConfigClose" class="ghost">关闭</button></div>
-  </div></div>
-  <div id="facilitiesModal" class="modal map-modal" hidden><div class="modal-box"><h3>导入厕所点位</h3>
-    <p>仅导入你有权使用并已核实的 WGS84 数据。高德GCJ-02坐标不能直接导入，不依据照片像素猜坐标。未知无障碍/开放信息可填 null。<a href="/data/toilets-template.json" target="_blank">空模板</a></p>
-    <p class="muted">每项必填 id、name、lat、lng、coordinate_system（WGS84）、source、verified_at；可选 opening_hours、accessible、notes。</p>
-    <textarea id="facilitiesInput" rows="8" aria-label="厕所JSON点位数组">[]</textarea><pre id="facilitiesPreviewText"></pre>
-    <div class="modal-actions"><button id="facilitiesPreview">校验并预览</button><button id="facilitiesSave" disabled>确认导入</button><button id="facilitiesClose" class="ghost">关闭</button></div>
-  </div></div>
-  <script src="/js/session.js?v=__WEB_REVISION__"></script>
-  <script src="/vendor/leaflet/leaflet.js"></script>
-  <script src="/js/map-osm.js?v=__WEB_REVISION__"></script>
-  <script src="/js/app.js?v=__WEB_REVISION__"></script>
-  <script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
+<details id="uiWeatherDetails"><summary>天气、红叶与资料来源</summary><div class="cond" id="conditions">加载中…</div></details></div><div class="card arrived" id="arrivedCard" style="display:none">
+<div class="card-title"><span id="arrivedName">到点播报</span>
+<span class="muted" id="arrivedPoi"> </span></div>
+<div id="arrivedText"></div>
+<div class="arrived-actions">
+<button class="ghost sm" id="playAgainBtn">再念一遍</button>
+<button class="ghost sm" id="stopVoiceBtn">别念了</button>
+<button class="ghost sm" id="askMoreBtn">讲讲这里</button>
+</div>
+</div><span class="muted" id="stateInfo"></span><div class="ui-story"><button data-story=""><img alt="栖霞寺山门历史实景照片" src="/assets/places/qixiasi-gate.jpg"/><span>来听听，山里的故事 →</span></button><details><summary>资料来源</summary><p>Farm，2005，<a href="https://commons.wikimedia.org/wiki/File:Gate_of_Qixia_Temple_nanjing.jpg" rel="noopener" target="_blank">Wikimedia Commons</a>，<a href="https://creativecommons.org/licenses/by-sa/3.0/" rel="noopener" target="_blank">CC BY-SA 3.0</a>。</p></details></div></aside></div></section><section class="ui-view" hidden="" id="view-map"><div class="ui-map-card"><aside class="ui-planner"><h2>规划你的山间路</h2><div class="route-endpoints"><div>起点：<strong id="routeOrigin">未选起点</strong></div><div>终点：<strong id="routeDestination">未选终点</strong></div><div class="muted" id="routeVia">未设置途经点</div></div><div class="map-toolbar"><button class="ghost" id="pickOrigin">点地图选起点</button><button class="ghost" id="pickDestination">点地图选终点</button><button class="ghost" id="clearVia">清空途经</button><label><input id="avoidSteps" type="checkbox"/>避开已标注台阶</label><button id="planWalking">规划步行路线</button></div><div class="route-summary" id="routeSummary"></div><div class="map-toolbar"><button id="startLocation">开始定位导航</button><button class="ghost" id="stopLocation">停止定位</button><button class="ghost" id="useDeviceOrigin">以本次位置为起点</button></div><p id="locationStatus">定位未开启 · 手动起点仅用于路线预览</p><p id="navigationStatus" role="status"></p><section aria-label="设施位置校对" class="annotation-editor" hidden="" id="annotationEditor">
+<h3>大门与厕所位置校对</h3><p>选择设施后点“开始地图点选”，在地图上点位置，预览后确认保存。点选不代表现场测量或道路通行核实。</p>
+<label for="annotationSelect">设施位置</label><select id="annotationSelect"></select>
+<p id="annotationPreview" role="status"></p>
+<div class="map-toolbar"><button id="annotationPick">开始地图点选</button><button disabled="" id="annotationSave">确认保存位置</button><button class="ghost" id="annotationReset">恢复此点默认位置</button><button class="ghost" id="annotationCancel">取消校对</button></div>
+</section></aside><div class="ui-map-main">
+<div class="card-title map-heading">栖霞山 · 真实地图 <span class="muted" id="posInfo"></span>
+</div>
+<form class="map-search" id="mapSearchForm"><input aria-label="搜索景点" id="mapSearchInput" maxlength="80" placeholder="搜索景点，如栖霞寺、千佛岩"/><button type="submit">搜索</button><button class="ghost" id="majorPois" type="button">主要景点</button></form><div class="map-toolbar"><button class="ghost" id="mapRetry">重试底图</button><button class="ghost" id="homeMap">回到景区</button><button class="ghost" id="fitRoute">路线全览</button><details class="ui-layers"><summary>图层</summary><div class="map-toolbar"><label><input checked="" id="showPois" type="checkbox"/>地标（含周边）</label><label><input checked="" id="showToilets" type="checkbox"/>厕所</label><label><input checked="" id="showGates" type="checkbox"/>大门</label><label><input checked="" id="showRoute" type="checkbox"/>当前路线</label><label><input checked="" id="showRoads" type="checkbox"/>本地路网</label></div></details></div><div class="map-results" id="mapResults"></div>
+<p class="map-alert" hidden="" id="mapLoadError" role="alert"></p>
+<p class="map-alert" hidden="" id="mapModeNotice">当前是演示草稿，不显示真实厕所和大门。<button id="returnRealMap">返回真实地图显示设施</button></p>
+<div class="map-workspace" id="mapWorkspace">
+<div class="real-map-wrap" id="realMapWrap"><div aria-label="OpenStreetMap交互地图" id="realMap"></div><div id="mapEmpty">本地地图数据加载中，无需地图Key。</div></div>
+<section aria-label="选中地点详情" aria-live="polite" class="poi-detail" hidden="" id="poiDetail"></section>
+</div>
+<div class="map-box" hidden="" id="mapBox"></div>
+<div id="mapRealTools">
+<p class="muted" hidden="" id="mapFollowStatus">镜头跟随已暂停，可继续查看景点。<button class="ghost" id="resumeFollow">回到我的位置</button></p>
+</div><p class="map-message" id="mapMessage" role="status"></p>
+</div></div></section><section class="ui-view" hidden="" id="view-poster"><h1>把今天，留在山色里。</h1><iframe id="posterFrame" title="游记海报工作台"></iframe></section></div><section class="ui-container ui-tools-panel" hidden="" id="uiDemo"><h2>演示工具</h2><button data-close-tools="">收起工具</button><select aria-label="地图模式" id="mapMode"><option value="real">OSM真实地图</option><option value="demo">演示草稿（非GPS）</option></select><div class="card">
+<div class="card-title">演示控制台</div>
+<div class="console-row">
+<button id="scriptBtn">▶ 走一遍剧本（3 分钟）</button>
+</div>
+<div class="muted script-hint" hidden="" id="scriptHint"></div>
+<div class="console-row">
+<button data-act="advance" data-val="50">前进 50m</button>
+<button data-act="advance" data-val="200">前进 200m</button>
+</div>
+<div class="console-row">
+<select id="poiSelect"></select>
+<button id="gotoBtn">跳到这里</button>
+</div>
+<div class="console-row">
+</div>
+</div></section><section class="ui-container ui-tools-panel" hidden="" id="uiFacilities"><h2>设施数据工具</h2><button data-close-tools="">收起工具</button><div class="map-toolbar"><button class="ghost" id="annotationsOpen">大门与厕所校对</button><a class="ghost" download="" href="/api/map/annotations/export">导出设施位置备份</a><button class="ghost" id="facilitiesOpen">导入已有核实厕所</button></div></section><div class="ui-container ui-taskbar" hidden="" id="uiTasks"><span id="uiTaskStatus"></span><button hidden="" id="uiCancel">取消回答</button><button hidden="" id="uiStopLocation">停止定位</button><button hidden="" id="uiStopVoice">停止朗读</button><button data-view="poster" hidden="" id="uiPosterTask">返回海报任务</button></div></main>
+<dialog aria-label="景点照片大图" class="place-photo-dialog" id="placePhotoDialog">
+<button class="ghost" id="placePhotoClose">关闭大图</button><img alt="" id="placePhotoFull"/>
+</dialog>
+<div class="modal" id="keyModal" style="display:none">
+<div class="modal-box">
+<h3>DeepSeek API Key</h3>
+<input id="keyInput" placeholder="sk-…（只存本机 config.json）" type="password"/>
+<div class="modal-actions">
+<button id="keySave">保存并测试</button>
+<button class="ghost" id="keyClose">关闭</button>
+</div>
+<div class="muted" id="keyMsg"></div>
+</div>
+</div>
+<div class="modal map-modal" hidden="" id="mapConfigModal"><div class="modal-box">
+<h3>Leaflet＋OpenStreetMap · 无需地图Key</h3><div id="mapDataInfo"></div>
+<p>在线底图按当前视野请求，遵守缓存和署名要求；不下载离线瓦片。断网仍显示本地道路、地标并可算路。公共瓦片服务无可用性保证。</p>
+<p>本地路网由OSM公开数据生成，未完成现场开放/入口核实。本次12处厕所由2026-10-19用户紫色标注的真实OSM截图配准，位置近似，未经现场测量；不使用以前导览图补点补路。两处大门按用户黄色标记定位。</p>
+<p><a href="https://www.openstreetmap.org/copyright" rel="noopener noreferrer" target="_blank">OSM署名与许可</a> · <a download="" href="/api/map/osm/database">本地数据（ODbL）</a> · <a download="" href="/api/map/osm/source">原始OSM导出</a> · <a href="/vendor/leaflet/LICENSE" target="_blank">Leaflet许可</a></p>
+<div class="modal-actions"><button class="ghost" id="mapConfigClose">关闭</button></div>
+</div></div>
+<div class="modal map-modal" hidden="" id="facilitiesModal"><div class="modal-box"><h3>导入厕所点位</h3>
+<p>仅导入你有权使用并已核实的 WGS84 数据。高德GCJ-02坐标不能直接导入，不依据照片像素猜坐标。未知无障碍/开放信息可填 null。<a href="/data/toilets-template.json" target="_blank">空模板</a></p>
+<p class="muted">每项必填 id、name、lat、lng、coordinate_system（WGS84）、source、verified_at；可选 opening_hours、accessible、notes。</p>
+<textarea aria-label="厕所JSON点位数组" id="facilitiesInput" rows="8">[]</textarea><pre id="facilitiesPreviewText"></pre>
+<div class="modal-actions"><button id="facilitiesPreview">校验并预览</button><button disabled="" id="facilitiesSave">确认导入</button><button class="ghost" id="facilitiesClose">关闭</button></div>
+</div></div>
+<script src="/js/session.js?v=__WEB_REVISION__"></script>
+<script src="/vendor/leaflet/leaflet.js"></script>
+<script src="/js/map-osm.js?v=__WEB_REVISION__"></script>
+<script src="/js/ui-shell.js?v=__WEB_REVISION__"></script><script src="/js/app.js?v=__WEB_REVISION__"></script>
+<script>document.querySelector("#exitApp").onclick = () => Qixi.exit().catch(e => alert(e.message));</script>
 </body>
 </html>
-

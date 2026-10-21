@@ -12,6 +12,27 @@ window.QixiMap = (() => {
   const annotationMarkers=new Map();
   const placeByOsm=new Map(),contentCache=new Map(),markers=new Map();
   const reducedMotion=()=>window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let photoAnimation=null;
+  function openPhoto(photo,event){
+    const dialog=$('#placePhotoDialog'),img=$('#placePhotoFull');
+    photoAnimation?.cancel();img.src=photo.src;img.alt=photo.title;dialog.showModal();
+    if(event?.detail && !reducedMotion() && dialog.animate) photoAnimation=dialog.animate([{opacity:0,transform:'scale(.97)'},{opacity:1,transform:'scale(1)'}],{duration:200,easing:'cubic-bezier(.23,1,.32,1)'});
+  }
+  function closePhoto(event){
+    const dialog=$('#placePhotoDialog');
+    if(!dialog.open)return;
+    if(!event?.detail || reducedMotion() || !dialog.animate){photoAnimation?.cancel();dialog.close();return;}
+    const current=getComputedStyle(dialog),start={opacity:current.opacity,transform:current.transform};
+    photoAnimation?.cancel();
+    const animation=photoAnimation=dialog.animate([start,{opacity:0,transform:'scale(.97)'}],{duration:160,easing:'cubic-bezier(.23,1,.32,1)'});
+    animation.onfinish=()=>{if(photoAnimation===animation){dialog.close();animation.cancel();}};
+  }
+  let shownAtSize=false;
+  function resize(){
+    if(!map || !$('#realMap').clientWidth) return;
+    map.invalidateSize({pan:false,animate:false});
+    if(!shownAtSize){shownAtSize=true;overview();}
+  }
   function highlight(){
     new Map([...markers,...annotationMarkers]).forEach((m,id)=>m.getElement()?.classList.toggle('selected-place',id===selectedRaw?.id));
     document.querySelectorAll('#mapResults button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.osmId===selectedRaw?.id)));
@@ -34,7 +55,7 @@ window.QixiMap = (() => {
     const title=document.createElement('h3');title.textContent=p.name;box.append(title);
     if(item){
       if(item.photo){
-        const photo=item.photo,open=button('',()=>{const img=$('#placePhotoFull');img.src=photo.src;img.alt=photo.title;$('#placePhotoDialog').showModal();},'place-photo-button');
+        const photo=item.photo,open=button('',event=>openPhoto(photo,event),'place-photo-button');
         open.setAttribute('aria-label','放大'+photo.title);const img=document.createElement('img');img.src=photo.src;img.alt=photo.title;img.decoding='async';
         img.onerror=()=>{open.replaceChildren(paragraph('照片加载失败，可继续阅读介绍'));open.disabled=true;};open.append(img);box.append(open);
       }else box.append(paragraph('照片待补充'));
@@ -246,7 +267,7 @@ window.QixiMap = (() => {
       if(key){(route.annotation_targets||[]).filter(p=>p.role==="destination").forEach(p=>L.marker(p.road_endpoint,{title:"路网终点：设施入口待确认",icon:icon("路终","map-road-end-symbol")}).addTo(roadEndGroup));routeLine=L.polyline(route.geometry,{color:"#ae3d2c",weight:6,opacity:.95}).addTo(map);fit=true;}
     }
     layerToggle(roadEndGroup,$("#showRoute").checked);
-    if(routeLine){$("#showRoute").checked?routeLine.addTo(map):map.removeLayer(routeLine);if(fit&&(!selectedRaw||explicitFit))map.fitBounds(routeLine.getBounds(),{padding:[45,45],maxZoom:17});}
+    if(routeLine){$("#showRoute").checked?routeLine.addTo(map):map.removeLayer(routeLine);if(fit&&(!selectedRaw||explicitFit))map.fitBounds(routeLine.getBounds(),{padding:[45,45],maxZoom:17,animate:!reducedMotion()});}
     const box=$("#routeSummary");box.replaceChildren();
     if(!key){box.textContent=route?.error?.message||"本地步行算路已就绪，选择起终点即可使用，无需地图Key。";return;}
     const h=document.createElement("strong");h.textContent=`至 ${route.name} · ${(route.total_m/1000).toFixed(2)} 公里 · 估计 ${route.duration_min} 分钟`;box.append(h);
@@ -295,7 +316,7 @@ window.QixiMap = (() => {
         if(epoch!==locationEpoch||generation!==Qixi.generation)continue;
         if(result.accepted){lastSample=sample_at;if(deviceMarker)map.removeLayer(deviceMarker);if(accuracyCircle)map.removeLayer(accuracyCircle);
           deviceMarker=L.circleMarker(coord,{radius:7,color:"#fff",weight:2,fillColor:"#246eaf",fillOpacity:1}).addTo(map);
-          accuracyCircle=L.circle(coord,{radius:p.coords.accuracy,color:"#448ac0",fillOpacity:.12,weight:1}).addTo(map);if(follow&&inside(coord))map.panTo(coord);
+          accuracyCircle=L.circle(coord,{radius:p.coords.accuracy,color:"#448ac0",fillOpacity:.12,weight:1}).addTo(map);if(follow&&inside(coord))map.panTo(coord,{animate:!reducedMotion()});
         }
         $("#locationStatus").textContent=`设备定位 · 精度约 ${Math.round(p.coords.accuracy)} 米 · ${new Date(p.timestamp).toLocaleTimeString()} · ${result.eligible?"可做实时判断":result.reason||"等待稳定样本"}${inside(coord)?"":" · 位于路网范围外，请手动选起点"}`;
         await deps.refresh();
@@ -306,6 +327,7 @@ window.QixiMap = (() => {
     const change=async()=>{$("#mapMode").disabled=true;try{
       cancelEditor();closeDetails();action++;await stopLocation();await post("/api/map/mode",{mode:next,provider:"osm"});mode=next;
       $("#mapWorkspace").hidden=next!=="real";$("#realMapWrap").hidden=next!=="real";$("#mapBox").hidden=next!=="demo";$("#mapRealTools").hidden=next!=="real";
+      if($('#view-map')) $('#view-map').dataset.mapMode=next;
       if(next==="real"){map?.invalidateSize({pan:false,animate:false});requestAnimationFrame(()=>overview());}
       $("#mapModeNotice").hidden=next==="real";await deps.refresh();
     }finally{$("#mapMode").value=mode;$("#mapMode").disabled=false;}};
@@ -330,8 +352,9 @@ window.QixiMap = (() => {
     deps=options;
     bindEditor();
     $('#returnRealMap').onclick=run(async()=>{await setMode('real');$('#showToilets').checked=true;$('#showGates').checked=true;drawAnnotations();overview();});
-    $('#placePhotoClose').onclick=()=>$('#placePhotoDialog').close();
-    $('#placePhotoDialog').addEventListener('close',()=>{$('#placePhotoFull').removeAttribute('src');});
+    $('#placePhotoClose').onclick=closePhoto;
+    $('#placePhotoDialog').addEventListener('cancel',()=>photoAnimation?.cancel());
+    $('#placePhotoDialog').addEventListener('close',()=>{photoAnimation?.cancel();$('#placePhotoFull').removeAttribute('src');});
     $('#resumeFollow').onclick=()=>{if(watch===null||!deviceMarker)return message('请先取得设备位置');const loc=lastState?.location;if(!loc||!inside([loc.lat,loc.lng]))return message('当前设备位置不在本地范围');follow=true;syncFollow();map.panTo(deviceMarker.getLatLng(),{animate:!reducedMotion()});};
     new ResizeObserver(entries=>{const box=$('#mapWorkspace');box.classList.toggle('stacked',entries[0].contentRect.width<720);if(map&&mode==="real"&&entries[0].contentRect.width>0)map.invalidateSize({pan:false,animate:false});}).observe($('#mapWorkspace'));
 
@@ -344,7 +367,7 @@ window.QixiMap = (() => {
     $("#clearVia").onclick=()=>{via=[];action++;invalidateSelection();refreshEndpoints();};$("#avoidSteps").onchange=()=>{action++;invalidateSelection();};
     $("#planWalking").onclick=run(plan);$("#startLocation").onclick=run(startLocation);$("#stopLocation").onclick=run(stopLocation);
     $("#useDeviceOrigin").onclick=()=>{const loc=lastState?.location;if(loc?.source!=="device"||!lastState.navigation?.eligible||!inside([loc.lat,loc.lng]))return message("需要景区范围内、新鲜且精度合格的设备位置，否则请手动选起点");assign("origin",{name:"本次设备位置",coord:[loc.lat,loc.lng]});};
-    $("#fitRoute").onclick=()=>{if(routeLine)map.fitBounds(routeLine.getBounds(),{padding:[45,45],maxZoom:17});};$("#homeMap").onclick=()=>{if(map)overview();};
+    $("#fitRoute").onclick=()=>{if(routeLine)map.fitBounds(routeLine.getBounds(),{padding:[45,45],maxZoom:17,animate:!reducedMotion()});};$("#homeMap").onclick=()=>{if(map)overview();};
     $("#showPois").onchange=()=>layerToggle(poiGroup,$("#showPois").checked);$("#showRoads").onchange=()=>layerToggle(roadGroup,$("#showRoads").checked);$("#showRoute").onchange=()=>renderRoute(lastState?.route);
     $("#showGates").onchange=drawAnnotations;$("#showToilets").onchange=drawFacilities;
     $("#facilitiesOpen").onclick=()=>{$("#facilitiesModal").hidden=false;};$("#facilitiesClose").onclick=()=>{$("#facilitiesModal").hidden=true;};
@@ -353,8 +376,8 @@ window.QixiMap = (() => {
     $("#facilitiesSave").onclick=run(async()=>{const body=JSON.parse($("#facilitiesSave").dataset.body);if(!confirm(`确认用${body.items.length}个点位替换用户厕所数据？坐标必须是WGS84。`))return;await request("/api/map/facilities/import",body);facilityData=(await request("/api/map/facilities")).items;drawFacilities();$("#facilitiesModal").hidden=true;});
     document.addEventListener("visibilitychange",()=>{if(document.hidden)stopLocation();});
     window.addEventListener("pagehide",()=>{if(token)navigator.sendBeacon("/api/map/stop",new Blob([JSON.stringify({...session(),token})],{type:"application/json"}));});
-    try{await post("/api/map/mode",{mode:"real",provider:"osm"});}catch(e){message("会话暂不可用，仍可查看地图："+e.message);}await initMap();
+    try{await post("/api/map/mode",{mode:"real",provider:"osm"});}catch(e){message("会话暂不可用，仍可查看地图："+e.message);}await initMap();resize();
   }
-  function inspect(){return {mode,initialized:!!map,showToilets:$('#showToilets').checked,showGates:$('#showGates').checked,markers:[...annotationMarkers].map(([id,m])=>({id,coord:[m.getLatLng().lat,m.getLatLng().lng],onMap:map.hasLayer(m),inBounds:map.getBounds().contains(m.getLatLng())}))};}
-  return {init,update,setMode,reset,stop:stopLocation,inspect,get mode(){return mode;}};
+  function inspect(){return {mode,locating:watch!==null,initialized:!!map,showToilets:$('#showToilets').checked,showGates:$('#showGates').checked,markers:[...annotationMarkers].map(([id,m])=>({id,coord:[m.getLatLng().lat,m.getLatLng().lng],onMap:map.hasLayer(m),inBounds:map.getBounds().contains(m.getLatLng())}))};}
+  return {init,update,setMode,reset,stop:stopLocation,inspect,resize,get mode(){return mode;}};
 })();

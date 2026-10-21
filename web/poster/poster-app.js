@@ -5,6 +5,41 @@
 (function () {
   const $ = (s) => document.querySelector(s);
   const SID = Qixi.sid;
+  const embedded = window.parent !== window && new URLSearchParams(location.search).get('embedded') === '1';
+  let hostActive = !embedded, hostReady = false, hostGeneration = null, hostVisits = null;
+  let hostEpoch = localStorage.getItem('qixi_epoch') || '';
+  let resolveHost;
+  const hostState = new Promise(resolve => { resolveHost = resolve; });
+  const tellHost = (type, data = {}) => { if(embedded) parent.postMessage({channel:'qixi-ui-v1',type,sid:SID,...data},location.origin); };
+  if (embedded) document.body.classList.add('embedded');
+  function applyEpoch(next) {
+    if(typeof next !== 'string' || next === hostEpoch) return;
+    hostEpoch = next; hostGeneration = null; albumEpoch++; detects.forEach(c=>c.abort()); invalidate();
+  }
+  window.addEventListener('message', e => {
+    if(!embedded || e.origin !== location.origin || e.source !== parent || e.data?.channel !== 'qixi-ui-v1' || e.data.sid !== SID) return;
+    const d=e.data;
+    if(d.type === 'active' && typeof d.active === 'boolean') {
+      hostActive=d.active; if(hostActive) requestAnimationFrame(fitStage);
+    } else if(d.type === 'epoch') applyEpoch(d.epoch);
+    else if(d.type === 'snapshot' && Number.isInteger(d.generation) && Array.isArray(d.visited)) {
+      const changed=hostReady && hostGeneration !== null && hostGeneration !== d.generation;
+      const epochChanged=d.epoch !== hostEpoch;
+      applyEpoch(d.epoch);
+      if(changed && !epochChanged) {albumEpoch++;detects.forEach(c=>c.abort());invalidate();}
+      hostGeneration=d.generation;Qixi.generation=d.generation;hostReady=true;
+      const visits=JSON.stringify(d.visited);
+      if(hostVisits!==null && hostVisits!==visits && state.trip) {
+        $('#hostTripNotice').hidden=false;
+        $('#hostTripNotice').textContent='游览记录已更新。需要使用最新记录时，请在日记工具中刷新文案后重新生成。';
+      }
+      hostVisits=visits;
+      if(!state.trip) {
+        $('#tripInfo').textContent=d.visited.length ? d.visited.map(v=>state.poiById[v.poi_id]?.name || v.poi_id).join(' · ') : '还没有游踪。先到地图走一段，再来生成日记。';
+      }
+      resolveHost(d);
+    } else if(d.type === 'unavailable') { $('#tripInfo').textContent='行程暂不可用，请返回问答检查服务后重试。'; }
+  });
   const esc = Qixi.escape;
   let revision = 0, albumEpoch = 0, rendering = 0;
   let tripPending = null;
@@ -38,6 +73,7 @@
     $("#pngBtn").disabled = true;
     $("#diaryBody").textContent = "输入已更新，请重新生成日记。";
     $("#candHint").textContent = "输入已更新，旧海报已失效。";
+    if($('#hostTripNotice')) $('#hostTripNotice').hidden=true;
   }
 
   function removePhoto(item) {
@@ -323,13 +359,15 @@
     box.innerHTML = "";
     for (const line of lines) {
       const d = document.createElement("div");
-      d.className = "replay-line";
+      d.className = "replay-line replaying";
       box.appendChild(d);
+      if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {d.textContent=line;d.classList.remove("replaying");continue;}
       for (const ch of line) {
         if (myRun !== replayRun) return;
         d.textContent += ch;
         await new Promise((r) => setTimeout(r, 46));
       }
+      d.classList.remove("replaying");
       await new Promise((r) => setTimeout(r, 320));
     }
   }
@@ -659,9 +697,10 @@
     $("#pngBtn").disabled = true;
     $("#pngBtn").addEventListener("click", exportPNG);
     $("#copyDiary").addEventListener("click", async () => { try { await navigator.clipboard.writeText((state.trip?.diary?.paragraphs || []).join("\n\n")); $("#copyDiary").textContent="已复制"; } catch(e) { $("#copyDiary").textContent="请选中正文复制"; } });
-    window.addEventListener("storage", (e) => { if (e.key === "qixi_epoch") { albumEpoch++; detects.forEach(c=>c.abort()); invalidate(); } });
+    window.addEventListener("storage", (e) => { if (e.key === "qixi_epoch") applyEpoch(e.newValue || ""); });
     window.addEventListener("resize", fitStage);
     document.addEventListener("keydown", (e) => {
+      if(!hostActive || /INPUT|TEXTAREA|SELECT/.test(e.target.tagName) || e.target.isContentEditable) return;
       if (e.key === "1" || e.key === "2" || e.key === "3") showCandidate(Number(e.key) - 1).catch(e => $("#candHint").textContent=e.message);
     });
   }
@@ -676,7 +715,13 @@
     if (S && S.preloadMotifs) S.preloadMotifs();
     bind();
     fitStage();
-    const st = await api(`/api/state?session_id=${SID}`);
+    if(embedded) {
+      document.querySelector('.topnav a').onclick=e=>{e.preventDefault();tellHost('back');};
+      tellHost('ready');
+      const retry=setInterval(()=>{if(!hostReady)tellHost('request-state');else clearInterval(retry);},5000);
+      new MutationObserver(()=>tellHost('busy',{busy:!!tripPending || $('#genBtn').disabled || detects.size>0})).observe(document.querySelector('.poster-layout'),{subtree:true,attributes:true,childList:true});
+    }
+    const st = embedded ? await hostState : await api(`/api/state?session_id=${SID}`);
     Qixi.generation = st.generation;
     state.trip = {visited:st.visited.map(v=>({poi_id:v.poi_id,name:state.poiById[v.poi_id]?.name || v.poi_id}))};
     renderTrip();

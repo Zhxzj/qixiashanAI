@@ -35,7 +35,7 @@ async function api(path, opts) {
 // ---------- 初始化 ----------
 
 async function init() {
-  refreshConditions().catch(() => { $("#conditions").textContent = "天气暂不可用"; });
+  refreshConditions().catch(() => { $("#conditions").textContent = "天气暂不可用";window.QixiUI?.conditionsError(); });
   const core=api('/api/data').then(d=>{DATA=d;fillPoiSelect();return refreshState();});
   const health=api('/api/health').then(h=>setKeyStatus(!!h.key_configured));
   const status=await Promise.allSettled([core,health]);
@@ -51,6 +51,7 @@ async function init() {
 }
 
 function setKeyStatus(ok) {
+  window.QixiUI?.keyStatus(ok);
   const el = $("#keyStatus");
   el.textContent = ok ? "Key 已保存（可测试连接）" : "对话尚未配置";
   el.classList.toggle("ok", ok);
@@ -72,6 +73,7 @@ async function refreshState() {
   renderMap(st);
   renderStateInfo(st);
   renderTripMini(st);
+  window.QixiUI?.snapshot(st);
   return st;
 }
 
@@ -170,6 +172,7 @@ function addNote(text) {
 
 async function sendChat(text) {
   if (!text.trim()) return;
+  window.QixiUI?.conversation();
   addMsg("user", text);
   const bubble = addMsg("ai", "");
   let note = null;
@@ -393,7 +396,7 @@ async function runScript() {
   const b = document.createElement("button");
   b.className = "chip-btn";
   b.textContent = "打开发日记 →";
-  b.onclick = () => (location.href = "/poster.html");
+  b.onclick = () => (window.QixiUI ? QixiUI.show("poster") : location.href = "/poster.html");
   hint.appendChild(b);
   btn.textContent = "▶ 走一遍剧本（3 分钟）";
   state.scriptRunning = false;
@@ -408,6 +411,7 @@ async function refreshConditions() {
   const today = w.today || {};
   const red = c.red_leaf || {};
   if (red.kind === "estimated") red.text = (red.text || "") + " · 算法估计";
+  window.QixiUI?.conditions(c);
   $("#conditions").innerHTML = `
     <div class="cond-line"><b>${now.text || ""}</b> ${now.temp_c ?? "-"}°C
       <span class="muted">${now.wind || ""}</span></div>
@@ -466,6 +470,7 @@ function bindEvents() {
     try { r = await demoCall("/api/demo/reset", { session_id: SID }); }
     catch(e) { addNote("新行程创建失败："+e.message); return; }
     localStorage.setItem("qixi_epoch", crypto.randomUUID());
+    window.QixiUI?.resetEpoch();
     seenArrivals.clear();
     state.visits = {};
     state.voiceOn = true;
@@ -493,7 +498,7 @@ function bindEvents() {
     const name = (state.speaking && state.speaking.name) || "这里";
     sendChat(`讲讲${name}`);
   });
-  $("#toPosterBtn").addEventListener("click", () => (location.href = "/poster.html"));
+  $("#toPosterBtn").addEventListener("click", () => (window.QixiUI ? QixiUI.show("poster") : location.href = "/poster.html"));
 
   $("#keyBtn").addEventListener("click", () => {
     $("#keyModal").style.display = "flex";
@@ -515,9 +520,12 @@ function bindEvents() {
     const t = await api("/api/config/test", { method: "POST" });
     $("#keyMsg").textContent = t.ok ? "连接正常 ✓" : `连接失败：${t.message}`;
     $("#keyStatus").textContent = t.ok ? "模型已连通" : "Key 已保存，连接未通过";
+    window.QixiUI?.keyStatus(true);
     } catch (e) { $("#keyMsg").textContent = e.message; }
   });
 }
 
 init().catch((e) => addNote("启动数据加载失败：" + e.message));
 bindEvents();
+
+window.QixiAppUI = {refresh:refreshState, tasks:()=>({chat:chats.size,voice:!!(state.voiceOn && ((state.speaking?.el && !state.speaking.el.paused) || window.speechSynthesis?.speaking))})};

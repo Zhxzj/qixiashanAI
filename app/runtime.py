@@ -11,7 +11,7 @@ USER_DIR = Path(os.environ.get("QIXI_USER_DIR") or str(Path(os.environ.get("LOCA
 APP_ID = "qixi-guide"
 API_VERSION = 2
 _manifest = RESOURCE_DIR / "manifest.json"
-BUILD_ID = os.environ.get("QIXI_BUILD_ID") or (json.loads(_manifest.read_text(encoding="utf-8"))["build_id"] if _manifest.exists() else "source-v8-approved-map")
+BUILD_ID = os.environ.get("QIXI_BUILD_ID") or (json.loads(_manifest.read_text(encoding="utf-8"))["build_id"] if _manifest.exists() else "source-v9-ui-v4")
 def resource_path(rel):
     return RESOURCE_DIR / rel
 def user_path(rel):
